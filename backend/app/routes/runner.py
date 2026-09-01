@@ -7,6 +7,7 @@ Receives Python source code and returns structured execution results.
 
 from flask import Blueprint, request, jsonify
 from app.services.runner import get_runner
+from app.services.diagnostics import diagnose_error
 
 runner_bp = Blueprint("runner", __name__)
 
@@ -14,7 +15,7 @@ runner_bp = Blueprint("runner", __name__)
 @runner_bp.route("/run", methods=["POST"])
 def run_code():
     """
-    Execute user-submitted Python code and return structured results.
+    Execute user-submitted Python code and return structured results with diagnostics.
 
     Expected JSON body:
       {
@@ -22,7 +23,7 @@ def run_code():
         "stdin": ""  (optional)
       }
 
-    Returns structured ExecutionResult as JSON (HTTP 200).
+    Returns structured ExecutionResult + CodeDiagnostic as JSON (HTTP 200).
     """
     if not request.is_json:
         return jsonify({
@@ -59,5 +60,20 @@ def run_code():
 
     runner = get_runner()
     result = runner.run(code=code, stdin=stdin)
+    response_data = result.to_dict()
 
-    return jsonify(result.to_dict()), 200
+    # Generate diagnostic if execution failed or timed out (Phase A4)
+    if result.status != "success":
+        diagnostic = diagnose_error(
+            code=code,
+            error_type=result.error_type,
+            error_message=result.error_message,
+            line_number=result.line_number,
+            stderr=result.stderr,
+            timed_out=result.timed_out
+        )
+        response_data["diagnostic"] = diagnostic.to_dict()
+    else:
+        response_data["diagnostic"] = None
+
+    return jsonify(response_data), 200

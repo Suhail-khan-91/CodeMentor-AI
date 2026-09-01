@@ -1,22 +1,23 @@
 /**
- * EditorPage.jsx — Coding workspace page (Phase A3)
+ * EditorPage.jsx — Coding workspace page (Phase A4)
  *
  * What this page does:
  *   - Renders the Monaco-based Python code editor.
  *   - Manages the code state (controlled).
  *   - Executes code via Code Runner Engine (POST /api/run).
+ *   - Renders educational Code Diagnostic cards (Phase A4).
  *   - Displays stdout, stderr, execution time, and process status.
  *   - Supports Ctrl+Enter / Cmd+Enter shortcut to run code.
  *   - Provides Reset Code and Clear Output capabilities.
  *
  * What this page deliberately does NOT do:
- *   - Diagnose errors into conversational guidance (Phase A4).
  *   - Evaluate task test cases / pass-fail scoring (Phase A5).
  *   - Call any AI (Phase A7+).
  */
 
 import { useState, useCallback, useEffect } from 'react';
 import CodeEditor, { DEFAULT_PYTHON_CODE } from '../components/CodeEditor';
+import DiagnosticCard from '../components/DiagnosticCard';
 import { runCode } from '../services/api';
 import './EditorPage.css';
 
@@ -25,6 +26,7 @@ export default function EditorPage() {
   const [isRunning, setIsRunning] = useState(false);
   const [result, setResult] = useState(null);
   const [apiError, setApiError] = useState(null);
+  const [showDiagnostic, setShowDiagnostic] = useState(true);
 
   const handleCodeChange = useCallback((newCode) => {
     setCode(newCode);
@@ -32,21 +34,26 @@ export default function EditorPage() {
 
   const handleClearCode = useCallback(() => {
     setCode(DEFAULT_PYTHON_CODE);
+    setResult(null);
+    setApiError(null);
+    setShowDiagnostic(true);
   }, []);
 
   const handleClearOutput = useCallback(() => {
     setResult(null);
     setApiError(null);
+    setShowDiagnostic(true);
   }, []);
 
   /**
-   * Execute code via the backend Code Runner API.
+   * Execute code via the backend Code Runner API and receive diagnostics.
    */
   const handleRun = useCallback(async () => {
     if (isRunning) return;
 
     setIsRunning(true);
     setApiError(null);
+    setShowDiagnostic(true);
 
     try {
       const executionResult = await runCode(code);
@@ -133,11 +140,11 @@ export default function EditorPage() {
       {/* Page header */}
       <div className="editor-page__header container">
         <div className="editor-page__title-group">
-          <h1 className="editor-page__title">Python Editor & Runner</h1>
-          <span className="editor-page__phase-tag">Phase A3 Live</span>
+          <h1 className="editor-page__title">Python Editor & Diagnostics</h1>
+          <span className="editor-page__phase-tag">Phase A4 Live</span>
         </div>
         <p className="editor-page__subtitle">
-          Write Python code, execute in an isolated process, and view real-time standard output and tracebacks.
+          Write Python code, execute in an isolated process, and receive instant beginner-friendly error diagnostics and hints.
         </p>
       </div>
 
@@ -190,11 +197,11 @@ export default function EditorPage() {
           />
         </section>
 
-        {/* Right — Output Terminal panel (Phase A3 Live) */}
-        <section className="output-panel" aria-label="Terminal output">
+        {/* Right — Output & Diagnostics panel (Phase A4 Live) */}
+        <section className="output-panel" aria-label="Terminal output and diagnostics">
           <div className="output-panel__header">
             <div className="output-panel__header-left">
-              <span className="output-panel__title">Terminal Output</span>
+              <span className="output-panel__title">Terminal & Diagnostics</span>
               {renderStatusBadge()}
             </div>
 
@@ -222,7 +229,7 @@ export default function EditorPage() {
             {isRunning && (
               <div className="output-state output-state--running">
                 <div className="output-pulse-loader" aria-hidden="true" />
-                <p className="output-state__text">Executing code in Python subprocess…</p>
+                <p className="output-state__text">Executing code and analyzing diagnostics…</p>
               </div>
             )}
 
@@ -230,7 +237,7 @@ export default function EditorPage() {
             {!isRunning && apiError && (
               <div className="output-state output-state--api-error">
                 <span className="output-state__icon" aria-hidden="true">⚠️</span>
-                <p className="output-state__error-title">Backend Execution Failed</p>
+                <p className="output-state__error-title">Backend Connection Failed</p>
                 <p className="output-state__error-msg">{apiError}</p>
                 <p className="output-state__error-hint">
                   Ensure the Flask backend is running on <code>http://localhost:5000</code>.
@@ -241,50 +248,45 @@ export default function EditorPage() {
             {/* 3. Idle state (no run yet) */}
             {!isRunning && !apiError && !result && (
               <div className="output-state output-state--idle">
-                <span className="output-state__icon" aria-hidden="true">⚡</span>
+                <span className="output-state__icon" aria-hidden="true">💡</span>
                 <p className="output-state__text">
                   Press <strong>Run Code</strong> or <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to execute your code.
                 </p>
                 <p className="output-state__subtext">
-                  Standard output (<code>stdout</code>), runtime errors, and execution metrics will appear here.
+                  Standard output (<code>stdout</code>), plain-English error diagnostics, and hints will appear here.
                 </p>
               </div>
             )}
 
-            {/* 4. Execution Result */}
+            {/* 4. Execution Result & Diagnostic Card */}
             {!isRunning && !apiError && result && (
               <div className="output-content">
-                {/* Error Summary Banner (if error occurred) */}
-                {result.details?.error_type && (
-                  <div className="output-error-banner">
-                    <span className="output-error-banner__tag">
-                      {result.details.error_type}
-                    </span>
-                    {result.details.line_number && (
-                      <span className="output-error-banner__line">
-                        Line {result.details.line_number}
-                      </span>
-                    )}
-                    {result.details.error_message && (
-                      <span className="output-error-banner__msg">
-                        {result.details.error_message}
-                      </span>
-                    )}
-                  </div>
+                {/* Phase A4: Educational Diagnostic Card */}
+                {showDiagnostic && result.diagnostic && result.diagnostic.has_diagnostic && (
+                  <DiagnosticCard
+                    diagnostic={result.diagnostic}
+                    onClose={() => setShowDiagnostic(false)}
+                  />
                 )}
 
                 {/* Standard Output stream */}
                 {result.stdout && (
-                  <pre className="output-stream output-stream--stdout">
-                    <code>{result.stdout}</code>
-                  </pre>
+                  <div className="output-stream-container">
+                    <span className="output-stream-label">Standard Output</span>
+                    <pre className="output-stream output-stream--stdout">
+                      <code>{result.stdout}</code>
+                    </pre>
+                  </div>
                 )}
 
                 {/* Standard Error / Traceback stream */}
                 {result.stderr && (
-                  <pre className="output-stream output-stream--stderr">
-                    <code>{result.stderr}</code>
-                  </pre>
+                  <div className="output-stream-container">
+                    <span className="output-stream-label output-stream-label--error">Raw Python Traceback</span>
+                    <pre className="output-stream output-stream--stderr">
+                      <code>{result.stderr}</code>
+                    </pre>
+                  </div>
                 )}
 
                 {/* Empty Output Note */}

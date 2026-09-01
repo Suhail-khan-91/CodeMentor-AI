@@ -1,0 +1,237 @@
+/* DiagnosticCard.css — Phase A4 */
+
+.diagnostic-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  animation: slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-bottom: var(--space-4);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Category Accent Borders */
+.diagnostic-card--syntax {
+  border-left: 4px solid #38bdf8;
+}
+
+.diagnostic-card--runtime {
+  border-left: 4px solid #fbbf24;
+}
+
+.diagnostic-card--indentation {
+  border-left: 4px solid #34d399;
+}
+
+.diagnostic-card--timeout {
+  border-left: 4px solid #f59e0b;
+}
+
+/* ── Header ── */
+.diagnostic-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface-2);
+  border-bottom: 1px solid var(--color-border);
+  gap: var(--space-2);
+}
+
+.diagnostic-card__header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.diagnostic-card__header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* ── Category Badges ── */
+.diagnostic-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.diagnostic-badge--syntax {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.diagnostic-badge--runtime {
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.12);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.diagnostic-badge--indentation {
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.diagnostic-badge--timeout {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.diagnostic-card__error-type {
+  font-size: 0.75rem;
+  font-family: 'Fira Code', 'Consolas', monospace;
+  color: var(--color-text-muted);
+  background: var(--color-bg);
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+}
+
+.diagnostic-card__line-pill {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  background: rgba(0, 212, 170, 0.1);
+  border: 1px solid rgba(0, 212, 170, 0.3);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.diagnostic-card__btn-close {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0 4px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.diagnostic-card__btn-close:hover {
+  color: var(--color-text);
+  background: var(--color-surface-2);
+}
+
+/* ── Body ── */
+.diagnostic-card__body {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.diagnostic-card__title {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.diagnostic-card__explanation {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── Snippet Callout ── */
+.diagnostic-card__snippet-wrapper {
+  background: #0d1117;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.diagnostic-card__snippet-header {
+  padding: 3px var(--space-3);
+  background: rgba(239, 68, 68, 0.08);
+  border-bottom: 1px solid rgba(239, 68, 68, 0.15);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #fca5a5;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.diagnostic-card__snippet {
+  margin: 0;
+  padding: var(--space-3);
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 0.85rem;
+  color: #ff7b72;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ── Actionable Hint Box ── */
+.diagnostic-card__hint {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  background: rgba(108, 99, 255, 0.08);
+  border: 1px solid rgba(108, 99, 255, 0.25);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+}
+
+.diagnostic-card__hint-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  line-height: 1.2;
+}
+
+.diagnostic-card__hint-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.diagnostic-card__hint-label {
+  font-size: 0.78rem;
+  color: var(--color-primary-hover);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+}
+
+.diagnostic-card__hint-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+.diagnostic-card__hint-text code {
+  color: var(--color-accent);
+  background: rgba(0, 212, 170, 0.1);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 0.8rem;
+}

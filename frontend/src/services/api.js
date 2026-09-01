@@ -65,7 +65,7 @@ export async function checkHealth() {
 }
 
 /**
- * Execute Python source code via the Code Runner Engine (Phase A3).
+ * Execute Python source code via the Code Runner Engine (Phase A3/A4).
  *
  * @param {string} code  - Python source code to execute
  * @param {string} [stdin=""] - Optional standard input string
@@ -81,9 +81,41 @@ export async function checkHealth() {
  *     error_type: string|null,
  *     error_message: string|null,
  *     line_number: number|null
- *   }
+ *   },
+ *   diagnostic: {
+ *     has_diagnostic: boolean,
+ *     error_type: string|null,
+ *     title: string,
+ *     friendly_explanation: string,
+ *     hint: string|null,
+ *     line_number: number|null,
+ *     code_snippet: string|null,
+ *     category: string,
+ *     confidence: string
+ *   }|null
  * }>}
  */
 export async function runCode(code, stdin = '') {
   return apiPost('/api/run', { code, stdin });
+}
+
+/**
+ * Generate educational diagnostic for code and error details (Phase A4).
+ *
+ * @param {string} code - Python source code
+ * @param {object} [errorDetails={}] - Optional error details (error_type, error_message, line_number, stderr, timed_out)
+ * @returns {Promise<{
+ *   has_diagnostic: boolean,
+ *   error_type: string|null,
+ *   title: string,
+ *   friendly_explanation: string,
+ *   hint: string|null,
+ *   line_number: number|null,
+ *   code_snippet: string|null,
+ *   category: string,
+ *   confidence: string
+ * }>}
+ */
+export async function diagnoseCode(code, errorDetails = {}) {
+  return apiPost('/api/diagnose', { code, ...errorDetails });
 }

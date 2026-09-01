@@ -593,12 +593,169 @@ code-mentor/
 
 ---
 
+## PHASE A4 — Code Diagnostic Engine
+
+**Status:** ✅ COMPLETE  
+**Date completed:** 2026-09-01  
+
+---
+
+### What Was Built
+
+#### Backend — Deterministic Code Diagnostic Engine
+
+**Architecture:** Pure rule-based, deterministic diagnostic pipeline using Python's standard library (`ast`, `tokenize`, `re`, `traceback`) with zero external AI/LLM dependencies. Integrates directly with the `POST /api/run` execution response and provides a standalone `POST /api/diagnose` route.
+
+**Files created:**
+
+| File | Purpose |
+|------|---------|
+| `backend/app/services/diagnostics/base.py` | `CodeDiagnostic` dataclass model and serialization |
+| `backend/app/services/diagnostics/syntax_rules.py` | Deterministic matchers for missing colons, unclosed strings, unmatched delimiters `()[]{}`, assignment in conditions (`=` vs `==`), indentation/tab errors, and invalid variable/keyword names |
+| `backend/app/services/diagnostics/runtime_rules.py` | Deterministic matchers for `ZeroDivisionError`, `NameError` (with built-in casing typo suggestions like `Print` $\rightarrow$ `print`), `TypeError` (string + number concatenation, non-callable calls, argument count), `IndexError`, `KeyError`, `AttributeError`, `ValueError`, `RecursionError`, and `TimeoutError` |
+| `backend/app/services/diagnostics/engine.py` | Main `DiagnosticEngine` orchestrating rule priorities, snippet extraction, and fallback diagnostics |
+| `backend/app/services/diagnostics/__init__.py` | Package exports (`CodeDiagnostic`, `DiagnosticEngine`, `diagnose_error`) |
+| `backend/app/routes/diagnostics.py` | Standalone `POST /api/diagnose` endpoint |
+| `backend/tests/test_diagnostics.py` | Comprehensive test suite (30 tests) verifying all syntax rules, runtime rules, fallback mechanics, and API endpoints |
+
+**Modified backend files:**
+- `backend/app/routes/runner.py`: Automatically generates and attaches `diagnostic` to `POST /api/run` response upon failed execution.
+- `backend/app/__init__.py`: Registered `diagnostics_bp` route blueprint.
+- `backend/app/routes/health.py`: Updated phase status to `A4`.
+
+**Key API endpoints:**
+- `POST http://localhost:5000/api/run` — Executes code and automatically includes `diagnostic` when errors occur.
+- `POST http://localhost:5000/api/diagnose` — Standalone endpoint accepting `{ code, error_type, line_number, stderr }` returning structured `CodeDiagnostic`.
+
+---
+
+#### Frontend — Educational Diagnostic Card Integration
+
+**Files created/modified:**
+
+| File | Changes Made |
+|------|--------------|
+| `frontend/src/components/DiagnosticCard.jsx` | NEW reusable component rendering category badge, error title, plain-English explanation, culprit code snippet, and actionable pro-tip hint |
+| `frontend/src/components/DiagnosticCard.css` | NEW styling with category-specific accent borders (syntax blue, runtime amber, indentation emerald, timeout orange), code snippet container, and pro-tip box |
+| `frontend/src/services/api.js` | Added `diagnoseCode(code, errorDetails)` helper |
+| `frontend/src/pages/EditorPage.jsx` | Integrated `<DiagnosticCard />` above output streams, updated header to `Phase A4 Live` |
+| `frontend/src/pages/EditorPage.css` | Added output stream container and label styles |
+| `frontend/src/components/Navbar.jsx` | Updated phase badge to `Phase A4` |
+| `frontend/src/pages/Home.jsx` | Updated Diagnostics feature card to `live: true` with `/editor` link, updated subtitle |
+
+---
+
+### What Was Intentionally NOT Built in A4
+
+- ❌ AI hints or LLM API calls (Phase A7+)
+- ❌ Task Evaluation / test case grading (Phase A5)
+- ❌ Known Mistake / Educational Curriculum hints (Phase A6)
+- ❌ Custom Question Mode (Phase A10)
+- ❌ Course content / lessons / exams (Part B)
+
+---
+
+### A4 Test Results
+
+| Test Suite / Component | Result |
+|------------------------|--------|
+| `python -m pytest tests/ -v` | ✅ 58/58 passed (5 health + 23 runner + 30 diagnostic tests) |
+| Missing colon detection (`if`, `def`, `for`, `while`) | ✅ Passed with exact line number and hint |
+| Unclosed string detection | ✅ Passed (`"..."` and `'...'`) |
+| Unmatched delimiter detection | ✅ Passed (`()`, `[]`, `{}`) |
+| Assignment in `if` condition (`=` vs `==`) | ✅ Passed |
+| Indentation and Tab errors | ✅ Passed |
+| `ZeroDivisionError` diagnosis | ✅ Passed |
+| `NameError` casing typo detection (`Print` $\rightarrow$ `print`) | ✅ Passed |
+| `TypeError` string + int concatenation diagnosis | ✅ Passed |
+| `IndexError`, `KeyError`, `AttributeError`, `ValueError` | ✅ Passed |
+| `RecursionError` & `TimeoutError` | ✅ Passed |
+| Fallback diagnostics on unknown errors | ✅ Passed (no unhandled exceptions) |
+| `POST /api/diagnose` standalone API | ✅ Passed |
+| Browser Live Verification | ✅ `DiagnosticCard` rendered with live snippet, explanation, and how-to-fix hint |
+
+---
+
+## Current Project State (as of A4)
+
+### Directory Structure
+```
+code-mentor/
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── CodeEditor.jsx
+│   │   │   ├── CodeEditor.css
+│   │   │   ├── DiagnosticCard.jsx  ← NEW in A4
+│   │   │   ├── DiagnosticCard.css  ← NEW in A4
+│   │   │   ├── Navbar.jsx          ← Updated (Phase A4)
+│   │   │   ├── Navbar.css
+│   │   │   ├── StatusBadge.jsx
+│   │   │   └── StatusBadge.css
+│   │   ├── pages/
+│   │   │   ├── EditorPage.jsx      ← Updated (Phase A4)
+│   │   │   ├── EditorPage.css      ← Updated (Phase A4)
+│   │   │   ├── Home.jsx            ← Updated (Phase A4)
+│   │   │   └── Home.css
+│   │   ├── services/
+│   │   │   └── api.js              ← Updated (diagnoseCode)
+│   │   ├── hooks/
+│   │   ├── App.jsx
+│   │   ├── App.css
+│   │   ├── main.jsx
+│   │   └── index.css
+│   ├── public/
+│   ├── index.html
+│   ├── vite.config.js
+│   ├── package.json
+│   └── .env.example
+│
+├── backend/
+│   ├── app/
+│   │   ├── routes/
+│   │   │   ├── health.py           ← Updated (Phase A4)
+│   │   │   ├── runner.py           ← Updated (Phase A4)
+│   │   │   └── diagnostics.py      ← NEW in A4 (POST /api/diagnose)
+│   │   ├── services/
+│   │   │   ├── runner/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── base.py
+│   │   │   │   ├── parser.py
+│   │   │   │   └── subprocess_runner.py
+│   │   │   └── diagnostics/        ← NEW in A4
+│   │   │       ├── __init__.py
+│   │   │       ├── base.py
+│   │   │       ├── engine.py
+│   │   │       ├── syntax_rules.py
+│   │   │       └── runtime_rules.py
+│   │   ├── utils/
+│   │   ├── __init__.py             ← App factory (diagnostics_bp registered)
+│   │   └── config.py
+│   ├── tests/
+│   │   ├── test_health.py          ← 5 tests
+│   │   ├── test_runner.py          ← 23 tests
+│   │   └── test_diagnostics.py     ← NEW in A4 (30 tests)
+│   ├── venv/                       ← gitignored
+│   ├── run.py
+│   ├── requirements.txt
+│   └── .env.example
+│
+├── docs/
+│   └── README.md
+├── .gitignore
+├── README.md
+├── work-history.md                 ← this file
+└── CodeMentor_AI_Project_Blueprint_PRD.md
+```
+
+---
+
 ## Next Phase
 
-**Phase A4 — Code Diagnostic Engine** (not started)
+**Phase A5 — Task Evaluation Engine** (not started)
 
-What A4 must do:
-1. Receive raw error output and structured metadata (`details.error_type`, `details.line_number`) from A3 Code Runner.
-2. Translate technical/cryptic Python errors into beginner-friendly explanations.
-3. Deterministically identify common rookie mistakes (e.g. unclosed parentheses, missing colons, off-by-one indicators).
-4. Display friendly diagnostic cards beneath the code editor.
+What A5 must do:
+1. Distinguish between "code ran successfully" (A3) and "solution is logically correct" (A5).
+2. Compare student output / return values against predefined expected results or test cases.
+3. Produce structured pass/fail results, test case breakdown, and correctness scoring.
+4. Prepare structured feedback data for subsequent hint (A6) and AI (A7+) systems.

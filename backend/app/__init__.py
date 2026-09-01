@@ -13,6 +13,7 @@ from flask_cors import CORS
 from app.config import get_config
 from app.routes.health import health_bp
 from app.routes.runner import runner_bp
+from app.routes.diagnostics import diagnostics_bp
 
 
 def create_app(config_name: str | None = None) -> Flask:
@@ -28,10 +29,11 @@ def create_app(config_name: str | None = None) -> Flask:
 
     # -----------------------------------------------------------------
     # Register route blueprints
-    # Future engines (diagnostics, AI, etc.) will each
+    # Future engines (AI, Evaluation, etc.) will each
     # register their own blueprint here.
     # -----------------------------------------------------------------
     app.register_blueprint(health_bp, url_prefix="/api")
     app.register_blueprint(runner_bp, url_prefix="/api")
+    app.register_blueprint(diagnostics_bp, url_prefix="/api")
 
     return app

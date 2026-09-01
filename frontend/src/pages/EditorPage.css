@@ -400,6 +400,25 @@
   font-family: 'Fira Code', 'Consolas', monospace;
 }
 
+.output-stream-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.output-stream-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  padding-left: 2px;
+}
+
+.output-stream-label--error {
+  color: #f87171;
+}
+
 .output-stream {
   margin: 0;
   padding: var(--space-3);

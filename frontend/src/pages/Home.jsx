@@ -42,6 +42,8 @@ const FEATURE_CARDS = [
     title: 'Diagnostics',
     description: 'Understand Python errors in plain English, not cryptic tracebacks.',
     phase: 'Phase A4',
+    href: '/editor',
+    live: true,
   },
   {
     id: 'ai-tutor',
@@ -128,7 +130,7 @@ print(greet("CodeMentor AI"))`}</code></pre>
         <h2 id="features-heading" className="home__section-title">
           Platform Features
           <span className="home__section-subtitle">
-            Phase A3 ✅ live &mdash; A4–A14 coming soon
+            Phase A4 ✅ live &mdash; A5–A14 coming soon
           </span>
         </h2>
 
