@@ -1,0 +1,64 @@
+/* StatusBadge.css */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: 999px;
+  font-size: var(--font-size-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* Animated pulsing dot */
+.status-badge__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* State: loading */
+.status-badge--loading .status-badge__dot {
+  background: var(--color-warning);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+/* State: connected */
+.status-badge--connected {
+  border-color: var(--color-success);
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.15);
+}
+.status-badge--connected .status-badge__dot {
+  background: var(--color-success);
+}
+
+/* State: error */
+.status-badge--error {
+  border-color: var(--color-error);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.15);
+}
+.status-badge--error .status-badge__dot {
+  background: var(--color-error);
+}
+
+.status-badge__label {
+  color: var(--color-text-muted);
+}
+
+.status-badge__label strong {
+  color: var(--color-text);
+}
+
+.status-badge__message {
+  margin-left: var(--space-2);
+  color: var(--color-error);
+  font-size: 0.8rem;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
