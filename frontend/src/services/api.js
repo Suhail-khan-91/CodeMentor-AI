@@ -34,9 +34,56 @@ export async function apiGet(path) {
 }
 
 /**
+ * Perform a POST request to the given path with a JSON body.
+ * Throws an Error if the response is not OK.
+ *
+ * @param {string} path  - e.g. '/api/run'
+ * @param {object} body  - Request payload object
+ * @returns {Promise<any>} Parsed JSON body
+ */
+export async function apiPost(path, body) {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => ({}));
+    throw new Error(errorBody.error ?? `HTTP ${response.status}`);
+  }
+
+  return response.json();
+}
+
+/**
  * Check the backend health endpoint.
  * @returns {Promise<{ status: string, service: string, phase: string }>}
  */
 export async function checkHealth() {
   return apiGet('/api/health');
+}
+
+/**
+ * Execute Python source code via the Code Runner Engine (Phase A3).
+ *
+ * @param {string} code  - Python source code to execute
+ * @param {string} [stdin=""] - Optional standard input string
+ * @returns {Promise<{
+ *   status: string,
+ *   stdout: string,
+ *   stderr: string,
+ *   exit_code: number|null,
+ *   execution_time_ms: number,
+ *   timed_out: boolean,
+ *   error: string|null,
+ *   details: {
+ *     error_type: string|null,
+ *     error_message: string|null,
+ *     line_number: number|null
+ *   }
+ * }>}
+ */
+export async function runCode(code, stdin = '') {
+  return apiPost('/api/run', { code, stdin });
 }

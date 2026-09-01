@@ -18,6 +18,11 @@ class BaseConfig:
     TESTING = False
     SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-change-in-production")
     ALLOWED_ORIGIN = os.getenv("ALLOWED_ORIGIN", "http://localhost:5173")
+    # Code Runner Engine settings (Phase A3)
+    EXECUTION_TIMEOUT = float(os.getenv("EXECUTION_TIMEOUT", "5.0"))
+    MAX_CODE_LENGTH = int(os.getenv("MAX_CODE_LENGTH", "50000"))
+    MAX_OUTPUT_BYTES = int(os.getenv("MAX_OUTPUT_BYTES", "65536"))
+    RUNNER_TYPE = os.getenv("RUNNER_TYPE", "subprocess")
 
 
 class DevelopmentConfig(BaseConfig):

@@ -33,6 +33,8 @@ const FEATURE_CARDS = [
     title: 'Code Runner',
     description: 'Execute your Python code safely and see output or errors instantly.',
     phase: 'Phase A3',
+    href: '/editor',
+    live: true,
   },
   {
     id: 'diagnostics',
@@ -126,7 +128,7 @@ print(greet("CodeMentor AI"))`}</code></pre>
         <h2 id="features-heading" className="home__section-title">
           Platform Features
           <span className="home__section-subtitle">
-            Phase A2 ✅ live &mdash; A3–A14 coming soon
+            Phase A3 ✅ live &mdash; A4–A14 coming soon
           </span>
         </h2>
 
