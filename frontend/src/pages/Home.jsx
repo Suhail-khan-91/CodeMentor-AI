@@ -5,9 +5,9 @@
  * Shows:
  *  - Platform branding / welcome message
  *  - Live backend connection status (calls /api/health)
- *  - Placeholder cards for future platform features
+ *  - Feature cards (editor card is now live in Phase A2)
  *
- * Phase A1 scope: foundation only — no code editor, runner, or AI yet.
+ * Phase A2: Code Editor is now accessible via /editor.
  */
 
 import { useEffect, useState } from 'react';
@@ -24,6 +24,8 @@ const FEATURE_CARDS = [
     title: 'Code Editor',
     description: 'Write Python directly in the browser with syntax highlighting and intelligent assistance.',
     phase: 'Phase A2',
+    href: '/editor',
+    live: true,
   },
   {
     id: 'runner',
@@ -124,7 +126,7 @@ print(greet("CodeMentor AI"))`}</code></pre>
         <h2 id="features-heading" className="home__section-title">
           Platform Features
           <span className="home__section-subtitle">
-            Phases A2–A14 — coming soon
+            Phase A2 ✅ live &mdash; A3–A14 coming soon
           </span>
         </h2>
 
@@ -133,13 +135,18 @@ print(greet("CodeMentor AI"))`}</code></pre>
             <article
               key={card.id}
               id={`feature-${card.id}`}
-              className="feature-card"
+              className={`feature-card${card.live ? ' feature-card--live' : ''}`}
               role="listitem"
             >
               <span className="feature-card__icon" aria-hidden="true">{card.icon}</span>
               <h3 className="feature-card__title">{card.title}</h3>
               <p className="feature-card__desc">{card.description}</p>
-              <span className="feature-card__phase">{card.phase}</span>
+              <div className="feature-card__footer">
+                <span className="feature-card__phase">{card.phase}</span>
+                {card.live && card.href && (
+                  <a href={card.href} className="feature-card__link">Try it →</a>
+                )}
+              </div>
             </article>
           ))}
         </div>

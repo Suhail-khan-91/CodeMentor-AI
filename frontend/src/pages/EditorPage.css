@@ -1,0 +1,205 @@
+/* EditorPage.css */
+
+.editor-page {
+  padding-bottom: var(--space-12);
+}
+
+/* ── Page header ── */
+.editor-page__header {
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--space-6);
+}
+
+.editor-page__title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.editor-page__title {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.editor-page__phase-tag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  background: rgba(0, 212, 170, 0.1);
+  border: 1px solid rgba(0, 212, 170, 0.3);
+  padding: 2px 10px;
+  border-radius: 999px;
+}
+
+.editor-page__subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* ── Workspace — two-column layout ── */
+.editor-page__workspace {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+@media (max-width: 960px) {
+  .editor-page__workspace {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Editor panel ── */
+.editor-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.editor-panel__toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.editor-panel__char-count {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-5, 1.25rem);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  transition: background 0.2s, transform 0.15s, opacity 0.2s, box-shadow 0.2s;
+  white-space: nowrap;
+}
+
+.btn:active { transform: scale(0.97); }
+
+.btn--primary {
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(108, 99, 255, 0.35);
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  box-shadow: 0 4px 16px rgba(108, 99, 255, 0.5);
+}
+
+.btn--primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn--ghost {
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  background: transparent;
+}
+
+.btn--ghost:hover {
+  color: var(--color-text);
+  background: var(--color-surface-2);
+  border-color: var(--color-text-muted);
+}
+
+/* ── Output panel ── */
+.output-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.output-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface-2);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.output-panel__title {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.output-panel__badge {
+  font-size: 0.7rem;
+  color: var(--color-warning);
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.output-panel__body {
+  flex: 1;
+  padding: var(--space-4);
+  min-height: 200px;
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  white-space: pre-wrap;
+  overflow-y: auto;
+}
+
+.output-panel__body--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.output-panel__placeholder {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-8);
+  max-width: 280px;
+}
+
+.output-panel__placeholder-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+  opacity: 0.7;
+}
+
+.output-panel__placeholder-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  font-family: var(--font-family);
+}
+
+.output-panel__placeholder-subtext {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  opacity: 0.7;
+  line-height: 1.5;
+  font-family: var(--font-family);
+}

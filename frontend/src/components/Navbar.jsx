@@ -2,7 +2,7 @@
  * Navbar.jsx
  *
  * Top navigation bar for CodeMentor AI.
- * Phase A1: branding only + placeholder nav links.
+ * Phase A2: Editor link added.
  * Future phases will add active-route highlighting and more links.
  */
 
@@ -10,7 +10,8 @@ import './Navbar.css';
 
 const NAV_LINKS = [
   { label: 'Dashboard', href: '/' },
-  // Future phases will add: Editor, Progress, Settings, etc.
+  { label: 'Editor', href: '/editor' },
+  // Future phases will add: Progress, Settings, etc.
 ];
 
 export default function Navbar() {
@@ -36,7 +37,7 @@ export default function Navbar() {
 
         {/* Phase indicator pill */}
         <span className="navbar__phase-badge" title="Current development phase">
-          Phase A1
+          Phase A2
         </span>
       </div>
     </header>
