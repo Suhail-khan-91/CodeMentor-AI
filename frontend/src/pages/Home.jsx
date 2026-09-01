@@ -46,6 +46,15 @@ const FEATURE_CARDS = [
     live: true,
   },
   {
+    id: 'evaluator',
+    icon: '🎯',
+    title: 'Task Evaluator',
+    description: 'Solve programming challenges and evaluate solutions against multiple test cases.',
+    phase: 'Phase A5',
+    href: '/editor',
+    live: true,
+  },
+  {
     id: 'ai-tutor',
     icon: '🤖',
     title: 'AI Tutor',
@@ -130,7 +139,7 @@ print(greet("CodeMentor AI"))`}</code></pre>
         <h2 id="features-heading" className="home__section-title">
           Platform Features
           <span className="home__section-subtitle">
-            Phase A4 ✅ live &mdash; A5–A14 coming soon
+            Phase A5 ✅ live &mdash; A6–A14 coming soon
           </span>
         </h2>
 

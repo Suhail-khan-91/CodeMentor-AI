@@ -119,3 +119,48 @@ export async function runCode(code, stdin = '') {
 export async function diagnoseCode(code, errorDetails = {}) {
   return apiPost('/api/diagnose', { code, ...errorDetails });
 }
+
+/**
+ * Fetch available starter practice tasks (Phase A5).
+ *
+ * @returns {Promise<{ tasks: Array<object> }>}
+ */
+export async function getSampleTasks() {
+  return apiGet('/api/tasks');
+}
+
+/**
+ * Evaluate Python code against a task or test case suite (Phase A5).
+ *
+ * @param {string} code - Python source code submitted by user
+ * @param {object|string} taskOrId - TaskDefinition object or task_id string
+ * @returns {Promise<{
+ *   passed_all: boolean,
+ *   status: string,
+ *   total_tests: number,
+ *   passed_tests: number,
+ *   score_percentage: number,
+ *   total_execution_time_ms: number,
+ *   summary_message: string,
+ *   test_results: Array<{
+ *     test_case_id: string,
+ *     description: string,
+ *     passed: boolean,
+ *     status: string,
+ *     actual_output: string,
+ *     expected_output: string,
+ *     stdin: string,
+ *     is_hidden: boolean,
+ *     execution_time_ms: number,
+ *     error_message: string|null,
+ *     diagnostic: object|null
+ *   }>
+ * }>}
+ */
+export async function evaluateTask(code, taskOrId) {
+  const payload = typeof taskOrId === 'string'
+    ? { code, task_id: taskOrId }
+    : { code, task: taskOrId };
+
+  return apiPost('/api/evaluate', payload);
+}

@@ -750,12 +750,173 @@ code-mentor/
 
 ---
 
+## PHASE A5 — Task Evaluation Engine
+
+**Status:** ✅ COMPLETE  
+**Date completed:** 2026-09-02  
+
+---
+
+### What Was Built
+
+#### Backend — Task Evaluation Engine & Matcher Subsystem
+
+**Architecture:** A deterministic test runner and evaluation orchestrator that takes user-submitted Python code and a `TaskDefinition`, executes the code against each test case with piped `stdin` via A3 `SubprocessRunner`, catches errors with A4 `DiagnosticEngine`, and compares `actual_output` against `expected_output` across 4 comparison modes.
+
+**Files created:**
+
+| File | Purpose |
+|------|---------|
+| `backend/app/services/evaluator/base.py` | `TestCase`, `TaskDefinition`, `TestCaseResult`, and `EvaluationResult` dataclasses with serialization and hidden-test secret protection |
+| `backend/app/services/evaluator/comparer.py` | Flexible output matching engine supporting `trimmed`, `exact`, `ignore_case`, and `numeric_float` (tolerance $\pm 10^{-4}$) |
+| `backend/app/services/evaluator/sample_tasks.py` | 5 starter practice challenges (*Hello World*, *Personalized Greeting*, *Even or Odd*, *Temperature Converter*, *Sum of Two Numbers*) |
+| `backend/app/services/evaluator/evaluator_service.py` | `TaskEvaluator` class orchestrating test execution, error diagnostics integration, and overall scoring |
+| `backend/app/services/evaluator/__init__.py` | Package exports (`TaskEvaluator`, `evaluate_task`, `SAMPLE_TASKS`, `get_task_by_id`, `compare_output`) |
+| `backend/app/routes/evaluator.py` | Route blueprint for `POST /api/evaluate`, `GET /api/tasks`, and `GET /api/tasks/<id>` |
+| `backend/tests/test_evaluator.py` | Comprehensive automated test suite (21 unit/integration tests) |
+
+**Modified backend files:**
+- `backend/app/__init__.py`: Registered `evaluator_bp` blueprint under `/api`.
+- `backend/app/routes/health.py`: Updated phase status to `A5`.
+
+**Key API endpoints:**
+- `POST /api/evaluate` — Evaluates code against `task` or `task_id`. Returns pass/fail status, test case breakdown, execution times, diffs, and diagnostics.
+- `GET /api/tasks` — Returns all available starter practice tasks with masked hidden test case secrets.
+- `GET /api/tasks/<task_id>` — Returns single task definition.
+
+---
+
+#### Frontend — Task Evaluation Panel & Mode Switcher
+
+**Files created/modified:**
+
+| File | Changes Made |
+|------|--------------|
+| `frontend/src/components/TaskEvaluationPanel.jsx` | NEW component rendering task switcher dropdown, task description card, overall score bar with pass ratio, and test case accordion cards with diff views and embedded error diagnostics |
+| `frontend/src/components/TaskEvaluationPanel.css` | NEW styling for progress bar, status pills (`✓ Passed`, `✗ Failed`, `⚠ Error`, `⏱ Timed Out`), diff boxes, and task description headers |
+| `frontend/src/services/api.js` | Added `getSampleTasks()` and `evaluateTask(code, taskOrId)` client helpers |
+| `frontend/src/pages/EditorPage.jsx` | Added mode switcher tabs (**Free Play Mode** vs **Task Evaluation Mode**), task selector integration, and "Evaluate Task" toolbar button |
+| `frontend/src/pages/EditorPage.css` | Added mode switcher tab styles and layout rules |
+| `frontend/src/components/Navbar.jsx` | Updated phase badge to `Phase A5` |
+| `frontend/src/pages/Home.jsx` | Added Task Evaluator card (`live: true`, link to `/editor`) and updated subtitle |
+
+---
+
+### What Was Intentionally NOT Built in A5
+
+- ❌ AI hints or LLM calls (Phase A7+)
+- ❌ Hardcoded Course Curricula / Chapters (Part B)
+- ❌ User Progress Database / Authentication (Phase A12)
+- ❌ Full Custom Question Mode authoring wizard (Phase A10)
+
+---
+
+### A5 Test Results
+
+| Test Suite / Component | Result |
+|------------------------|--------|
+| `python -m pytest tests/ -v` | ✅ 79/79 passed (5 health + 23 runner + 30 diagnostic + 21 evaluation tests) |
+| Output Comparer (`trimmed`, `exact`, `ignore_case`, `numeric_float`) | ✅ Passed all edge cases |
+| Logical failure detection (code runs exit 0 but output wrong) | ✅ Passed (`status = "failed"`, score accurate) |
+| Runtime crash during test case execution | ✅ Passed (`status = "error"`, A4 diagnostic attached) |
+| Syntax error during evaluation | ✅ Passed (syntax error diagnostic attached to results) |
+| Timeout during evaluation | ✅ Passed (`status = "timeout"`) |
+| Hidden test case parameter protection | ✅ Passed (secrets masked in `.to_dict()`) |
+| `POST /api/evaluate` & `GET /api/tasks` endpoints | ✅ Passed with full JSON validation |
+| Browser Live Verification | ✅ Verified 100% pass on correct solution, and 0% failure with diff views on incorrect code |
+
+---
+
+## Current Project State (as of A5)
+
+### Directory Structure
+```
+code-mentor/
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── CodeEditor.jsx
+│   │   │   ├── CodeEditor.css
+│   │   │   ├── DiagnosticCard.jsx
+│   │   │   ├── DiagnosticCard.css
+│   │   │   ├── TaskEvaluationPanel.jsx  ← NEW in A5
+│   │   │   ├── TaskEvaluationPanel.css  ← NEW in A5
+│   │   │   ├── Navbar.jsx               ← Updated (Phase A5)
+│   │   │   ├── Navbar.css
+│   │   │   ├── StatusBadge.jsx
+│   │   │   └── StatusBadge.css
+│   │   ├── pages/
+│   │   │   ├── EditorPage.jsx           ← Updated (Phase A5 Mode Switcher)
+│   │   │   ├── EditorPage.css           ← Updated (Phase A5)
+│   │   │   ├── Home.jsx                 ← Updated (Phase A5)
+│   │   │   └── Home.css
+│   │   ├── services/
+│   │   │   └── api.js                   ← Updated (getSampleTasks, evaluateTask)
+│   │   ├── hooks/
+│   │   ├── App.jsx
+│   │   ├── App.css
+│   │   ├── main.jsx
+│   │   └── index.css
+│   ├── public/
+│   ├── index.html
+│   ├── vite.config.js
+│   ├── package.json
+│   └── .env.example
+│
+├── backend/
+│   ├── app/
+│   │   ├── routes/
+│   │   │   ├── health.py                ← Updated (Phase A5)
+│   │   │   ├── runner.py
+│   │   │   ├── diagnostics.py
+│   │   │   └── evaluator.py             ← NEW in A5 (POST /api/evaluate, GET /api/tasks)
+│   │   ├── services/
+│   │   │   ├── runner/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── base.py
+│   │   │   │   ├── parser.py
+│   │   │   │   └── subprocess_runner.py
+│   │   │   ├── diagnostics/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── base.py
+│   │   │   │   ├── engine.py
+│   │   │   │   ├── syntax_rules.py
+│   │   │   │   └── runtime_rules.py
+│   │   │   └── evaluator/               ← NEW in A5
+│   │   │       ├── __init__.py
+│   │   │       ├── base.py
+│   │   │       ├── comparer.py
+│   │   │       ├── sample_tasks.py
+│   │   │       └── evaluator_service.py
+│   │   ├── utils/
+│   │   ├── __init__.py                  ← App factory (evaluator_bp registered)
+│   │   └── config.py
+│   ├── tests/
+│   │   ├── test_health.py               ← 5 tests
+│   │   ├── test_runner.py               ← 23 tests
+│   │   ├── test_diagnostics.py          ← 30 tests
+│   │   └── test_evaluator.py            ← NEW in A5 (21 tests)
+│   ├── venv/                            ← gitignored
+│   ├── run.py
+│   ├── requirements.txt
+│   └── .env.example
+│
+├── docs/
+│   └── README.md
+├── .gitignore
+├── README.md
+├── work-history.md                      ← this file
+└── CodeMentor_AI_Project_Blueprint_PRD.md
+```
+
+---
+
 ## Next Phase
 
-**Phase A5 — Task Evaluation Engine** (not started)
+**Phase A6 — Rule-Based Hint System** (not started)
 
-What A5 must do:
-1. Distinguish between "code ran successfully" (A3) and "solution is logically correct" (A5).
-2. Compare student output / return values against predefined expected results or test cases.
-3. Produce structured pass/fail results, test case breakdown, and correctness scoring.
-4. Prepare structured feedback data for subsequent hint (A6) and AI (A7+) systems.
+What A6 must do:
+1. Provide tiered, progressive pedagogical hints without giving away full solutions.
+2. Build rule-based hint templates mapped to common misconception patterns and task metadata.
+3. Track hint reveal levels (e.g. Hint 1: Conceptual nudge $\rightarrow$ Hint 2: Specific approach $\rightarrow$ Hint 3: Code structure hint).
+4. Lay the deterministic ground-truth foundation for the AI Tutor (A7+).
