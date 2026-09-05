@@ -198,3 +198,49 @@ export async function fetchHints(code, taskOrId = null, evaluationResult = null)
   return apiPost('/api/hints', payload);
 }
 
+/**
+ * Ask the AI Tutor for Socratic, contextual guidance (Phase A7).
+ *
+ * @param {object} params
+ * @param {string} params.code - Python source code
+ * @param {string} [params.taskId] - Optional task identifier
+ * @param {object} [params.task] - Optional TaskDefinition object
+ * @param {string} [params.question] - Optional student inquiry
+ * @param {object} [params.diagnostic] - Optional A4 diagnostic details
+ * @param {object} [params.evaluationResult] - Optional A5 evaluation results
+ * @param {object} [params.executionDetails] - Optional A3 execution metrics
+ * @returns {Promise<{
+ *   success: boolean,
+ *   status: string,
+ *   socratic_guidance: string,
+ *   conceptual_nudge: string,
+ *   strategy: string,
+ *   structural_clue: string,
+ *   source: string,
+ *   provider: string,
+ *   model: string,
+ *   error_message: string|null,
+ *   suggested_actions: Array<string>
+ * }>}
+ */
+export async function askAITutor({
+  code,
+  taskId = null,
+  task = null,
+  question = '',
+  diagnostic = null,
+  evaluationResult = null,
+  executionDetails = null,
+}) {
+  const payload = { code };
+  if (taskId) payload.task_id = taskId;
+  if (task) payload.task = task;
+  if (question && question.trim()) payload.question = question.trim();
+  if (diagnostic) payload.diagnostic = diagnostic;
+  if (evaluationResult) payload.evaluation_result = evaluationResult;
+  if (executionDetails) payload.execution_details = executionDetails;
+
+  return apiPost('/api/tutor/ask', payload);
+}
+
+

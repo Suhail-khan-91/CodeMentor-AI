@@ -37,7 +37,7 @@ export default function Navbar() {
 
         {/* Phase indicator pill */}
         <span className="navbar__phase-badge" title="Current development phase">
-          Phase A6
+          Phase A7
         </span>
       </div>
     </header>

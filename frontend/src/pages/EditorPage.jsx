@@ -19,6 +19,7 @@ import { useState, useCallback, useEffect } from 'react';
 import CodeEditor, { DEFAULT_PYTHON_CODE } from '../components/CodeEditor';
 import DiagnosticCard from '../components/DiagnosticCard';
 import TaskEvaluationPanel from '../components/TaskEvaluationPanel';
+import AITutorPanel from '../components/AITutorPanel';
 import { runCode, evaluateTask, getSampleTasks, fetchHints } from '../services/api';
 import './EditorPage.css';
 
@@ -209,7 +210,7 @@ export default function EditorPage() {
           <h1 className="editor-page__title">
             {mode === 'task' ? 'Task Evaluation & Practice' : 'Python Editor & Diagnostics'}
           </h1>
-          <span className="editor-page__phase-tag">Phase A6 Live</span>
+          <span className="editor-page__phase-tag">Phase A7 Live</span>
         </div>
         <p className="editor-page__subtitle">
           {mode === 'task'
@@ -322,6 +323,7 @@ export default function EditorPage() {
           /* Task Evaluation Mode Panel */
           <section className="task-panel" aria-label="Task Evaluation Results">
             <TaskEvaluationPanel
+              code={code}
               tasks={tasks}
               activeTask={activeTask}
               onSelectTask={handleSelectTask}
@@ -426,6 +428,15 @@ export default function EditorPage() {
                     </p>
                   )}
                 </div>
+              )}
+
+              {/* Phase A7: AI Tutor Panel in Free Play Mode */}
+              {!isRunning && (
+                <AITutorPanel
+                  code={code}
+                  diagnostic={result?.diagnostic}
+                  executionDetails={result}
+                />
               )}
             </div>
           </section>

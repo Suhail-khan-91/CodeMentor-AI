@@ -67,8 +67,10 @@ const FEATURE_CARDS = [
     id: 'ai-tutor',
     icon: '🤖',
     title: 'AI Tutor',
-    description: 'Get contextual hints and guidance from an AI tutor without being handed the answer.',
+    description: 'Get contextual Socratic hints and guidance without being handed the complete answer.',
     phase: 'Phase A7',
+    href: '/editor',
+    live: true,
   },
   {
     id: 'custom-mode',
@@ -148,7 +150,7 @@ print(greet("CodeMentor AI"))`}</code></pre>
         <h2 id="features-heading" className="home__section-title">
           Platform Features
           <span className="home__section-subtitle">
-            Phase A6 ✅ live &mdash; A7–A14 coming soon
+            Phase A7 ✅ live &mdash; A8–A14 coming soon
           </span>
         </h2>
 

@@ -1,0 +1,276 @@
+/**
+ * AITutorPanel.css — Styles for Phase A7 AI Tutor Component.
+ *
+ * Glassmorphic dark styling with cyan/purple gradient accents and Socratic structure.
+ */
+
+.ai-tutor-container {
+  margin-top: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid rgba(0, 212, 170, 0.35);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 212, 170, 0.08);
+  transition: all 0.25s ease;
+}
+
+.ai-tutor-container:hover {
+  border-color: rgba(0, 212, 170, 0.6);
+  box-shadow: 0 6px 24px rgba(0, 212, 170, 0.14);
+}
+
+/* Header */
+.ai-tutor__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  background: linear-gradient(90deg, rgba(0, 212, 170, 0.1) 0%, rgba(108, 99, 255, 0.1) 100%);
+  border-bottom: 1px solid var(--color-border);
+  gap: var(--space-2);
+}
+
+.ai-tutor__header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.ai-tutor__title {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: #5eead4;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ai-tutor__badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(0, 212, 170, 0.15);
+  color: #2dd4bf;
+  border: 1px solid rgba(0, 212, 170, 0.3);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ai-tutor__header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Question Input Section */
+.ai-tutor__query-bar {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface-2);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.ai-tutor__input {
+  flex: 1;
+  background: #0d0f16;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.ai-tutor__input:focus {
+  border-color: #2dd4bf;
+  box-shadow: 0 0 0 2px rgba(45, 212, 191, 0.15);
+}
+
+.ai-tutor__btn-ask {
+  background: linear-gradient(135deg, #00d4aa 0%, #059669 100%);
+  color: #032b21;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.ai-tutor__btn-ask:hover:not(:disabled) {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+.ai-tutor__btn-ask:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Loading State */
+.ai-tutor__loading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.ai-tutor__pulse-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #00d4aa;
+  animation: tutorPulse 1.4s infinite ease-in-out;
+}
+
+@keyframes tutorPulse {
+  0%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+    box-shadow: 0 0 12px #00d4aa;
+  }
+}
+
+/* Body Content */
+.ai-tutor__body {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Socratic Guidance Box */
+.ai-tutor__socratic-box {
+  background: rgba(13, 148, 136, 0.08);
+  border-left: 3px solid #00d4aa;
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+}
+
+.ai-tutor__socratic-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #2dd4bf;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-1);
+}
+
+.ai-tutor__socratic-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* Sub-Tier Cards */
+.ai-tutor__tier-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-3);
+}
+
+.ai-tutor__tier-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+}
+
+.ai-tutor__tier-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.ai-tutor__tier-badge--nudge {
+  color: var(--color-accent);
+}
+
+.ai-tutor__tier-badge--strategy {
+  color: var(--color-warning);
+}
+
+.ai-tutor__tier-text {
+  font-size: 0.84rem;
+  color: var(--color-text);
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* Structural Clue */
+.ai-tutor__clue-box {
+  background: #090a0f;
+  border: 1px solid rgba(108, 99, 255, 0.25);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+}
+
+.ai-tutor__clue-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-primary-hover);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.ai-tutor__clue-code {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.84rem;
+  color: #c4b5fd;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+/* Suggested Actions */
+.ai-tutor__actions-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  padding-top: var(--space-2);
+}
+
+.ai-tutor__actions-label {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.ai-tutor__action-tag {
+  font-size: 0.75rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 2px 10px;
+  color: var(--color-text);
+}
+
+/* Safeguard Footer */
+.ai-tutor__safeguard-footer {
+  padding: var(--space-2) var(--space-4);
+  background: rgba(0, 0, 0, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+}

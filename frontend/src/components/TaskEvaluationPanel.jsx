@@ -8,9 +8,11 @@
 import { useState } from 'react';
 import DiagnosticCard from './DiagnosticCard';
 import ProgressiveHintPanel from './ProgressiveHintPanel';
+import AITutorPanel from './AITutorPanel';
 import './TaskEvaluationPanel.css';
 
 export default function TaskEvaluationPanel({
+  code,
   tasks,
   activeTask,
   onSelectTask,
@@ -213,6 +215,15 @@ export default function TaskEvaluationPanel({
             <ProgressiveHintPanel
               hintsData={hintsData}
               taskTitle={activeTask?.title}
+            />
+          )}
+
+          {/* 6. Phase A7: AI Tutor Engine Panel */}
+          {!evaluationResult.passed_all && (
+            <AITutorPanel
+              code={code}
+              activeTask={activeTask}
+              evaluationResult={evaluationResult}
             />
           )}
         </div>
