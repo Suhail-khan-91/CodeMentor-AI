@@ -920,3 +920,162 @@ What A6 must do:
 2. Build rule-based hint templates mapped to common misconception patterns and task metadata.
 3. Track hint reveal levels (e.g. Hint 1: Conceptual nudge $\rightarrow$ Hint 2: Specific approach $\rightarrow$ Hint 3: Code structure hint).
 4. Lay the deterministic ground-truth foundation for the AI Tutor (A7+).
+
+---
+
+## PHASE A6 — Rule-Based Hint System
+
+**Status:** ✅ COMPLETE  
+**Date completed:** 2026-09-05  
+**Git Commit:** `e5c1131`  
+
+---
+
+### Executive Summary
+
+Phase A6 implements the **Rule-Based Hint System**, establishing a fast, deterministic, 100% AI-free pedagogical guidance engine. It connects directly with the **A4 Diagnostic Engine** (for runtime and syntax crashes) and the **A5 Task Evaluation Engine** (for logical test failures, prompt pollution, and output mismatches).
+
+Hints follow a strict, non-spoiler **3-tier progressive revelation structure** (Conceptual Nudge → Strategy / Approach → Structural Clue) that starts completely locked at Level 0 and requires explicit manual clicks by the student to reveal one tier at a time. It lays the standardized ground-truth foundation for the future **Phase A7 AI Tutor**.
+
+---
+
+### What Was Built
+
+#### 1. Hint Architecture & Rule Categories
+
+The hint engine utilizes a priority-ranked rule system evaluated deterministically via Python's standard `ast` and `re` modules:
+
+1. **Task-Specific Known Mistake Rules (Highest Priority):**
+   - `task_hello`: Casing / punctuation mismatches (`Hello World` vs `Hello, World!`) and nested quote detection (`print("'Hello, World!'")`).
+   - `task_greeting`: Hardcoded greeting detection without `input()`, interactive prompt pollution in `input("Enter name: ")`.
+   - `task_even_odd`: Missing integer conversion (`input()` returning str), inverted modulo conditional logic (`% 2 == 1` printing Even).
+   - `task_temp_converter`: Formula calculation bugs (missing `+ 32` offset, integer division `9 // 5`, inverted ratio `5 / 9`).
+   - `task_sum_two`: String concatenation bug (`'5' + '10' = '510'`), single line input read error.
+
+2. **General Logical Error & Output Rules:**
+   - `rule_general_empty_output`: Program executed exit code 0 but produced empty stdout (missing `print()`).
+   - `rule_general_prompt_pollution`: Prompt string inside `input()` polluting automated grader stdout.
+   - `rule_general_timeout`: Infinite loops or blocking inputs exceeding 5.0s timeout.
+   - `rule_general_runtime_crash`: Bridges unhandled exceptions to A4 diagnostics with tiered remediation advice.
+
+3. **Task Default Progressive Fallback:**
+   - Pre-authored, curated 3-tier progressive hint sequences for every starter task (`task_hello`, `task_greeting`, `task_even_odd`, `task_temp_converter`, `task_sum_two`).
+   - Ensures that students are **never left without guidance**, even if their code has an unexpected or non-standard mistake.
+
+4. **Global Fallback:**
+   - Provides generalized 3-tier problem-solving guidance for unassociated or generic code.
+
+---
+
+#### 2. Three Progressive Hint Tiers & Anti-Spoiler Philosophy
+
+| Tier | Level Name | Pedagogical Goal | Content | Anti-Spoiler Constraint |
+| :--- | :--- | :--- | :--- | :--- |
+| **Level 1** | **Conceptual Nudge** | Adjust mental model | Plain-English concept reminder (e.g. data types, remainder definition) | **Zero syntax, no keywords, no code snippets** |
+| **Level 2** | **Strategy / Approach** | Algorithmic direction | Logical steps and standard functions needed (e.g. `int()`, `if/else`, formula) | **No complete line implementations** |
+| **Level 3** | **Structural Clue** | Structural pattern | Code skeleton or syntax template (e.g. `num = int(input())\nif num % 2 == 0: ...`) | **NEVER the full copy-paste complete solution** |
+
+---
+
+#### 3. Manual Reveal & State Tracking
+
+- **Strict Level 0 Starting State:** Hints are **never** automatically displayed upon running or evaluating code. All 3 levels start locked.
+- **Manual Progression:**
+  - `Level 0`: Card displays locked state: *"💡 3 progressive hints available for this challenge."* Action button: `[ Reveal Hint 1: Conceptual Nudge ]`.
+  - `Level 1`: Conceptual Nudge revealed. Action button: `[ Unlock Hint 2: Strategy & Approach ]`.
+  - `Level 2`: Nudge + Strategy revealed. Action button: `[ Unlock Hint 3: Structural Clue ]`.
+  - `Level 3`: All 3 tiers displayed with distinct color-coded badges (`🌱 Level 1: Nudge`, `🧭 Level 2: Strategy`, `🧩 Level 3: Structural Clue`).
+- **State Lifecycle:**
+  - Preserved across quick iterative code runs while attempting the same task.
+  - Automatically reset to Level 0 upon task switch or explicit "Reset Code" / "Lock / Reset Hints".
+  - Automatically cleared upon full success (`passed_all === true`, 100% score).
+
+---
+
+#### 4. Backend Files Created & Modified
+
+| File | Purpose |
+| :--- | :--- |
+| `backend/app/services/hints/base.py` | [NEW] `TieredHint`, `HintRule`, and `HintResponse` dataclasses with JSON serialization |
+| `backend/app/services/hints/matchers.py` | [NEW] AST visitors and regex checkers (`contains_prompt_in_input`, `uses_raw_input_without_conversion`, `detect_inverted_modulo`, `detect_addition_concatenation`, `detect_celcius_fahrenheit_mistake`, `detect_hardcoded_solution`, etc.) |
+| `backend/app/services/hints/rules_tasks.py` | [NEW] Task-specific known mistake rules and default progressive hints for all 5 sample tasks |
+| `backend/app/services/hints/rules_general.py` | [NEW] Cross-task logical rules (empty output, prompt pollution, timeouts, runtime crashes) and generic fallback |
+| `backend/app/services/hints/engine.py` | [NEW] `HintEngine` class orchestrating priority sorting, rule evaluation, and fallback cascading |
+| `backend/app/services/hints/__init__.py` | [NEW] Package exports (`HintEngine`, `get_hint_engine()`, `generate_hints()`) |
+| `backend/app/routes/hints.py` | [NEW] `POST /api/hints` endpoint with payload validation and task resolution |
+| `backend/app/__init__.py` | [MODIFIED] Registered `hints_bp` under `/api` in Flask application factory |
+| `backend/tests/test_hints.py` | [NEW] 28 automated pytest tests covering models, matchers, rules, fallbacks, pedagogical constraints, and API routes |
+
+**Key API Endpoint Added:**
+- `POST /api/hints`
+  - **Body:** `{ "code": "...", "task_id": "...", "evaluation_result": { ... } }`
+  - **Response (200 OK):**
+    ```json
+    {
+      "has_hints": true,
+      "rule_id": "rule_even_odd_no_int",
+      "rule_name": "Missing Integer Conversion",
+      "matched_mistake": "input() returns a string. The modulo operator (%) requires numeric integers.",
+      "hints": {
+        "level_1_nudge": "Remember that input() always returns text (a string)...",
+        "level_2_strategy": "Wrap the input() call with int() before applying the modulo (%) remainder operator.",
+        "level_3_clue": "Pattern: num = int(input())\nif num % 2 == 0: ..."
+      },
+      "source": "rule_based",
+      "total_levels": 3
+    }
+    ```
+
+---
+
+#### 5. Frontend Files Created & Modified
+
+| File | Purpose |
+| :--- | :--- |
+| `frontend/src/components/ProgressiveHintPanel.jsx` | [NEW] Progressive hint UI component with 3-segment step meter, locked state view, color-coded tiered cards, structural clue code formatting, and manual reveal/reset action controls |
+| `frontend/src/components/ProgressiveHintPanel.css` | [NEW] Dark-mode glassmorphic styling, glowing step progress pills, and distinct tier accent borders |
+| `frontend/src/components/TaskEvaluationPanel.jsx` | [MODIFIED] Integrated `ProgressiveHintPanel` below the test case breakdown for failed/error test evaluations |
+| `frontend/src/pages/EditorPage.jsx` | [MODIFIED] Added `hintsData` state management, automatic hint fetching on non-passing evaluations, hint reset on task switch/code reset, and updated Phase tag to `Phase A6 Live` |
+| `frontend/src/services/api.js` | [MODIFIED] Added `fetchHints(code, taskOrId, evaluationResult)` communication helper |
+| `frontend/src/components/Navbar.jsx` | [MODIFIED] Updated phase badge to `Phase A6` |
+| `frontend/src/pages/Home.jsx` | [MODIFIED] Added `Progressive Hints` feature card (Phase A6, live) and updated platform status subtitle |
+
+---
+
+### Compatibility with Future Phase A7 (AI Tutor Engine)
+
+1. **Assistance Routing Hierarchy:** Deterministic rules in A6 evaluate with zero latency. In Phase A7, the AI Tutor will first check A6: if a deterministic rule fired with high confidence, the system serves the rule-based hint; if the mistake is unclassified or open-ended, the AI Tutor provides contextual LLM guidance.
+2. **Unified 3-Tier Schema:** `TieredHint` (`level_1_nudge`, `level_2_strategy`, `level_3_clue`) is standardized so that A7 prompt templates will produce the exact same JSON schema, ensuring identical UI behavior.
+3. **Source Attribution:** Each hint includes `"source": "rule_based"`, which A7 will extend with `"source": "ai_tutor"`.
+4. **Context Feeder:** Test diffs and AST diagnostic insights from A4/A5/A6 provide grounded, hallucination-resistant context for A7 LLM prompts.
+
+---
+
+### What Was Intentionally Excluded from A6
+
+- ❌ Zero external LLM / Cloud AI / Ollama dependencies (Phase A7/A8).
+- ❌ No attempt to predict every conceivable Python mistake (focused strictly on high-frequency beginner traps).
+- ❌ No automatic hint popups or unprompted spoiler reveals.
+- ❌ No full copy-paste complete solutions in Level 3 hints.
+- ❌ No user accounts, database persistence, or score deduction penalties (Phase A12).
+
+---
+
+### Automated Test Suite Verification
+
+All backend tests are executed via `pytest`:
+```bash
+cd backend
+.\venv\Scripts\activate
+python -m pytest tests/ -v
+```
+
+#### Final Test Suite Breakdown (107/107 Tests Passing):
+- `tests/test_health.py` — **5 tests** (Health checks, 404 handlers, headers)
+- `tests/test_runner.py` — **23 tests** (Subprocess execution, syntax/runtime errors, timeouts, memory caps, stdin)
+- `tests/test_diagnostics.py` — **30 tests** (Syntax rules, runtime rules, casing typo corrections, fallback diagnostics)
+- `tests/test_evaluator.py` — **21 tests** (Match modes, logical failures, test crash diagnostics, hidden test masking, evaluator API routes)
+- `tests/test_hints.py` — **28 tests** (Tiered hint models, matchers, task-specific known mistakes, general rules, fallback guarantees, pedagogical integrity, REST API routes)
+
+**Result:** ✅ **107 passed in 3.28s** (100% green, 0 warnings).  
+**Frontend Build:** ✅ `npm run build` completed in 673ms with zero errors.
