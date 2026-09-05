@@ -1257,4 +1257,104 @@ python -m pytest tests/ -v
 **Result:** ✅ **137 passed in 3.42s** (100% green, 0 warnings, 0 regressions).  
 **Frontend Build:** ✅ `npm run build` completed in 101ms with zero errors.
 
+---
+
+## PHASE A9 — AI Error Explanation
+
+**Status:** ✅ COMPLETE  
+**Date completed:** 2026-09-05  
+**Git Commit:** `97969c4`  
+
+---
+
+### Executive Summary
+
+Phase A9 adds a dedicated **AI Error Explanation Engine** to CodeMentor AI. While the Phase A4 Diagnostic Engine provides fast, deterministic, basic explanations, Phase A9 provides an on-demand, deep-dive pedagogical analysis of confusing Python syntax and runtime exceptions without giving away solutions. Both systems coexist harmoniously: deterministic A4 diagnostics remain the instant, zero-latency first line of defense, while A9 is triggered on-demand by the student to unpack *what* the error means, *why* Python raised it on that specific line of code, and *how* to reason about fixing it.
+
+---
+
+### What Was Built
+
+#### 1. AI Error Explainer Service (`backend/app/services/ai/error_explainer.py`)
+
+- **Structured Data Model (`AIErrorExplanationResponse` in `base.py`):**
+  - `headline`: Concise 1-sentence plain-English summary.
+  - `what_it_means`: Conceptual, beginner-friendly explanation of the error category.
+  - `why_it_happened`: Contextual explanation of what Python expected vs. what it encountered on this specific line of code.
+  - `how_to_think_about_it`: Socratic mental model and guiding questions (anti-solution compliant).
+  - `concepts_to_review`: 2–3 key conceptual topics (e.g. `["Case Sensitivity", "Built-in Functions"]`).
+  - Metadata: `line_number`, `source`, `provider`, `model`, `status`.
+- **Specialized Prompt Engineering (`build_error_explanation_prompt`):**
+  - Synthesizes student code (with numbered lines), failing line number, error type, error message, traceback, and A4 deterministic diagnostic context (category, title, hint).
+  - Strict system prompt enforces beginner-friendly language, Socratic mental models, JSON output, and an unwavering anti-solution policy.
+- **Deterministic Offline Mock Provider (`get_deterministic_mock_explanation`):**
+  - Built-in pedagogical explanations for common Python errors: `SyntaxError` (missing colon, `=` vs `==`, unclosed quotes), `IndentationError`, `NameError` (casing typos e.g. `Print`, undefined variables), `TypeError` (string + int concatenation, non-callables), `ZeroDivisionError`, `IndexError`, `KeyError`, `AttributeError`, `ValueError`, `TimeoutError`, and general fallbacks.
+  - Guarantees 100% offline, zero-cost unit testing and local development without API keys.
+- **Provider Orchestration & Resilient Fallbacks (`AIErrorExplainer`):**
+  - Dynamically utilizes the active provider configured in Phase A8 (Mock, Ollama, Cloud).
+  - JSON parser with fallback extraction.
+  - Graceful degradation: if a remote provider is unreachable or times out, the system automatically falls back to deterministic explanations with an informative status, preventing crashes or blank screens.
+
+#### 2. Backend REST API Route (`backend/app/routes/ai_error_explainer.py`)
+
+- **`POST /api/ai/explain-error`:**
+  - **Request Body:** `{ "code": "...", "error_type": "...", "error_message": "...", "line_number": int, "traceback": "...", "diagnostic": { ... } }`
+  - **Response (200 OK):** Full structured `AIErrorExplanationResponse` payload.
+  - Blueprint `ai_error_explainer_bp` registered under `/api` in `backend/app/__init__.py`.
+
+#### 3. Frontend UI Integration & Polish
+
+- **`DiagnosticCard.jsx` & `DiagnosticCard.css`:**
+  - Preserves instant deterministic A4 diagnostic as the primary view.
+  - Adds on-demand **"🤖 Explain Error with AI"** trigger button with Phase A9 badge.
+  - Animated loading state with spinner while the AI analyzes the error.
+  - Expandable/collapsible deep-dive card featuring:
+    - Provider badge (`🤖 AI Error Deep Dive • {provider} ({model})`).
+    - Headline banner.
+    - 3 structured pedagogical blocks: *What This Error Means*, *Why It Happened In Your Code*, and *Mental Model & How to Fix*.
+    - Concept chips for focused study.
+    - Anti-solution pedagogical safety reminder.
+- **Workspace Integration:**
+  - Passed `code` and `executionResult` to `DiagnosticCard` in both `EditorPage.jsx` (Free Play Mode) and `TaskEvaluationPanel.jsx` (Task Evaluation Mode).
+- **Client Service Layer (`frontend/src/services/api.js`):**
+  - Added `explainErrorWithAI(payload)`.
+- **Navigation & Dashboard:**
+  - Updated phase badge in `Navbar.jsx` to `Phase A9`.
+  - Added live `AI Error Explanation` feature card to `Home.jsx`.
+
+---
+
+### Scope & Architectural Boundaries Enforced
+
+- ✅ **Strict A9 Scope:** Dedicated entirely to AI-assisted error explanations for syntax and runtime errors.
+- ❌ **No Scope Creep into A10+:** Did NOT implement Custom Question Mode (A10), Help Counters (A11), Progress/Score Engine (A12), or Debug Mode (A13).
+- ✅ **A4 Deterministic First:** A4 diagnostics remain the default, instant, basic layer. A9 acts purely as an on-demand deeper dive.
+- ✅ **Anti-Solution Guarantee:** AI prompt strictly forbids outputting code solutions or replacing student code.
+- ✅ **Reused A7/A8 Infrastructure:** Reused the unified provider abstraction and `AIConfigService`.
+
+---
+
+### Automated Test Suite Verification
+
+All backend tests are executed via `pytest`:
+```bash
+cd backend
+.\venv\Scripts\activate
+python -m pytest tests/ -v
+```
+
+#### Final Test Suite Breakdown (156/156 Tests Passing):
+- `tests/test_health.py` — **5 tests** (Health checks, 404 handlers, security headers)
+- `tests/test_runner.py` — **23 tests** (Subprocess execution, syntax/runtime errors, timeouts, memory caps, stdin)
+- `tests/test_diagnostics.py` — **30 tests** (Syntax rules, runtime rules, casing typo corrections, fallback diagnostics)
+- `tests/test_evaluator.py` — **21 tests** (Match modes, logical failures, test crash diagnostics, hidden test masking, evaluator API routes)
+- `tests/test_hints.py` — **28 tests** (Tiered hint models, matchers, task-specific known mistakes, general rules, fallback guarantees, pedagogical integrity, REST API routes)
+- `tests/test_tutor.py` — **16 tests** (AI Tutor models, Socratic prompt assembly, provider abstraction, unconfigured fallbacks, anti-solution safety, REST API routes)
+- `tests/test_ai_config.py` — **14 tests** (Runtime config management, key masking, connection testing, Ollama/Cloud probing, A7 dynamic client sync, REST API routes)
+- `tests/test_ai_error_explainer.py` — **19 tests** (Prompt assembly with traceback and A4 diagnostic, mock explanations for colon/assignment/quote syntax errors, indentation errors, NameError casing/undefined, TypeError concatenation/general, ZeroDivisionError, IndexError, TimeoutError, fallback errors, Mock client execution, JSON client parsing, failure graceful degradation, REST API routes and validation)
+
+**Result:** ✅ **156 passed in 11.47s** (100% green, 0 warnings, 0 regressions).  
+**Frontend Build:** ✅ `npm run build` completed in 415ms with zero errors.
+
+
 
