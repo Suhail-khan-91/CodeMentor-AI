@@ -1356,5 +1356,98 @@ python -m pytest tests/ -v
 **Result:** ✅ **156 passed in 11.47s** (100% green, 0 warnings, 0 regressions).  
 **Frontend Build:** ✅ `npm run build` completed in 415ms with zero errors.
 
+---
+
+## PHASE A10 — Custom Question Mode
+
+**Status:** ✅ COMPLETE  
+**Date completed:** 2026-09-06  
+**Git Commit:** `65f27b7`  
+
+---
+
+### Executive Summary
+
+Phase A10 delivers **Custom Question Mode**, the primary testing playground for Part A of CodeMentor AI. It empowers students to author, customize, and solve their own Python challenges with full platform support: writing code in Monaco Editor (A2), executing in an isolated sandbox (A3), receiving deterministic diagnostics (A4) and on-demand AI error explanations (A9), grading against custom test cases and comparison modes (A5), and receiving Socratic hints and tutoring grounded in their custom problem definition (A6, A7, A8).
+
+---
+
+### What Was Built
+
+#### 1. Custom Question Engine & Templates (`backend/app/services/custom_question/`)
+
+- **Starter Templates (`templates.py`):**
+  - Pre-defined challenge templates to jumpstart students: *Right-Angled Star Triangle*, *Reverse Words in a Sentence*, *Count Vowels in a String*, and *Blank Custom Challenge*.
+  - Each template includes a challenge title, problem description, starter code, and verified test cases with inputs, expected outputs, and matching modes (`trimmed`, `exact`, `ignore_case`, `numeric_float`).
+- **Schema Validation (`validate_custom_question`):**
+  - Enforces mandatory title and description strings, validates test case lists, and ensures comparison modes are among permitted options.
+- **Custom Question Context Integration (`prompt_builder.py`):**
+  - Extended `build_tutor_prompt` to detect custom questions (`task.id == 'custom_question'` or starting with `custom`) and label them specifically as `### CURRENT TASK (Student's Custom Question):`.
+  - Ensures the Socratic AI Tutor explicitly grounds its guidance in the student's unique challenge statement and user-defined test results.
+
+#### 2. Backend REST API Endpoints (`backend/app/routes/custom_question.py`)
+
+- **`GET /api/custom-questions/templates`:** Returns pre-defined starter challenge templates.
+- **`POST /api/custom-questions/validate`:** Validates custom question payloads before solving.
+- **`POST /api/custom-questions/evaluate`:** Grades code against user-defined test cases using the Phase A5 evaluation engine.
+- Blueprint `custom_question_bp` registered under `/api` in `backend/app/__init__.py`.
+
+#### 3. Frontend Custom Question Panel & Workspace (`frontend/src/components/CustomQuestionPanel.jsx` & `.css`)
+
+- **Dual-Mode Challenge Panel:**
+  - **Edit Mode:**
+    - Form fields for Question Title, Problem Description, and Starter Code.
+    - Test Case Manager: dynamically add, edit, or delete test cases (stdin, expected output, and comparison modes).
+    - Starter template dropdown to load pre-made challenges instantly.
+    - "✓ Save & Start Solving" action with validation error feedback.
+  - **Solve & Evaluation Mode:**
+    - Clean challenge description card displaying requirements.
+    - "🎯 Grade Against Custom Tests" action button.
+    - "✏️ Edit Question" toggle to refine requirements or test cases anytime.
+    - Test Case Accordion: expands each test case to show pass/fail badges, timing, and side-by-side Expected vs. Actual diff views.
+    - Integrated `DiagnosticCard` (A4 + A9) when a custom test case causes an unhandled runtime exception.
+    - Integrated `AITutorPanel` (A7 + A8) providing Socratic guidance tailored to the student's custom problem.
+- **Workspace Navigation & Dashboard Integration:**
+  - Added `✏️ Custom Question Mode` to the workspace mode switcher tabs in `EditorPage.jsx`.
+  - URL query parameter support (`/editor?mode=custom`).
+  - Added `getCustomQuestionTemplates()`, `validateCustomQuestion()`, and `evaluateCustomQuestion()` to `api.js`.
+  - Updated header badge in `Navbar.jsx` to `Phase A10`.
+  - Marked `Custom Question Mode` feature card on `Home.jsx` as `live: true`.
+
+---
+
+### Scope & Architectural Boundaries Enforced
+
+- ✅ **Strict A10 Scope:** Dedicated strictly to student-authored question creation, execution, custom test grading, and contextual AI tutoring.
+- ❌ **No Scope Creep into A11+:** Did NOT implement Help Counters (A11), Progress/Score Engine & User Databases (A12), or Debug Mode (A13).
+- ✅ **Local / Session Only:** Custom questions and test outcomes remain in-memory and session-scoped as specified for Part A.
+- ✅ **Pedagogical Integrity:** Reused all existing anti-solution policies; the tutor never reveals complete solutions to custom problems.
+
+---
+
+### Automated Test Suite Verification
+
+All backend tests are executed via `pytest`:
+```bash
+cd backend
+.\venv\Scripts\activate
+python -m pytest tests/ -v
+```
+
+#### Final Test Suite Breakdown (178/178 Tests Passing):
+- `tests/test_health.py` — **5 tests** (Health checks, 404 handlers, security headers)
+- `tests/test_runner.py` — **23 tests** (Subprocess execution, syntax/runtime errors, timeouts, memory caps, stdin)
+- `tests/test_diagnostics.py` — **30 tests** (Syntax rules, runtime rules, casing typo corrections, fallback diagnostics)
+- `tests/test_evaluator.py` — **21 tests** (Match modes, logical failures, test crash diagnostics, hidden test masking, evaluator API routes)
+- `tests/test_hints.py` — **28 tests** (Tiered hint models, matchers, task-specific known mistakes, general rules, fallback guarantees, pedagogical integrity, REST API routes)
+- `tests/test_tutor.py` — **16 tests** (AI Tutor models, Socratic prompt assembly, provider abstraction, unconfigured fallbacks, anti-solution safety, REST API routes)
+- `tests/test_ai_config.py` — **14 tests** (Runtime config management, key masking, connection testing, Ollama/Cloud probing, A7 dynamic client sync, REST API routes)
+- `tests/test_ai_error_explainer.py` — **19 tests** (Prompt assembly, mock explanations, JSON client parsing, failure graceful degradation, REST API routes)
+- `tests/test_custom_question.py` — **22 tests** (Template collection schemas, validation logic for valid/missing/empty fields, non-dict payloads, invalid match modes, evaluation passing all tests, evaluation capturing diffs on failures, evaluation capturing crashes with A4 diagnostics, 0-test-case edge case, AI Tutor prompt builder custom label integration, AI Tutor Socratic custom response, REST API template retrieval, validation endpoint, and evaluate custom endpoint)
+
+**Result:** ✅ **178 passed in 11.71s** (100% green, 0 warnings, 0 regressions).  
+**Frontend Build:** ✅ `npm run build` completed in 100ms with zero errors.
+
+
 
 
