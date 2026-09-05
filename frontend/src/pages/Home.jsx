@@ -73,6 +73,15 @@ const FEATURE_CARDS = [
     live: true,
   },
   {
+    id: 'ai-config',
+    icon: '⚙️',
+    title: 'AI Connection & Config',
+    description: 'Configure and test connectivity for Local Ollama, Cloud AI, or Offline Mock providers.',
+    phase: 'Phase A8',
+    href: '/editor',
+    live: true,
+  },
+  {
     id: 'custom-mode',
     icon: '✏️',
     title: 'Custom Question Mode',
@@ -150,7 +159,7 @@ print(greet("CodeMentor AI"))`}</code></pre>
         <h2 id="features-heading" className="home__section-title">
           Platform Features
           <span className="home__section-subtitle">
-            Phase A7 ✅ live &mdash; A8–A14 coming soon
+            Phase A8 ✅ live &mdash; A9–A14 coming soon
           </span>
         </h2>
 

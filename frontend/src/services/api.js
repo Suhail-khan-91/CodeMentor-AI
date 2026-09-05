@@ -243,4 +243,41 @@ export async function askAITutor({
   return apiPost('/api/tutor/ask', payload);
 }
 
+/**
+ * Retrieve active AI settings with masked API keys (Phase A8).
+ *
+ * @returns {Promise<{ config: object }>}
+ */
+export async function getAIConfig() {
+  return apiGet('/api/ai/config');
+}
+
+/**
+ * Update active AI provider and connection settings (Phase A8).
+ *
+ * @param {object} config - Configuration update payload
+ * @returns {Promise<{ success: boolean, message: string, config: object }>}
+ */
+export async function saveAIConfig(config) {
+  return apiPost('/api/ai/config', config);
+}
+
+/**
+ * Test connectivity, responsiveness, and latency for an AI provider (Phase A8).
+ *
+ * @param {object} [testParams={}] - Optional parameters to probe before saving
+ * @returns {Promise<{
+ *   success: boolean,
+ *   status: string,
+ *   provider: string,
+ *   latency_ms: number,
+ *   message: string,
+ *   details?: object
+ * }>}
+ */
+export async function testAIConnection(testParams = {}) {
+  return apiPost('/api/ai/test', testParams);
+}
+
+
 

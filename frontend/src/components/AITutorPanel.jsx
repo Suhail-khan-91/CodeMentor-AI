@@ -11,6 +11,7 @@
 
 import { useState } from 'react';
 import { askAITutor } from '../services/api';
+import AISettingsModal from './AISettingsModal';
 import './AITutorPanel.css';
 
 export default function AITutorPanel({
@@ -21,6 +22,7 @@ export default function AITutorPanel({
   executionDetails = null,
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [question, setQuestion] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [tutorData, setTutorData] = useState(null);
@@ -75,6 +77,16 @@ export default function AITutorPanel({
         </div>
 
         <div className="ai-tutor__header-right">
+          <button
+            type="button"
+            className="btn btn--ghost"
+            style={{ padding: '3px 8px', fontSize: '0.78rem' }}
+            onClick={() => setIsSettingsOpen(true)}
+            title="Configure AI Provider"
+            id="btn-tutor-config"
+          >
+            ⚙️
+          </button>
           <button
             type="button"
             className="btn btn--ghost"
@@ -197,10 +209,21 @@ export default function AITutorPanel({
           {/* Safeguard footer */}
           <div className="ai-tutor__safeguard-footer">
             <span>🛡️ Anti-Spoiler Guarantee: We guide your reasoning without writing complete solutions.</span>
-            <span>Phase A7 Live</span>
+            <span>Phase A8 Live</span>
           </div>
         </>
       )}
+
+      {/* AI Settings Modal */}
+      <AISettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        onConfigSaved={(cfg) => {
+          if (tutorData) {
+            setTutorData(prev => ({ ...prev, provider: cfg.provider }));
+          }
+        }}
+      />
     </section>
   );
 }

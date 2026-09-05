@@ -6,15 +6,18 @@
  * Future phases will add active-route highlighting and more links.
  */
 
+import { useState } from 'react';
+import AISettingsModal from './AISettingsModal';
 import './Navbar.css';
 
 const NAV_LINKS = [
   { label: 'Dashboard', href: '/' },
   { label: 'Editor', href: '/editor' },
-  // Future phases will add: Progress, Settings, etc.
 ];
 
 export default function Navbar() {
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
   return (
     <header className="navbar" role="banner">
       <div className="navbar__inner container">
@@ -35,11 +38,31 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* Phase indicator pill */}
-        <span className="navbar__phase-badge" title="Current development phase">
-          Phase A7
-        </span>
+        {/* Right actions: Settings button & Phase badge */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <button
+            type="button"
+            className="btn btn--ghost"
+            style={{ padding: '4px 10px', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+            onClick={() => setIsSettingsOpen(true)}
+            id="btn-open-ai-settings"
+            title="Configure AI Provider (Local Ollama / Cloud API / Mock)"
+          >
+            <span aria-hidden="true">⚙️</span> AI Settings
+          </button>
+
+          {/* Phase indicator pill */}
+          <span className="navbar__phase-badge" title="Current development phase">
+            Phase A8
+          </span>
+        </div>
       </div>
+
+      {/* AI Settings Modal */}
+      <AISettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+      />
     </header>
   );
 }

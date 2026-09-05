@@ -17,6 +17,7 @@ from app.routes.diagnostics import diagnostics_bp
 from app.routes.evaluator import evaluator_bp
 from app.routes.hints import hints_bp
 from app.routes.tutor import tutor_bp
+from app.routes.ai_config import ai_config_bp
 
 
 def create_app(config_name: str | None = None) -> Flask:
@@ -41,5 +42,6 @@ def create_app(config_name: str | None = None) -> Flask:
     app.register_blueprint(evaluator_bp, url_prefix="/api")
     app.register_blueprint(hints_bp, url_prefix="/api")
     app.register_blueprint(tutor_bp, url_prefix="/api")
+    app.register_blueprint(ai_config_bp, url_prefix="/api")
 
     return app
