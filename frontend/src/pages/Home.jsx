@@ -82,12 +82,22 @@ const FEATURE_CARDS = [
     live: true,
   },
   {
+    id: 'ai-error-explainer',
+    icon: '🔍',
+    title: 'AI Error Explanation',
+    description: 'Deep-dive into confusing syntax and runtime exceptions with beginner-friendly AI deconstructions.',
+    phase: 'Phase A9',
+    href: '/editor',
+    live: true,
+  },
+  {
     id: 'custom-mode',
     icon: '✏️',
     title: 'Custom Question Mode',
     description: 'Write your own questions and practice solving them with full platform support.',
     phase: 'Phase A10',
   },
+
   {
     id: 'progress',
     icon: '📊',

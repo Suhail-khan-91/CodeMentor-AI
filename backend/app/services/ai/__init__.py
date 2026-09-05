@@ -5,8 +5,14 @@ Exposes the AITutorEngine and helper functions for generating Socratic guidance.
 """
 
 from typing import Optional, Dict, Any
-from app.services.ai.base import AITutorResponse, BaseLLMClient
+from app.services.ai.base import AITutorResponse, AIErrorExplanationResponse, BaseLLMClient
 from app.services.ai.tutor_engine import AITutorEngine
+from app.services.ai.error_explainer import (
+    AIErrorExplainer,
+    get_ai_error_explainer,
+    explain_error_with_ai,
+    build_error_explanation_prompt
+)
 from app.services.evaluator.base import TaskDefinition, EvaluationResult
 
 _ENGINE_INSTANCE: Optional[AITutorEngine] = None
@@ -45,7 +51,13 @@ def ask_ai_tutor(
 __all__ = [
     "AITutorEngine",
     "AITutorResponse",
+    "AIErrorExplainer",
+    "AIErrorExplanationResponse",
     "BaseLLMClient",
     "get_ai_tutor_engine",
-    "ask_ai_tutor"
+    "ask_ai_tutor",
+    "get_ai_error_explainer",
+    "explain_error_with_ai",
+    "build_error_explanation_prompt"
 ]
+

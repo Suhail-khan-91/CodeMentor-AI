@@ -171,8 +171,13 @@ export default function TaskEvaluationPanel({
                     <div className="eval-tc-card__body">
                       {/* Diagnostic Card if this test case produced a Python crash */}
                       {tr.diagnostic && tr.diagnostic.has_diagnostic && (
-                        <DiagnosticCard diagnostic={tr.diagnostic} />
+                        <DiagnosticCard
+                          diagnostic={tr.diagnostic}
+                          code={code}
+                          executionResult={tr}
+                        />
                       )}
+
 
                       {/* Visible Input / Expected / Actual table */}
                       {!tr.is_hidden ? (

@@ -279,5 +279,32 @@ export async function testAIConnection(testParams = {}) {
   return apiPost('/api/ai/test', testParams);
 }
 
-
-
+/**
+ * Request an on-demand, beginner-friendly AI error explanation (Phase A9).
+ *
+ * @param {object} payload
+ * @param {string} payload.code - Student's Python source code
+ * @param {string} payload.error_type - Exception class (e.g. 'SyntaxError', 'NameError')
+ * @param {string} [payload.error_message] - Error message or traceback summary
+ * @param {number|null} [payload.line_number] - Line number where error occurred
+ * @param {string} [payload.traceback] - Raw Python traceback / stderr
+ * @param {object} [payload.diagnostic] - Phase A4 deterministic diagnostic object
+ * @returns {Promise<{
+ *   success: boolean,
+ *   status: string,
+ *   error_type: string,
+ *   headline: string,
+ *   what_it_means: string,
+ *   why_it_happened: string,
+ *   how_to_think_about_it: string,
+ *   concepts_to_review: Array<string>,
+ *   line_number: number|null,
+ *   source: string,
+ *   provider: string,
+ *   model: string,
+ *   error_message?: string
+ * }>}
+ */
+export async function explainErrorWithAI(payload) {
+  return apiPost('/api/ai/explain-error', payload);
+}

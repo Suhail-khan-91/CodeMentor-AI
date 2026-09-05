@@ -400,9 +400,12 @@ export default function EditorPage() {
                   {showDiagnostic && result.diagnostic && result.diagnostic.has_diagnostic && (
                     <DiagnosticCard
                       diagnostic={result.diagnostic}
+                      code={code}
+                      executionResult={result}
                       onClose={() => setShowDiagnostic(false)}
                     />
                   )}
+
 
                   {result.stdout && (
                     <div className="output-stream-container">

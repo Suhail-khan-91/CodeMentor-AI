@@ -235,3 +235,269 @@
   font-family: 'Fira Code', 'Consolas', monospace;
   font-size: 0.8rem;
 }
+
+/* ══════════════════════════════════════════════════════════
+   Phase A9: AI Error Explanation Styles
+   ══════════════════════════════════════════════════════════ */
+
+.diagnostic-card__ai-trigger-bar {
+  display: flex;
+  align-items: center;
+  margin-top: var(--space-2);
+}
+
+.diagnostic-card__btn-ai-explain {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, rgba(108, 99, 255, 0.15), rgba(0, 212, 170, 0.15));
+  border: 1px solid rgba(108, 99, 255, 0.4);
+  color: var(--color-text);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.diagnostic-card__btn-ai-explain:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(108, 99, 255, 0.28), rgba(0, 212, 170, 0.25));
+  border-color: rgba(0, 212, 170, 0.6);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 12px rgba(108, 99, 255, 0.25);
+}
+
+.diagnostic-card__btn-ai-explain:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.diagnostic-card__btn-ai-icon {
+  font-size: 1rem;
+}
+
+.diagnostic-card__btn-ai-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  padding: 1px 6px;
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+}
+
+/* AI Container */
+.diagnostic-ai-container {
+  margin-top: var(--space-2);
+  animation: slideDown 0.25s ease-out;
+}
+
+/* Loading State */
+.diagnostic-ai-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: rgba(13, 17, 23, 0.7);
+  border: 1px dashed rgba(108, 99, 255, 0.4);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.diagnostic-ai-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(108, 99, 255, 0.3);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Error State */
+.diagnostic-ai-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-md);
+  font-size: 0.82rem;
+  color: #fca5a5;
+}
+
+.diagnostic-ai-error__body {
+  flex: 1;
+}
+
+.diagnostic-ai-error__body p {
+  margin: 2px 0 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+}
+
+.diagnostic-ai-retry-btn {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.diagnostic-ai-retry-btn:hover {
+  background: rgba(239, 68, 68, 0.35);
+}
+
+/* AI Explanation Card */
+.diagnostic-ai-card {
+  background: linear-gradient(180deg, rgba(22, 27, 34, 0.95), rgba(13, 17, 23, 0.95));
+  border: 1px solid rgba(0, 212, 170, 0.35);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.diagnostic-ai-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.diagnostic-ai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #a78bfa;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.diagnostic-ai-provider-tag {
+  font-size: 0.72rem;
+  font-family: 'Fira Code', 'Consolas', monospace;
+  color: var(--color-accent);
+  background: rgba(0, 212, 170, 0.08);
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 212, 170, 0.2);
+}
+
+/* Headline */
+.diagnostic-ai-headline {
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.45;
+  background: rgba(108, 99, 255, 0.12);
+  border-left: 3px solid #6c63ff;
+  padding: 8px 12px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+/* Structured Grid */
+.diagnostic-ai-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.diagnostic-ai-block {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+}
+
+.diagnostic-ai-block--strategy {
+  background: rgba(0, 212, 170, 0.04);
+  border-color: rgba(0, 212, 170, 0.2);
+}
+
+.diagnostic-ai-block__title {
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.diagnostic-ai-block--strategy .diagnostic-ai-block__title {
+  color: var(--color-accent);
+}
+
+.diagnostic-ai-block__text {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-text);
+  line-height: 1.55;
+}
+
+/* Concepts Chips */
+.diagnostic-ai-concepts {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+
+.diagnostic-ai-concepts__label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.diagnostic-ai-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.diagnostic-ai-chip {
+  font-size: 0.72rem;
+  background: rgba(108, 99, 255, 0.18);
+  color: #c4b5fd;
+  border: 1px solid rgba(108, 99, 255, 0.35);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+
+/* Footer Safety */
+.diagnostic-ai-footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 8px;
+  margin-top: 2px;
+}
+
