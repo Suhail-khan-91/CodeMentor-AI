@@ -1173,3 +1173,88 @@ python -m pytest tests/ -v
 **Result:** ✅ **123 passed in 7.50s** (100% green, 0 warnings, 0 regressions).  
 **Frontend Build:** ✅ `npm run build` completed in 103ms with zero errors.
 
+---
+
+## PHASE A8 — AI Connection & Configuration
+
+**Status:** ✅ COMPLETE  
+**Date completed:** 2026-09-05  
+**Git Commit:** `8b414b3`  
+
+---
+
+### Executive Summary
+
+Phase A8 delivers the **AI Connection & Configuration** layer for CodeMentor AI. It provides runtime configuration management, secure credential handling with server-side masking, connection testing with live round-trip latency probes, dynamic synchronization with the Phase A7 AI Tutor Engine without server restarts, and an interactive frontend Settings modal supporting Offline Mock, Local Ollama, and Cloud (OpenAI-compatible) providers.
+
+---
+
+### What Was Built
+
+#### 1. AI Configuration Service (`backend/app/services/ai/config_service.py`)
+
+- **Runtime Configuration State:** Manages the active provider (`mock`, `ollama`, `cloud`), Ollama host URL and model name, and Cloud API base URL, model name, and API key.
+- **Dynamic A7 Engine Sync:** Automatically updates the runtime LLM client in the Phase A7 singleton `AITutorEngine` (`get_ai_tutor_engine()._client = new_client`) upon saving configuration, instantly activating the new provider.
+- **Secure Key Masking:** Automatically masks API keys (e.g. `sk-...4a9f` or `***`) when returning configuration to the client or logging, ensuring raw secrets are never exposed to the frontend.
+- **Key Preservation:** If a masked key is submitted back in an update request, the existing unmasked key stored securely in memory is preserved.
+- **Connection Diagnostics & Latency Probes:**
+  - **Mock:** Instant zero-latency verification (0 ms).
+  - **Ollama:** HTTP GET probe to `/api/tags` with round-trip latency measurement (ms), confirming server accessibility and detecting whether the configured model is installed.
+  - **Cloud:** HTTP GET probe to `/models` (with `Bearer <api_key>` authorization) with round-trip latency measurement (ms), validating network connectivity and key authentication.
+
+#### 2. Backend REST API Routes (`backend/app/routes/ai_config.py`)
+
+- **`GET /api/ai/config`:** Retrieves current AI configuration with masked API keys.
+- **`POST /api/ai/config`:** Updates provider settings, model names, base URLs, and API keys, immediately syncing the A7 AI Tutor Engine.
+- **`POST /api/ai/test`:** Tests connection against specified or active provider settings and returns `{ "success": bool, "latency_ms": int, "message": str, "details": { ... } }`.
+- Registered `ai_config_bp` under `/api` in `backend/app/__init__.py`.
+
+#### 3. Frontend AI Settings Modal & Integration
+
+- **`AISettingsModal.jsx` & `.css` (`frontend/src/components/`):**
+  - Modern glassmorphic dialog with responsive backdrop blur.
+  - Provider selector tabs for **Offline Mock**, **Local Ollama**, and **Cloud AI**.
+  - Provider-specific configuration forms (Base URL, Model Name, API Key).
+  - Show/Hide toggle for API Key input with password masking.
+  - Live **"Test Connection"** action with animated spinner, latency badge (`XX ms`), status pill (`Connected` / `Failed`), and clear error diagnostic messages.
+  - **"Save & Activate"** action with success toast feedback.
+- **Navigation & Workspace Integration:**
+  - Added **"⚙️ AI Settings"** button to `Navbar.jsx` and updated header badge to `Phase A8`.
+  - Added **"⚙️"** direct settings shortcut button in `AITutorPanel.jsx` to quickly switch models/providers during tutoring.
+  - Added live **"AI Connection & Config"** feature card in `Home.jsx`.
+- **API Client Service (`frontend/src/services/api.js`):**
+  - Added `getAIConfig()`, `saveAIConfig()`, and `testAIConnection()`.
+
+---
+
+### Scope & Architectural Boundaries Enforced
+
+- ✅ **Strict A8 Scope:** Focused exclusively on AI configuration, credential management, connection testing, and provider switching.
+- ❌ **No Phase A9+ Features:** Did NOT implement automated AI error explanation cards, custom question multi-turn memory, or code rewrite features.
+- ✅ **Deterministic-First Preserved:** A4 Diagnostics, A5 Evaluation, and A6 Rule-Based Hints remain 100% deterministic and unaffected.
+- ✅ **Secure Secrets Handling:** Plaintext API keys are never exposed in GET responses or server logs.
+
+---
+
+### Automated Test Suite Verification
+
+All backend tests are executed via `pytest`:
+```bash
+cd backend
+.\venv\Scripts\activate
+python -m pytest tests/ -v
+```
+
+#### Final Test Suite Breakdown (137/137 Tests Passing):
+- `tests/test_health.py` — **5 tests** (Health checks, 404 handlers, security headers)
+- `tests/test_runner.py` — **23 tests** (Subprocess execution, syntax/runtime errors, timeouts, memory caps, stdin)
+- `tests/test_diagnostics.py` — **30 tests** (Syntax rules, runtime rules, casing typo corrections, fallback diagnostics)
+- `tests/test_evaluator.py` — **21 tests** (Match modes, logical failures, test crash diagnostics, hidden test masking, evaluator API routes)
+- `tests/test_hints.py` — **28 tests** (Tiered hint models, matchers, task-specific known mistakes, general rules, fallback guarantees, pedagogical integrity, REST API routes)
+- `tests/test_tutor.py` — **16 tests** (AI Tutor models, Socratic prompt assembly, provider abstraction, unconfigured fallbacks, anti-solution safety, REST API routes)
+- `tests/test_ai_config.py` — **14 tests** (Runtime config management, key masking, key preservation on update, mock connection testing, Ollama connection probe mocking, Cloud connection probe mocking, A7 engine dynamic client sync, REST API GET/POST endpoints)
+
+**Result:** ✅ **137 passed in 3.42s** (100% green, 0 warnings, 0 regressions).  
+**Frontend Build:** ✅ `npm run build` completed in 101ms with zero errors.
+
+
