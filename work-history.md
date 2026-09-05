@@ -1079,3 +1079,97 @@ python -m pytest tests/ -v
 
 **Result:** ✅ **107 passed in 3.28s** (100% green, 0 warnings).  
 **Frontend Build:** ✅ `npm run build` completed in 673ms with zero errors.
+
+---
+
+## PHASE A7 — AI Tutor Engine
+
+**Status:** ✅ COMPLETE  
+**Date completed:** 2026-09-05  
+**Git Commit:** `a056856`  
+
+---
+
+### Executive Summary
+
+Phase A7 introduces the **AI Tutor Engine**, building the intelligent, contextual tutoring layer for CodeMentor AI. Operating as the **Level 4 assistance layer**, the AI Tutor acts as the intelligent fallback when deterministic systems (A4 Diagnostics, A5 Evaluator, A6 Rules) cannot classify a student's mistake, or when a student explicitly requests Socratic explanation or asks an open-ended programming question.
+
+---
+
+### What Was Built
+
+#### 1. AI Tutor Architecture & Provider Abstraction
+
+A modular, pluggable provider architecture with zero mandatory external dependencies:
+- **`BaseLLMClient` Interface (`backend/app/services/ai/base.py`):** Abstract base class defining `generate()` and `is_available()`.
+- **`MockLLMClient` (`backend/app/services/ai/providers/mock_provider.py`):** Built-in deterministic Socratic tutor provider enabling 100% offline, zero-cost unit testing and local development without requiring external API keys.
+- **`OllamaLLMClient` (`backend/app/services/ai/providers/ollama_provider.py`):** HTTP client for locally hosted models (e.g. `llama3`, `mistral`) using Python's standard `urllib.request`.
+- **`CloudLLMClient` (`backend/app/services/ai/providers/cloud_provider.py`):** Standard OpenAI-compatible HTTP client for cloud models (e.g. `gpt-4o-mini`).
+- **`get_llm_provider()` Factory (`backend/app/services/ai/providers/__init__.py`):** Resolves provider based on environment/config, defaulting gracefully to `mock` when unconfigured.
+
+#### 2. Prompt & Context Assembly Pipeline
+
+- **`build_tutor_prompt()` (`backend/app/services/ai/prompt_builder.py`):**
+  - Synthesizes student code, task requirements, starter templates, A3 execution stdout/stderr, A4 beginner diagnostic explanations, A5 failed test case diffs, A6 rule match insights, and optional student questions.
+  - Enforces mandatory Socratic instructions: guide conceptual understanding, ask reflective questions, and explain *why* Python behaves as it does.
+
+#### 3. Safety & Anti-Solution Guarantees
+
+- **Strict No-Solution Policy:** The AI Tutor prompt explicitly forbids providing full copy-paste solutions or replacing the student's code.
+- **Structured Socratic Tiers:** Outputs `socratic_guidance` (explanation + guiding question), `conceptual_nudge` (mental model without syntax), `strategy` (algorithmic steps), and `structural_clue` (skeleton pattern with `...` placeholders).
+
+#### 4. A6 → A7 Integration & Escalation Logic
+
+- **Deterministic-First:** The system checks A6 fast rule matchers first.
+- **Escalation Path:** If A6 matches no specific mistake rule, or if the student clicks "Ask AI Tutor" or types a custom question, the request escalates to A7 AI Tutor with full pre-parsed diagnostic and evaluation context.
+
+#### 5. Backend API Endpoint
+
+- **`POST /api/tutor/ask` (`backend/app/routes/tutor.py`):**
+  - **Body:** `{ "code": "...", "task_id": "...", "question": "...", "evaluation_result": { ... }, "diagnostic": { ... } }`
+  - **Response (200 OK):**
+    ```json
+    {
+      "success": true,
+      "status": "success",
+      "socratic_guidance": "Notice that input() always returns text. What happens when you use % on a string?",
+      "conceptual_nudge": "Mathematical operators require numbers rather than strings.",
+      "strategy": "Convert the input string to an integer before applying modulo.",
+      "structural_clue": "# Pattern:\nnum = int(input())\nif num % 2 == 0: ...",
+      "source": "ai_tutor",
+      "provider": "mock",
+      "model": "mock-socratic-tutor",
+      "suggested_actions": ["Check variable types", "Wrap string input in int()"]
+    }
+    ```
+  - Blueprint `tutor_bp` registered under `/api` in `backend/app/__init__.py`.
+
+#### 6. Frontend Integration
+
+- **`AITutorPanel.jsx` & `.css`:** Glassmorphic component with cyan/purple gradient accents, interactive query bar for student questions, animated pulse loading state, Socratic narrative card, sub-tier hint cards, skeleton code box, and suggested next-step action chips.
+- **Workspace Integration:** Integrated into `TaskEvaluationPanel.jsx` (available on test failures) and `EditorPage.jsx` (available in Free Play mode).
+- **Client Service:** Added `askAITutor()` in `frontend/src/services/api.js`.
+- **Navigation & Badges:** Updated `Navbar.jsx` to `Phase A7` and marked AI Tutor card as `live: true` in `Home.jsx`.
+
+---
+
+### Automated Test Suite Verification
+
+All backend tests are executed via `pytest`:
+```bash
+cd backend
+.\venv\Scripts\activate
+python -m pytest tests/ -v
+```
+
+#### Final Test Suite Breakdown (123/123 Tests Passing):
+- `tests/test_health.py` — **5 tests** (Health checks, 404 handlers, headers)
+- `tests/test_runner.py` — **23 tests** (Subprocess execution, syntax/runtime errors, timeouts, memory caps, stdin)
+- `tests/test_diagnostics.py` — **30 tests** (Syntax rules, runtime rules, casing typo corrections, fallback diagnostics)
+- `tests/test_evaluator.py` — **21 tests** (Match modes, logical failures, test crash diagnostics, hidden test masking, evaluator API routes)
+- `tests/test_hints.py` — **28 tests** (Tiered hint models, matchers, task-specific known mistakes, general rules, fallback guarantees, pedagogical integrity, REST API routes)
+- `tests/test_tutor.py` — **16 tests** (AI Tutor models, Socratic prompt assembly, provider abstraction, unconfigured fallbacks, anti-solution safety, REST API routes)
+
+**Result:** ✅ **123 passed in 7.50s** (100% green, 0 warnings, 0 regressions).  
+**Frontend Build:** ✅ `npm run build` completed in 103ms with zero errors.
+
