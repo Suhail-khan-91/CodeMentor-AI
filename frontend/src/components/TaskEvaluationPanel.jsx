@@ -7,6 +7,7 @@
 
 import { useState } from 'react';
 import DiagnosticCard from './DiagnosticCard';
+import ProgressiveHintPanel from './ProgressiveHintPanel';
 import './TaskEvaluationPanel.css';
 
 export default function TaskEvaluationPanel({
@@ -15,6 +16,7 @@ export default function TaskEvaluationPanel({
   onSelectTask,
   evaluationResult,
   isEvaluating,
+  hintsData,
 }) {
   const [expandedTc, setExpandedTc] = useState(null);
 
@@ -205,6 +207,14 @@ export default function TaskEvaluationPanel({
               );
             })}
           </div>
+
+          {/* 5. Phase A6: Progressive Hint Engine Panel */}
+          {hintsData && !evaluationResult.passed_all && (
+            <ProgressiveHintPanel
+              hintsData={hintsData}
+              taskTitle={activeTask?.title}
+            />
+          )}
         </div>
       )}
     </div>

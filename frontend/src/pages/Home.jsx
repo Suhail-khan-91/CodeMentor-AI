@@ -55,6 +55,15 @@ const FEATURE_CARDS = [
     live: true,
   },
   {
+    id: 'hint-system',
+    icon: '💡',
+    title: 'Progressive Hints',
+    description: '3-tier deterministic guidance (Nudge → Strategy → Structure) without spoiling solutions.',
+    phase: 'Phase A6',
+    href: '/editor',
+    live: true,
+  },
+  {
     id: 'ai-tutor',
     icon: '🤖',
     title: 'AI Tutor',
@@ -139,7 +148,7 @@ print(greet("CodeMentor AI"))`}</code></pre>
         <h2 id="features-heading" className="home__section-title">
           Platform Features
           <span className="home__section-subtitle">
-            Phase A5 ✅ live &mdash; A6–A14 coming soon
+            Phase A6 ✅ live &mdash; A7–A14 coming soon
           </span>
         </h2>
 

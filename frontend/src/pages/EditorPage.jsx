@@ -19,7 +19,7 @@ import { useState, useCallback, useEffect } from 'react';
 import CodeEditor, { DEFAULT_PYTHON_CODE } from '../components/CodeEditor';
 import DiagnosticCard from '../components/DiagnosticCard';
 import TaskEvaluationPanel from '../components/TaskEvaluationPanel';
-import { runCode, evaluateTask, getSampleTasks } from '../services/api';
+import { runCode, evaluateTask, getSampleTasks, fetchHints } from '../services/api';
 import './EditorPage.css';
 
 export default function EditorPage() {
@@ -37,6 +37,7 @@ export default function EditorPage() {
   const [activeTask, setActiveTask] = useState(null);
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [evaluationResult, setEvaluationResult] = useState(null);
+  const [hintsData, setHintsData] = useState(null);
 
   // Load sample practice tasks on mount
   useEffect(() => {
@@ -61,6 +62,7 @@ export default function EditorPage() {
     if (selected) {
       setActiveTask(selected);
       setEvaluationResult(null);
+      setHintsData(null);
       if (selected.starter_code) {
         setCode(selected.starter_code);
       }
@@ -82,6 +84,7 @@ export default function EditorPage() {
     }
     setResult(null);
     setEvaluationResult(null);
+    setHintsData(null);
     setApiError(null);
     setShowDiagnostic(true);
   }, [mode, activeTask]);
@@ -113,7 +116,7 @@ export default function EditorPage() {
   }, [code, isRunning, isEvaluating]);
 
   /**
-   * Evaluate code against all test cases for the active task (Phase A5).
+   * Evaluate code against all test cases for the active task (Phase A5/A6).
    */
   const handleEvaluate = useCallback(async () => {
     if (!activeTask || isEvaluating || isRunning) return;
@@ -124,6 +127,19 @@ export default function EditorPage() {
     try {
       const evalRes = await evaluateTask(code, activeTask);
       setEvaluationResult(evalRes);
+
+      // Phase A6: If solution did not pass all tests, fetch progressive hints
+      if (!evalRes.passed_all) {
+        try {
+          const hintRes = await fetchHints(code, activeTask.id, evalRes);
+          setHintsData(hintRes);
+        } catch (hintErr) {
+          console.warn('Hints service unavailable:', hintErr);
+        }
+      } else {
+        // Solution passed 100% — clear hints
+        setHintsData(null);
+      }
     } catch (err) {
       setApiError(err.message || 'Failed to evaluate task on backend');
     } finally {
@@ -193,7 +209,7 @@ export default function EditorPage() {
           <h1 className="editor-page__title">
             {mode === 'task' ? 'Task Evaluation & Practice' : 'Python Editor & Diagnostics'}
           </h1>
-          <span className="editor-page__phase-tag">Phase A5 Live</span>
+          <span className="editor-page__phase-tag">Phase A6 Live</span>
         </div>
         <p className="editor-page__subtitle">
           {mode === 'task'
@@ -311,6 +327,7 @@ export default function EditorPage() {
               onSelectTask={handleSelectTask}
               evaluationResult={evaluationResult}
               isEvaluating={isEvaluating}
+              hintsData={hintsData}
             />
           </section>
         ) : (

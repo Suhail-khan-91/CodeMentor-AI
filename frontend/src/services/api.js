@@ -164,3 +164,37 @@ export async function evaluateTask(code, taskOrId) {
 
   return apiPost('/api/evaluate', payload);
 }
+
+/**
+ * Fetch 3-tier progressive hints for student code and task context (Phase A6).
+ *
+ * @param {string} code - Python source code submitted by user
+ * @param {object|string|null} [taskOrId=null] - TaskDefinition object or task_id string
+ * @param {object|null} [evaluationResult=null] - Optional EvaluationResult object
+ * @returns {Promise<{
+ *   has_hints: boolean,
+ *   rule_id: string|null,
+ *   rule_name: string|null,
+ *   matched_mistake: string|null,
+ *   hints: {
+ *     level_1_nudge: string,
+ *     level_2_strategy: string,
+ *     level_3_clue: string
+ *   }|null,
+ *   source: string,
+ *   total_levels: number
+ * }>}
+ */
+export async function fetchHints(code, taskOrId = null, evaluationResult = null) {
+  const payload = { code };
+  if (typeof taskOrId === 'string') {
+    payload.task_id = taskOrId;
+  } else if (taskOrId && typeof taskOrId === 'object') {
+    payload.task = taskOrId;
+  }
+  if (evaluationResult) {
+    payload.evaluation_result = evaluationResult;
+  }
+  return apiPost('/api/hints', payload);
+}
+
