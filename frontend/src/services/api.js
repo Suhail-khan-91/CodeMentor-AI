@@ -308,3 +308,34 @@ export async function testAIConnection(testParams = {}) {
 export async function explainErrorWithAI(payload) {
   return apiPost('/api/ai/explain-error', payload);
 }
+
+/**
+ * Fetch starter challenge templates for Custom Question Mode (Phase A10).
+ *
+ * @returns {Promise<{ templates: Array<object> }>}
+ */
+export async function getCustomQuestionTemplates() {
+  return apiGet('/api/custom-questions/templates');
+}
+
+/**
+ * Validate a student-defined custom question object (Phase A10).
+ *
+ * @param {object} question - Custom question definition
+ * @returns {Promise<{ valid: boolean, error?: string, message?: string }>}
+ */
+export async function validateCustomQuestion(question) {
+  return apiPost('/api/custom-questions/validate', { question });
+}
+
+/**
+ * Evaluate Python code against student-defined custom criteria (Phase A10).
+ *
+ * @param {string} code - Student's Python source code
+ * @param {object} question - Custom question definition with test cases
+ * @returns {Promise<object>} EvaluationResult
+ */
+export async function evaluateCustomQuestion(code, question) {
+  return apiPost('/api/custom-questions/evaluate', { code, question });
+}
+

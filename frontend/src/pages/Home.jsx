@@ -96,7 +96,10 @@ const FEATURE_CARDS = [
     title: 'Custom Question Mode',
     description: 'Write your own questions and practice solving them with full platform support.',
     phase: 'Phase A10',
+    href: '/editor?mode=custom',
+    live: true,
   },
+
 
   {
     id: 'progress',

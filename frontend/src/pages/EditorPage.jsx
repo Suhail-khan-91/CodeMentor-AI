@@ -19,12 +19,23 @@ import { useState, useCallback, useEffect } from 'react';
 import CodeEditor, { DEFAULT_PYTHON_CODE } from '../components/CodeEditor';
 import DiagnosticCard from '../components/DiagnosticCard';
 import TaskEvaluationPanel from '../components/TaskEvaluationPanel';
+import CustomQuestionPanel from '../components/CustomQuestionPanel';
 import AITutorPanel from '../components/AITutorPanel';
 import { runCode, evaluateTask, getSampleTasks, fetchHints } from '../services/api';
 import './EditorPage.css';
 
 export default function EditorPage() {
-  const [mode, setMode] = useState('editor'); // 'editor' (Free Play) | 'task' (Evaluation)
+  const getInitialMode = () => {
+    try {
+      const urlMode = new URLSearchParams(window.location.search).get('mode');
+      if (urlMode === 'custom' || urlMode === 'task' || urlMode === 'editor') {
+        return urlMode;
+      }
+    } catch (e) {}
+    return 'editor';
+  };
+
+  const [mode, setMode] = useState(getInitialMode); // 'editor' | 'task' | 'custom'
   const [code, setCode] = useState(DEFAULT_PYTHON_CODE);
 
   // Runner & Diagnostics state (Free Play Mode)
@@ -39,6 +50,7 @@ export default function EditorPage() {
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [evaluationResult, setEvaluationResult] = useState(null);
   const [hintsData, setHintsData] = useState(null);
+
 
   // Load sample practice tasks on mount
   useEffect(() => {
@@ -238,8 +250,19 @@ export default function EditorPage() {
           >
             <span aria-hidden="true">🎯</span> Task Evaluation Mode
           </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mode === 'custom'}
+            className={`mode-tab ${mode === 'custom' ? 'mode-tab--active' : ''}`}
+            onClick={() => handleSwitchMode('custom')}
+            id="tab-custom-mode"
+          >
+            <span aria-hidden="true">✏️</span> Custom Question Mode
+          </button>
         </div>
       </div>
+
 
       {/* Main workspace: editor + (output OR task panel) side-by-side */}
       <div className="editor-page__workspace container">
@@ -332,8 +355,17 @@ export default function EditorPage() {
               hintsData={hintsData}
             />
           </section>
+        ) : mode === 'custom' ? (
+          /* Custom Question Mode Panel (Phase A10) */
+          <section className="task-panel" aria-label="Custom Question Panel">
+            <CustomQuestionPanel
+              code={code}
+              onApplyStarterCode={(starter) => setCode(starter)}
+            />
+          </section>
         ) : (
           /* Free Play Mode Terminal Panel */
+
           <section className="output-panel" aria-label="Terminal output and diagnostics">
             <div className="output-panel__header">
               <div className="output-panel__header-left">

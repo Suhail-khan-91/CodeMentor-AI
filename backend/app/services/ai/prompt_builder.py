@@ -44,11 +44,14 @@ def build_tutor_prompt(
 
     # 1. Task Context
     if task:
-        context_parts.append(f"### CURRENT TASK:\nTitle: {task.title}\nDescription: {task.description}")
+        is_custom = getattr(task, "id", "") == "custom_question" or str(getattr(task, "id", "")).startswith("custom")
+        task_label = "### CURRENT TASK (Student's Custom Question):" if is_custom else "### CURRENT TASK:"
+        context_parts.append(f"{task_label}\nTitle: {task.title}\nDescription: {task.description}")
         if task.starter_code:
             context_parts.append(f"Starter Code Template:\n```python\n{task.starter_code}\n```")
     else:
         context_parts.append("### MODE: Free Play (Isolated Script Execution)")
+
 
     # 2. Student's Current Code
     clean_code = code if code.strip() else "# [No code written yet]"

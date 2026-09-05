@@ -19,6 +19,7 @@ from app.routes.hints import hints_bp
 from app.routes.tutor import tutor_bp
 from app.routes.ai_config import ai_config_bp
 from app.routes.ai_error_explainer import ai_error_explainer_bp
+from app.routes.custom_question import custom_question_bp
 
 
 def create_app(config_name: str | None = None) -> Flask:
@@ -45,6 +46,8 @@ def create_app(config_name: str | None = None) -> Flask:
     app.register_blueprint(tutor_bp, url_prefix="/api")
     app.register_blueprint(ai_config_bp, url_prefix="/api")
     app.register_blueprint(ai_error_explainer_bp, url_prefix="/api")
+    app.register_blueprint(custom_question_bp, url_prefix="/api")
 
     return app
+
 
