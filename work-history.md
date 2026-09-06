@@ -1799,6 +1799,106 @@ python -m pytest tests/ -v
 **Result:** ✅ **226 passed in 12.47s** (100% green, 0 warnings, 0 regressions).  
 **Frontend Build:** ✅ `npm run build` completed in 105ms with zero errors.
 
+---
+
+## PHASE A14 — Part A Integration & Testing
+
+**Status:** ✅ COMPLETE  
+**Git commit:** `7114ccf` — "feat: implement Phase A14 — Part A Integration & Testing (233/233 tests passing)"  
+**Date completed:** 2026-09-06
+
+---
+
+### Phase Overview & Objectives
+
+Phase A14 represents the culminating milestone for **Part A — Core Platform Engine**.
+According to the Master PRD:
+> "Connect everything and test the complete engine. Part A should be a functional technical platform even without the full Python curriculum."
+
+This phase verified and validated the end-to-end interoperability across all **11 integrated Part A subsystems**:
+1. **Runner Engine (Phase A3):** Subprocess sandbox execution, timeout handling, memory caps, stdin capture.
+2. **Code Diagnostic Engine (Phase A4):** Deterministic syntax and runtime error classifier and plain-English suggestions.
+3. **Task Evaluation Engine (Phase A5):** Multi-test case grading, match modes (exact, trimmed, contains, regex, numeric), output diffs, and hidden test masking.
+4. **Progressive Hint System (Phase A6):** 3-tier deterministic guidance (Nudge → Strategy → Structural Clue) and known mistake matching.
+5. **AI Tutor Engine (Phase A7):** Socratic pedagogical guidance, anti-solution guardrails, and dynamic context assembly.
+6. **AI Configuration & Connection (Phase A8):** Provider management (Mock, Ollama, Cloud LLMs) and connection testing.
+7. **AI Error Explainer (Phase A9):** Deep-dive error deconstructions with analogies and conceptual clues.
+8. **Custom Question Mode (Phase A10):** Student-authored challenge creation, validation, and grading.
+9. **Help / AI Usage Counter (Phase A11):** In-memory session tracking for hint reveals, tutor queries, and error explanations.
+10. **Progress & Score Engine (Phase A12):** In-memory session scoring, attempts tracking, completion rates, and cross-category aggregation.
+11. **Debug Mode (Phase A13):** Curated broken code challenges, revert mechanisms, and fix evaluation.
+
+---
+
+### What Was Built & Verified
+
+#### 1. End-to-End Master PRD Flow Integration & Testing (`backend/tests/test_integration_part_a.py`)
+- Programmatically validated the entire Primary PRD flow from end to end:
+  1. **Custom Question Creation & Validation:** Defined a custom problem ("Sum of Even Numbers up to N") with stdin/expected output test cases via `POST /api/custom-questions/validate`.
+  2. **Code Editor & Sandbox Execution:** Executed student code with intentional syntax error via `POST /api/run`.
+  3. **Deterministic Diagnostics:** Captured structured diagnostic (`SyntaxError`, line 2, missing colon suggestion).
+  4. **AI Error Explanation & Help Logging:** Fetched beginner-friendly deconstruction via `POST /api/ai/explain-error` and logged the event via `POST /api/help-counter/record`, verifying real-time counter increment.
+  5. **Task Evaluation with Logic Bug:** Evaluated faulty off-by-one code via `POST /api/custom-questions/evaluate`, verifying 0% score and expected vs. actual output diff.
+  6. **Socratic AI Tutor Guidance:** Consulted AI Tutor via `POST /api/tutor/ask` with problem context and test failure, verifying Socratic guidance and assistance logging.
+  7. **Code Correction & 100% Evaluation:** Evaluated corrected code to 100% pass via `POST /api/custom-questions/evaluate`.
+  8. **Progress & Score Recording:** Successfully recorded attempt via `POST /api/progress/record-attempt` with `category="custom"`.
+  9. **Progress Summary Aggregation:** Verified that `GET /api/progress/summary` reflects completed custom task and 100% best score.
+
+#### 2. Cross-Mode Continuity Across Single Session
+- Verified that Task Evaluation Mode (`starter`), Debug Mode (`debug`), and Custom Question Mode (`custom`) seamlessly co-exist and aggregate metrics in a single continuous session.
+- Help Counter tracks total assistance events across all modes.
+- Progress Tracker captures task completions and scores across all 3 categories simultaneously (`starter`, `debug`, `custom`).
+
+#### 3. Real User Action Driven State Updates
+- Tested multi-attempt score progression: partial score followed by 100% pass marks task completed, while subsequent lower scores preserve the 100% best score.
+- Tested complete audit event log capture via `GET /api/help-counter/events`.
+
+#### 4. Sandbox Safety & Timeout Recovery
+- Verified that infinite loops trigger timeout without crashing the backend or degrading subsequent evaluation or assistance requests.
+
+#### 5. Full Subsystem Reachability & Phase A14 Health
+- Verified all 11 Part A subsystem endpoints respond correctly.
+- Updated `GET /api/health` to confirm `phase: "A14"`, `service: "CodeMentor AI Backend"`, and `status: "ok"`.
+- Updated navigation and editor workspace badges to reflect `Phase A14 Live` / `Phase A14 Complete`.
+
+---
+
+### Scope & Architectural Boundaries Enforced
+- ✅ **Strict A14 Scope:** Dedicated entirely to Part A integration, end-to-end verification, and cross-mode consistency.
+- ❌ **No Part B Scope Creep:** Zero curriculum tracks, lesson plans, practice question banks, or chapter exams.
+- ❌ **Strictly In-Memory / Session:** Compliant with PRD Part A rules; no databases, auth, or persistent storage.
+- ✅ **Zero Regressions:** 100% of all Phase A1–A13 features, APIs, and tests remained functional and passing.
+
+---
+
+### Automated Test Suite Verification
+
+All backend tests are executed via `pytest`:
+```bash
+cd backend
+.\venv\Scripts\activate
+python -m pytest tests/ -v
+```
+
+#### Final Test Suite Breakdown (233/233 Tests Passing):
+- `tests/test_health.py` — **5 tests** (Health checks, 404 handlers, security headers)
+- `tests/test_runner.py` — **23 tests** (Subprocess execution, syntax/runtime errors, timeouts, memory caps, stdin)
+- `tests/test_diagnostics.py` — **30 tests** (Syntax rules, runtime rules, casing typo corrections, fallback diagnostics)
+- `tests/test_evaluator.py` — **21 tests** (Match modes, logical failures, test crash diagnostics, hidden test masking, evaluator API routes)
+- `tests/test_hints.py` — **28 tests** (Tiered hint models, matchers, task-specific known mistakes, general rules, fallback guarantees, pedagogical integrity, REST API routes)
+- `tests/test_tutor.py` — **16 tests** (AI Tutor models, Socratic prompt assembly, provider abstraction, unconfigured fallbacks, anti-solution safety, REST API routes)
+- `tests/test_ai_config.py` — **14 tests** (Runtime config management, key masking, connection testing, Ollama/Cloud probing, A7 dynamic client sync, REST API routes)
+- `tests/test_ai_error_explainer.py` — **19 tests** (Prompt assembly, mock explanations, JSON client parsing, failure graceful degradation, REST API routes)
+- `tests/test_custom_question.py` — **22 tests** (Templates, validation, evaluation with diffs, diagnostics, AI Tutor prompt integration, REST API routes)
+- `tests/test_help_counter.py` — **17 tests** (Session assistance counters, event audit logs, reset, REST API routes)
+- `tests/test_progress.py` — **15 tests** (Task seeding, attempt recording, score preservation, progress summary, REST API routes)
+- `tests/test_debugger.py` — **16 tests** (Curated challenges, intentional buggy failures, 100% fix verification, progress tracking, REST API routes)
+- `tests/test_integration_part_a.py` — **7 tests** (Complete Master PRD flow, cross-mode session continuity, user action state mutations, sandbox timeout safety, Phase A14 health & 11-subsystem reachability)
+
+**Result:** ✅ **233 passed in 18.09s** (100% green, 0 warnings, 0 regressions).  
+**Frontend Build:** ✅ `npm run build` completed in 113ms with zero errors and zero warnings.
+
+
 
 
 
