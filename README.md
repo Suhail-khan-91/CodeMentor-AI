@@ -72,3 +72,17 @@ AI	OpenAI, Claude, Gemini, Ollama
 APIs	REST, JSON
 Testing	Pytest
 Version Control	Git, GitHub
+
+## 📸 Screenshots
+
+### Dashboard / Home
+![CodeMentor AI Dashboard and Platform Features](IMAGES/1.png)
+
+### Python Editor & Diagnostics
+![Python Editor and Execution Terminal in Free Play Mode](IMAGES/3.png)
+
+### AI Error Explanation / AI Tutor
+![Beginner-Friendly Error Diagnostics and AI Error Deep Dive](IMAGES/4.png)
+
+### Other Coding Modes / Platform Features
+![AI Connection and Configuration Settings](IMAGES/5.png)
