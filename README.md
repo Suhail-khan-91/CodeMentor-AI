@@ -42,11 +42,13 @@ CodeMentor AI uses a **hybrid AI architecture** combining deterministic programm
           │
        Ollama
      (Local LLM)
+```
 
 The platform can use rule-based systems for deterministic feedback and LLMs for contextual tutoring, deeper explanations, and personalized guidance.
 
-🧠 AI Workflow
+## 🧠 AI Workflow
 
+```text
 Student Code
      ↓
 Run / Evaluate
@@ -60,18 +62,21 @@ AI Tutor
 Student Improves Code
      ↓
 Run Again
+```
 
 AI responses can be generated using cloud LLM APIs or local models through Ollama, allowing the system to remain flexible across different AI providers.
 
-🛠️ Tech Stack
-Category	Technologies
-Frontend	React, Vite, Monaco Editor
-Backend	Python, Flask
-Database	SQLite
-AI	OpenAI, Claude, Gemini, Ollama
-APIs	REST, JSON
-Testing	Pytest
-Version Control	Git, GitHub
+## 🛠️ Tech Stack
+
+| Category | Technologies |
+|---|---|
+| Frontend | React, Vite, Monaco Editor |
+| Backend | Python, Flask |
+| Database | SQLite |
+| AI | OpenAI, Claude, Gemini, Ollama |
+| APIs | REST, JSON |
+| Testing | Pytest |
+| Version Control | Git, GitHub |
 
 ## 📸 Screenshots
 
