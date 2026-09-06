@@ -8,6 +8,7 @@
 
 import { useState } from 'react';
 import AISettingsModal from './AISettingsModal';
+import ProgressModal from './ProgressModal';
 import './Navbar.css';
 
 const NAV_LINKS = [
@@ -17,6 +18,7 @@ const NAV_LINKS = [
 
 export default function Navbar() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isProgressOpen, setIsProgressOpen] = useState(false);
 
   return (
     <header className="navbar" role="banner">
@@ -38,8 +40,19 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* Right actions: Settings button & Phase badge */}
+        {/* Right actions: Progress button, Settings button & Phase badge */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <button
+            type="button"
+            className="btn btn--ghost"
+            style={{ padding: '4px 10px', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+            onClick={() => setIsProgressOpen(true)}
+            id="btn-open-progress"
+            title="View learning progress, scores, and completion metrics"
+          >
+            <span aria-hidden="true">📊</span> Progress
+          </button>
+
           <button
             type="button"
             className="btn btn--ghost"
@@ -53,10 +66,8 @@ export default function Navbar() {
 
           {/* Phase indicator pill */}
           <span className="navbar__phase-badge" title="Current development phase">
-            Phase A11
+            Phase A12
           </span>
-
-
         </div>
       </div>
 
@@ -64,6 +75,12 @@ export default function Navbar() {
       <AISettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
+      />
+
+      {/* Progress & Scores Modal (Phase A12) */}
+      <ProgressModal
+        isOpen={isProgressOpen}
+        onClose={() => setIsProgressOpen(false)}
       />
     </header>
   );

@@ -112,8 +112,10 @@ const FEATURE_CARDS = [
     id: 'progress',
     icon: '📊',
     title: 'Progress & Scores',
-    description: 'Track your learning journey, scores, and AI help usage over time.',
+    description: 'Track your learning journey, scores, task completion rates, and assistance correlation in real time.',
     phase: 'Phase A12',
+    href: '/editor',
+    live: true,
   },
 ];
 

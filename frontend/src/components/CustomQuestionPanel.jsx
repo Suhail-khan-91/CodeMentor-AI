@@ -15,7 +15,8 @@ import AITutorPanel from './AITutorPanel';
 import {
   getCustomQuestionTemplates,
   validateCustomQuestion,
-  evaluateCustomQuestion
+  evaluateCustomQuestion,
+  recordProgressAttempt
 } from '../services/api';
 import './CustomQuestionPanel.css';
 
@@ -149,6 +150,27 @@ export default function CustomQuestionPanel({
       const firstFail = res.test_results?.find(t => !t.passed);
       if (firstFail) {
         setExpandedTc(firstFail.test_case_id);
+      }
+
+      // Phase A12: Record custom task evaluation attempt in Progress & Score Engine
+      try {
+        recordProgressAttempt({
+          taskId: question.id || 'custom_task',
+          taskTitle: question.title || 'Custom Question',
+          category: 'custom',
+          scorePercentage: res.score_percentage || 0,
+          passedAll: !!res.passed_all,
+          passedTests: res.passed_tests || 0,
+          totalTests: res.total_tests || 0,
+        })
+          .then(() => {
+            window.dispatchEvent(new CustomEvent('progress-updated'));
+          })
+          .catch((progErr) => {
+            console.warn('Failed to record custom task progress:', progErr);
+          });
+      } catch (err) {
+        console.warn('Error recording custom progress attempt:', err);
       }
     } catch (err) {
       setEvalError(err.message || 'Failed to evaluate custom question.');

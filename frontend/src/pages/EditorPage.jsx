@@ -22,7 +22,7 @@ import TaskEvaluationPanel from '../components/TaskEvaluationPanel';
 import CustomQuestionPanel from '../components/CustomQuestionPanel';
 import AITutorPanel from '../components/AITutorPanel';
 import HelpUsageWidget from '../components/HelpUsageWidget';
-import { runCode, evaluateTask, getSampleTasks, fetchHints } from '../services/api';
+import { runCode, evaluateTask, getSampleTasks, fetchHints, recordProgressAttempt } from '../services/api';
 import './EditorPage.css';
 
 export default function EditorPage() {
@@ -153,6 +153,27 @@ export default function EditorPage() {
       } else {
         // Solution passed 100% — clear hints
         setHintsData(null);
+      }
+
+      // Phase A12: Record task evaluation attempt in Progress & Score Engine
+      try {
+        recordProgressAttempt({
+          taskId: activeTask.id,
+          taskTitle: activeTask.title,
+          category: 'starter',
+          scorePercentage: evalRes.score_percentage || 0,
+          passedAll: !!evalRes.passed_all,
+          passedTests: evalRes.passed_tests || 0,
+          totalTests: evalRes.total_tests || 0,
+        })
+          .then(() => {
+            window.dispatchEvent(new CustomEvent('progress-updated'));
+          })
+          .catch((progErr) => {
+            console.warn('Failed to record progress attempt:', progErr);
+          });
+      } catch (err) {
+        console.warn('Error recording progress attempt:', err);
       }
     } catch (err) {
       setApiError(err.message || 'Failed to evaluate task on backend');

@@ -395,4 +395,80 @@ export async function getHelpEvents(limit = 50) {
   return apiGet(`/api/help-counter/events?limit=${limit}`);
 }
 
+/**
+ * Retrieve global student progress and score summary (Phase A12).
+ *
+ * @returns {Promise<{
+ *   success: boolean,
+ *   summary: {
+ *     total_tasks_available: number,
+ *     tasks_attempted: number,
+ *     tasks_completed: number,
+ *     completion_percentage: number,
+ *     total_attempts: number,
+ *     average_best_score: number,
+ *     total_assists_linked: number,
+ *     tasks: object
+ *   }
+ * }>}
+ */
+export async function getProgressSummary() {
+  return apiGet('/api/progress/summary');
+}
+
+/**
+ * Record a task evaluation attempt and update cumulative progress (Phase A12).
+ *
+ * @param {object} params
+ * @param {string} params.taskId
+ * @param {string} [params.taskTitle]
+ * @param {'starter'|'custom'} [params.category='starter']
+ * @param {number} params.scorePercentage
+ * @param {boolean} params.passedAll
+ * @param {number} [params.passedTests=0]
+ * @param {number} [params.totalTests=0]
+ * @param {object} [params.assistanceSnapshot=null]
+ * @returns {Promise<{ success: boolean, task: object, summary: object }>}
+ */
+export async function recordProgressAttempt({
+  taskId,
+  taskTitle = null,
+  category = 'starter',
+  scorePercentage,
+  passedAll,
+  passedTests = 0,
+  totalTests = 0,
+  assistanceSnapshot = null,
+}) {
+  return apiPost('/api/progress/record-attempt', {
+    task_id: taskId,
+    task_title: taskTitle,
+    category,
+    score_percentage: scorePercentage,
+    passed_all: passedAll,
+    passed_tests: passedTests,
+    total_tests: totalTests,
+    assistance_snapshot: assistanceSnapshot,
+  });
+}
+
+/**
+ * Retrieve progress record and attempt history for a specific task (Phase A12).
+ *
+ * @param {string} taskId
+ * @returns {Promise<{ success: boolean, task: object }>}
+ */
+export async function getTaskProgress(taskId) {
+  return apiGet(`/api/progress/task/${encodeURIComponent(taskId)}`);
+}
+
+/**
+ * Reset all student progress and score records back to initial state (Phase A12).
+ *
+ * @returns {Promise<{ success: boolean, message: string, summary: object }>}
+ */
+export async function resetProgress() {
+  return apiPost('/api/progress/reset', {});
+}
+
 

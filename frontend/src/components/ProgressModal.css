@@ -1,0 +1,419 @@
+/**
+ * ProgressModal.css — Phase A12: Progress & Score Engine Modal Styles.
+ */
+
+.progress-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 12, 18, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  animation: modalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.progress-modal-card {
+  width: 100%;
+  max-width: 780px;
+  max-height: 90vh;
+  background: var(--color-surface, #1a1d27);
+  border: 1px solid var(--color-border, #2e3247);
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6), 0 0 32px rgba(108, 99, 255, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ───── Header ───── */
+.progress-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  background: rgba(15, 17, 23, 0.7);
+  border-bottom: 1px solid var(--color-border, #2e3247);
+}
+
+.progress-modal__title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progress-modal__icon {
+  font-size: 1.6rem;
+}
+
+.progress-modal__title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-text, #e8eaf0);
+  margin: 0;
+}
+
+.progress-modal__subtitle {
+  font-size: 0.78rem;
+  color: var(--color-text-muted, #8b8fa8);
+}
+
+.progress-modal__close-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-muted, #8b8fa8);
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm, 6px);
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+
+.progress-modal__close-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-text, #e8eaf0);
+}
+
+/* ───── Body ───── */
+.progress-modal__body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Hero Completion Banner */
+.progress-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  background: linear-gradient(135deg, rgba(108, 99, 255, 0.14) 0%, rgba(0, 212, 170, 0.08) 100%);
+  border: 1px solid rgba(108, 99, 255, 0.3);
+  border-radius: var(--radius-md, 10px);
+}
+
+.progress-hero__left {
+  flex: 1;
+  max-width: 480px;
+}
+
+.progress-hero__label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-accent, #00d4aa);
+}
+
+.progress-hero__value {
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 4px 0 10px;
+}
+
+.progress-hero__sub {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text-muted, #8b8fa8);
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary, #6c63ff) 0%, var(--color-accent, #00d4aa) 100%);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.progress-hero__percent {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--color-accent, #00d4aa);
+  padding-left: 20px;
+}
+
+/* Quick Metrics Grid */
+.progress-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 640px) {
+  .progress-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.metric-card {
+  padding: 12px 14px;
+  background: rgba(35, 38, 53, 0.6);
+  border: 1px solid var(--color-border, #2e3247);
+  border-radius: var(--radius-sm, 6px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.metric-card__icon {
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+
+.metric-card__number {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-text, #e8eaf0);
+}
+
+.metric-card__label {
+  font-size: 0.72rem;
+  color: var(--color-text-muted, #8b8fa8);
+  margin-top: 2px;
+}
+
+/* Task Breakdown Section */
+.progress-tasks-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.progress-tasks-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.progress-tasks-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text, #e8eaf0);
+  margin: 0;
+}
+
+.progress-filter-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--color-surface-2, #232635);
+  padding: 3px;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--color-border, #2e3247);
+}
+
+.progress-tab {
+  padding: 4px 10px;
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted, #8b8fa8);
+  font-size: 0.74rem;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.progress-tab:hover {
+  color: var(--color-text, #e8eaf0);
+}
+
+.progress-tab--active {
+  background: var(--color-primary, #6c63ff);
+  color: #fff;
+}
+
+/* Tasks Grid */
+.progress-tasks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 12px;
+}
+
+.progress-task-card {
+  padding: 12px 14px;
+  background: rgba(26, 29, 39, 0.75);
+  border: 1px solid var(--color-border, #2e3247);
+  border-radius: var(--radius-sm, 6px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.progress-task-card:hover {
+  border-color: #3b4059;
+  transform: translateY(-1px);
+}
+
+.progress-task-card--completed {
+  border-color: rgba(34, 197, 94, 0.35);
+  background: rgba(34, 197, 94, 0.04);
+}
+
+.progress-task-card--in_progress {
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+.progress-task-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.progress-task-card__title-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.progress-task-card__category {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-text-muted, #8b8fa8);
+  letter-spacing: 0.03em;
+}
+
+.progress-task-card__name {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--color-text, #e8eaf0);
+  margin: 2px 0 0;
+  line-height: 1.25;
+}
+
+/* Badges */
+.progress-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.progress-badge--completed {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+.progress-badge--in-progress {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.progress-badge--not-attempted {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text-muted, #8b8fa8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Score Rows */
+.progress-task-card__score-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.76rem;
+}
+
+.progress-task-card__score-label {
+  color: var(--color-text-muted, #8b8fa8);
+}
+
+.progress-task-card__score-val {
+  font-weight: 700;
+  color: var(--color-accent, #00d4aa);
+}
+
+.progress-score-mini-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-score-mini-fill {
+  height: 100%;
+  background: var(--color-primary, #6c63ff);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.progress-score-mini-fill--pass {
+  background: var(--color-success, #22c55e);
+}
+
+.progress-task-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--color-text-muted, #8b8fa8);
+  margin-top: 2px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(46, 50, 71, 0.5);
+}
+
+.progress-task-card__latest {
+  font-size: 0.68rem;
+  color: #a5b4fc;
+}
+
+.progress-empty-state {
+  padding: 24px;
+  text-align: center;
+  color: var(--color-text-muted, #8b8fa8);
+  font-size: 0.84rem;
+}
+
+/* ───── Footer ───── */
+.progress-modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  background: rgba(15, 17, 23, 0.7);
+  border-top: 1px solid var(--color-border, #2e3247);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.progress-modal__scope-notice {
+  font-size: 0.72rem;
+  color: var(--color-text-muted, #8b8fa8);
+}
+
+.progress-modal__footer-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
