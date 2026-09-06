@@ -1687,6 +1687,119 @@ python -m pytest tests/ -v
 **Result:** ✅ **210 passed in 11.92s** (100% green, 0 warnings, 0 regressions).  
 **Frontend Build:** ✅ `npm run build` completed in 105ms with zero errors.
 
+---
+
+## PHASE A13 — Debug Mode
+
+**Status:** ✅ COMPLETE  
+**Date completed:** 2026-09-06  
+**Git Commit:** `1dce6e4`  
+
+---
+
+### Executive Summary
+
+Phase A13 delivers **Debug Mode**, the interactive practice mode that exercises the entire CodeMentor AI engine stack in reverse. Rather than constructing code from scratch, students are presented with realistic, intentional broken Python programs. They run the code, observe syntax errors, runtime crashes, or output mismatches, and leverage the platform's diagnostic, hint, and tutoring engines to diagnose, fix, and re-evaluate their solution.
+
+In strict compliance with Part A specifications:
+- The mode is **purely session- and in-memory based**.
+- It reuses all foundational engines: Runner (A3), Diagnostics (A4), Evaluator (A5), Progressive Hints (A6), AI Tutor (A7), AI Error Explanation (A9), Help Counter (A11), and Progress & Score Engine (A12).
+- Progress and scores are recorded dynamically under `category: 'debug'`.
+- Zero database tables, authentication, random mutators, or Part B curriculum dependencies were introduced.
+
+---
+
+### What Was Built
+
+#### 1. Curated Debug Challenges & Service (`backend/app/services/debugger/`)
+
+- **Data Models (`base.py`):**
+  - `DebugChallenge`: Structured challenge definition (`id`, `title`, `description`, `bug_type`, `buggy_code`, `test_cases`, `hints`, `category='debug'`).
+  - `to_task_definition()`: Seamless conversion into standard Phase A5 `TaskDefinition` for test case execution.
+  - `to_dict()`: Clean JSON serialization with masked hidden test cases.
+- **5 Foundational Debugging Starters (`challenges.py`):**
+  1. **`debug_syntax_colon` (Syntax Bug):** Conditional statement missing a colon and unindented body (`if score >= 50`).
+  2. **`debug_type_concat` (Type Bug):** Arithmetic addition without `int()` casting, concatenating strings (`'510'` instead of `15`).
+  3. **`debug_off_by_one` (Logic Bug):** Off-by-one loop boundary in `range(1, 10)` stopping at 9 instead of 10.
+  4. **`debug_even_odd_inverted` (Logic Bug):** Inverted modulo logic where `num % 2 == 1` erroneously prints `"Even"`.
+  5. **`debug_name_error_casing` (Runtime Bug):** Case-sensitive NameError where variable is created as `total` but printed as `Total`.
+- **Package Exports (`__init__.py`):**
+  - `get_debug_challenges()` and `get_debug_challenge(challenge_id)`.
+
+#### 2. Backend REST API Endpoints (`backend/app/routes/debugger.py`)
+
+- **`GET /api/debug/challenges`:**
+  - Returns metadata and starter buggy code for all curated challenges.
+- **`GET /api/debug/challenges/<challenge_id>`:**
+  - Returns challenge details, test case specifications, and tiered hint metadata.
+- **`POST /api/debug/evaluate`:**
+  - Evaluates student's repaired code using Phase A5 `evaluate_task()`.
+  - Automatically records evaluation attempts in Phase A12 `ProgressTracker` with `category: 'debug'`.
+  - Returns evaluation results, diffs, and attaches Phase A6 tiered hints.
+- Registered blueprint `debugger_bp` under `/api` in `backend/app/__init__.py`.
+
+#### 3. Frontend UI & Workspace Integration
+
+- **New Component: `DebugChallengePanel.jsx` & `DebugChallengePanel.css`:**
+  - Challenge selector dropdown with bug classification pills (`🔍 Syntax Bug`, `⚡ Type Error`, `🧩 Logic Bug`, `💥 Runtime Bug`).
+  - Challenge scenario card explaining expected behavior.
+  - "↺ Revert to Buggy Code" action button allowing students to restore the original broken snippet if needed.
+  - Test case breakdown accordion with side-by-side Expected vs. Actual diff views.
+  - Integrated `DiagnosticCard` (A4 + A9) when repaired code throws syntax or runtime exceptions.
+  - Integrated `ProgressiveHintPanel` (A6) with 3-tier progressive reveals (Nudge, Strategy, Structural Clue).
+  - Integrated `AITutorPanel` (A7 + A8) for Socratic guidance.
+  - Success celebration card upon 100% pass.
+- **Workspace Integration (`EditorPage.jsx`):**
+  - Added `🐛 Debug Mode` tab to the mode switcher (`/editor?mode=debug`).
+  - Automatically preloads the active challenge's buggy code into Monaco editor.
+  - Added toolbar "Evaluate Fix" action button.
+  - Extended keyboard shortcut `Ctrl+Enter` to trigger debug evaluation in Debug Mode.
+  - Synchronizes evaluation outcomes with Phase A12 `ProgressModal` via `progress-updated`.
+- **Navigation & Dashboard:**
+  - Updated phase badge in `Navbar.jsx` to `Phase A13`.
+  - Activated `Debug Mode` feature card on `Home.jsx` as `live: true`.
+- **Client Service Layer (`frontend/src/services/api.js`):**
+  - Added `getDebugChallenges()`, `getDebugChallenge()`, and `evaluateDebugChallenge()`.
+
+---
+
+### Scope & Architectural Boundaries Enforced
+
+- ✅ **Strict A13 Scope:** Dedicated entirely to the interactive Debug Mode engine and the 5 curated starter challenges.
+- ❌ **No Scope Creep into Part B:** Did NOT implement extensive curriculum debugging tracks, practice banks, or chapter exams.
+- ❌ **No Arbitrary Mutators:** Relies on curated pedagogical scenarios rather than non-deterministic random code mutators.
+- ✅ **Strictly In-Memory / Session:** Compliant with PRD Part A rules; no databases, auth, or persistent storage.
+- ✅ **Zero Regressions:** 100% of all Phase A1–A12 features, APIs, and tests remained functional and passing.
+
+---
+
+### Automated Test Suite Verification
+
+All backend tests are executed via `pytest`:
+```bash
+cd backend
+.\venv\Scripts\activate
+python -m pytest tests/ -v
+```
+
+#### Final Test Suite Breakdown (226/226 Tests Passing):
+- `tests/test_health.py` — **5 tests** (Health checks, 404 handlers, security headers)
+- `tests/test_runner.py` — **23 tests** (Subprocess execution, syntax/runtime errors, timeouts, memory caps, stdin)
+- `tests/test_diagnostics.py` — **30 tests** (Syntax rules, runtime rules, casing typo corrections, fallback diagnostics)
+- `tests/test_evaluator.py` — **21 tests** (Match modes, logical failures, test crash diagnostics, hidden test masking, evaluator API routes)
+- `tests/test_hints.py` — **28 tests** (Tiered hint models, matchers, task-specific known mistakes, general rules, fallback guarantees, pedagogical integrity, REST API routes)
+- `tests/test_tutor.py` — **16 tests** (AI Tutor models, Socratic prompt assembly, provider abstraction, unconfigured fallbacks, anti-solution safety, REST API routes)
+- `tests/test_ai_config.py` — **14 tests** (Runtime config management, key masking, connection testing, Ollama/Cloud probing, A7 dynamic client sync, REST API routes)
+- `tests/test_ai_error_explainer.py` — **19 tests** (Prompt assembly, mock explanations, JSON client parsing, failure graceful degradation, REST API routes)
+- `tests/test_custom_question.py` — **22 tests** (Templates, validation, evaluation with diffs, diagnostics, AI Tutor prompt integration, REST API routes)
+- `tests/test_help_counter.py` — **17 tests** (Session initial zero state, hint reveal tier increments, AI tutor counter increments, AI error explanation counter increments, combined assistance calculation, invalid event handling, session reset, audit log truncation, REST API summary endpoint, hint reveal recording endpoint, AI tutor recording endpoint, error explanation recording endpoint, missing event validation, invalid event type validation, non-JSON request rejection, counter reset endpoint, audit event log query endpoint)
+- `tests/test_progress.py` — **15 tests** (Initial starter task seeding, first attempt partial score tracking, passing attempt completion, best score preservation on subsequent attempts, custom question progress tracking, completion rate calculation, average best score calculation, tracker reset, REST API summary endpoint, record attempt endpoint, missing task ID validation, invalid score validation, non-JSON request rejection, get task progress endpoint, not found 404 handling, reset progress endpoint)
+- `tests/test_debugger.py` — **16 tests** (5 curated challenge catalog verification, data model serialization, lookup by ID, intentional failure of buggy syntax colon, fix verification syntax colon 100%, intentional failure of type concat, fix verification type concat 100%, intentional failure of off-by-one loop, fix verification off-by-one 100%, intentional failure of even-odd inverted, fix verification even-odd inverted 100%, intentional failure of NameError casing with A4 diagnostic, fix verification NameError 100%, ProgressTracker category 'debug' integration, REST API challenge listing, challenge detail retrieval, 404 handling, evaluate debug challenge route with score recording, missing field validation, non-JSON request rejection)
+
+**Result:** ✅ **226 passed in 12.47s** (100% green, 0 warnings, 0 regressions).  
+**Frontend Build:** ✅ `npm run build` completed in 105ms with zero errors.
+
+
 
 
 
