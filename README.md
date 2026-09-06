@@ -89,5 +89,5 @@ AI responses can be generated using cloud LLM APIs or local models through Ollam
 ### AI Error Explanation / AI Tutor
 ![Beginner-Friendly Error Diagnostics and AI Error Deep Dive](IMAGES/4.png)
 
-### Other Coding Modes / Platform Features
+### AI Connection & Configuration
 ![AI Connection and Configuration Settings](IMAGES/5.png)
