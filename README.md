@@ -1,232 +1,81 @@
 # CodeMentor AI
 
-> An interactive Python learning platform with AI-assisted tutoring.
+> An AI-powered interactive Python learning and coding platform for beginners.
 
-**Current status: Phase A1 — Project Foundation** ✅
+CodeMentor AI helps students learn Python by writing, running, debugging, and improving code with automated diagnostics, task evaluation, progressive hints, and AI-powered tutoring.
 
----
+## ✨ Features
 
-## What is CodeMentor AI?
+- 🐍 Interactive Python Editor with Monaco Editor
+- ⚡ Controlled Python Code Execution
+- 🔍 Beginner-Friendly Error Diagnostics
+- 🎯 Automated Task & Test-Case Evaluation
+- 💡 Progressive Rule-Based Hints
+- 🤖 AI Tutor & AI Error Explanation
+- ✏️ Custom Question Mode
+- 🐞 Debug Mode
+- 📊 Progress & Score Tracking
+- ⚙️ Multiple AI Provider Support
 
-CodeMentor AI is a Python learning platform where students learn by writing and running code inside the application. The platform helps students understand errors, receive hints, debug code, and progressively solve programming problems — with AI assistance available when needed.
+## 🤖 AI Architecture
 
-The project is built in two parts:
+CodeMentor AI uses a **hybrid AI architecture** combining deterministic programming systems with LLMs.
 
-| Part | Focus |
-|------|-------|
-| **Part A — Core Engine** | Code Editor, Code Runner, Diagnostics, AI Tutor, Progress System |
-| **Part B — Educational Course** | Python curriculum, lessons, practice, exams |
+```text
+                  CodeMentor AI
+                       │
+                React Frontend
+                       │
+                 Flask REST API
+                       │
+        ┌──────────────┼──────────────┐
+        ↓              ↓              ↓
+   Code Runner    Diagnostics     Evaluator
+        │              │              │
+        └──────────────┼──────────────┘
+                       ↓
+                Hint / AI Layer
+                       │
+          ┌────────────┼────────────┐
+          ↓            ↓            ↓
+       OpenAI       Claude       Gemini
+          │
+       Ollama
+     (Local LLM)
 
-*Part B begins only after Part A is stable.*
+The platform can use rule-based systems for deterministic feedback and LLMs for contextual tutoring, deeper explanations, and personalized guidance.
 
----
+🧠 AI Workflow
 
-## Current Phase: A1 — Project Foundation
+Student Code
+     ↓
+Run / Evaluate
+     ↓
+Detect Problem
+     ↓
+Rule-Based Hint
+     ↓
+AI Tutor
+     ↓
+Student Improves Code
+     ↓
+Run Again
 
-Phase A1 establishes the clean, working foundation for all future phases:
+AI responses can be generated using cloud LLM APIs or local models through Ollama, allowing the system to remain flexible across different AI providers.
 
-- ✅ React + Vite frontend application
-- ✅ Flask backend with maintainable route structure
-- ✅ Frontend ↔ Backend API communication (`GET /api/health`)
-- ✅ Environment / configuration management
-- ✅ Git-ready project structure
+🛠️ Tech Stack
+Category	Technologies
+Frontend	React, Vite, Monaco Editor
+Backend	Python, Flask
+Database	SQLite
+AI	OpenAI, Claude, Gemini, Ollama
+APIs	REST, JSON
+Testing	Pytest
+Version Control	Git, GitHub
 
----
+<img width="1157" height="997" alt="1" src="https://github.com/user-attachments/assets/1896e930-2bb9-4bfa-96d5-430fb29ae425" />
+<img width="1071" height="789" alt="3" src="https://github.com/user-attachments/assets/63bb216d-10b1-4598-9b3c-2da1b7e6c981" />
+<img width="764" height="947" alt="4" src="https://github.com/user-attachments/assets/36a854c8-3079-442d-b5fd-4291dd2cf4be" />
+<img width="878" height="746" alt="5" src="https://github.com/user-attachments/assets/fb5feadb-5f16-460a-862d-3dde8e9664d7" />
 
-## Technology Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | React, Vite, plain CSS |
-| Backend | Python, Flask |
-| Database | SQLite *(introduced in a later phase)* |
-| AI | OpenAI / Claude / Gemini / Ollama *(Phase A7+)* |
-
----
-
-## Project Structure
-
-```
-code-mentor/
-├── frontend/                  # React + Vite application
-│   ├── src/
-│   │   ├── components/        # Reusable UI components
-│   │   ├── pages/             # Page-level components
-│   │   ├── services/          # API communication (api.js)
-│   │   ├── hooks/             # Custom React hooks (future)
-│   │   ├── App.jsx
-│   │   ├── App.css
-│   │   ├── main.jsx
-│   │   └── index.css          # Global CSS design system
-│   ├── public/
-│   ├── index.html
-│   ├── vite.config.js         # Dev proxy → Flask :5000
-│   ├── package.json
-│   └── .env.example
-│
-├── backend/                   # Flask application
-│   ├── app/
-│   │   ├── routes/
-│   │   │   └── health.py      # GET /api/health
-│   │   ├── services/          # Business logic (future)
-│   │   ├── utils/             # Shared helpers (future)
-│   │   ├── __init__.py        # App factory
-│   │   └── config.py          # Environment-based config
-│   ├── tests/
-│   │   └── test_health.py     # Backend tests
-│   ├── run.py                 # Flask entry point
-│   ├── requirements.txt
-│   └── .env.example
-│
-├── docs/                      # Project documentation (future)
-├── .gitignore
-├── README.md
-└── CodeMentor_AI_Project_Blueprint_PRD.md
-```
-
----
-
-## Prerequisites
-
-- **Python** 3.10+ ([python.org](https://www.python.org/))
-- **Node.js** 18+ and **npm** ([nodejs.org](https://nodejs.org/))
-- **Git**
-
----
-
-## Setup
-
-### 1. Clone the repository
-
-```bash
-git clone <repository-url>
-cd code-mentor
-```
-
-### 2. Backend setup
-
-```bash
-cd backend
-
-# Create a virtual environment
-python -m venv venv
-
-# Activate it
-# Windows:
-.\venv\Scripts\activate
-# macOS/Linux:
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# (Optional) Copy and edit the example environment file
-copy .env.example .env
-```
-
-### 3. Frontend setup
-
-```bash
-cd frontend
-
-# Install dependencies
-npm install
-
-# (Optional) Copy the example environment file
-copy .env.example .env.local
-```
-
----
-
-## Running the Application
-
-You need **two terminal windows** — one for the backend, one for the frontend.
-
-### Terminal 1 — Start the backend
-
-```bash
-cd backend
-.\venv\Scripts\activate   # Windows
-# source venv/bin/activate  # macOS/Linux
-
-python run.py
-```
-
-Flask will start on **http://localhost:5000**
-
-### Terminal 2 — Start the frontend
-
-```bash
-cd frontend
-npm run dev
-```
-
-Vite will start on **http://localhost:5173**
-
-Open **http://localhost:5173** in your browser.
-
----
-
-## Verifying Frontend ↔ Backend Communication
-
-1. Start the Flask backend (Terminal 1).
-2. Start the Vite frontend (Terminal 2).
-3. Open [http://localhost:5173](http://localhost:5173).
-4. The dashboard should display **"Backend Status: Connected"** with a green indicator.
-
-If Flask is not running, the dashboard will show **"Backend Status: Unreachable"** with a red indicator.
-
-You can also test the API directly:
-
-```bash
-curl http://localhost:5000/api/health
-```
-
-Expected response:
-
-```json
-{
-  "status": "ok",
-  "service": "CodeMentor AI Backend",
-  "phase": "A1"
-}
-```
-
----
-
-## Running Backend Tests
-
-```bash
-cd backend
-.\venv\Scripts\activate
-python -m pytest tests/ -v
-```
-
----
-
-## Development Phases
-
-| Phase | Description | Status |
-|-------|-------------|--------|
-| A1 | Project Foundation | ✅ Complete |
-| A2 | Code Editor (Monaco) | 🔜 Next |
-| A3 | Code Runner Engine | 🔜 Planned |
-| A4 | Code Diagnostic Engine | 🔜 Planned |
-| A5 | Task Evaluation Engine | 🔜 Planned |
-| A6 | Known Mistake / Hint System | 🔜 Planned |
-| A7 | AI Tutor Engine | 🔜 Planned |
-| A8 | AI Connection & Configuration | 🔜 Planned |
-| A9 | AI Error Explanation | 🔜 Planned |
-| A10 | Custom Question Mode | 🔜 Planned |
-| A11 | Help / AI Usage Counter | 🔜 Planned |
-| A12 | Progress & Score Engine | 🔜 Planned |
-| A13 | Debug Mode | 🔜 Planned |
-| A14 | Part A Integration & Testing | 🔜 Planned |
-
----
-
-## Contributing
-
-This project follows a phase-by-phase development strategy. See `CodeMentor_AI_Project_Blueprint_PRD.md` for the full project specification.
-
-Do not start Part B until Part A is stable.
