@@ -339,7 +339,7 @@ export default function EditorPage() {
               ? 'Custom Question Playground'
               : 'Python Editor & Diagnostics'}
           </h1>
-          <span className="editor-page__phase-tag">Phase A13 Live</span>
+          <span className="editor-page__phase-tag">Phase A14 Live</span>
         </div>
         <p className="editor-page__subtitle">
           {mode === 'task'

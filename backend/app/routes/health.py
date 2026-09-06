@@ -16,7 +16,7 @@ def health_check():
     return jsonify({
         "status": "ok",
         "service": "CodeMentor AI Backend",
-        "phase": "A5"
+        "phase": "A14"
     }), 200
 
 

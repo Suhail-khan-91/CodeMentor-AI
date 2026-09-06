@@ -76,7 +76,7 @@ def record_task_attempt():
             passed_tests=int(passed_tests),
             total_tests=int(total_tests),
             task_title=task_title.strip() if isinstance(task_title, str) else None,
-            category="custom" if category == "custom" else "starter",
+            category="custom" if category == "custom" else ("debug" if category == "debug" else "starter"),
             assistance_snapshot=assistance_snapshot if isinstance(assistance_snapshot, dict) else None,
         )
         return jsonify({
