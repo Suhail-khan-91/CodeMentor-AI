@@ -12,6 +12,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { recordHelpEvent } from '../services/api';
 import './ProgressiveHintPanel.css';
 
 export default function ProgressiveHintPanel({ hintsData, taskTitle }) {
@@ -32,7 +33,21 @@ export default function ProgressiveHintPanel({ hintsData, taskTitle }) {
 
   const handleRevealNext = () => {
     if (unlockedLevel < 3) {
-      setUnlockedLevel(prev => prev + 1);
+      const nextLevel = unlockedLevel + 1;
+      setUnlockedLevel(nextLevel);
+
+      // Phase A11: Track hint reveal assistance event
+      recordHelpEvent('hint_reveal', {
+        level: nextLevel,
+        rule_id: hintsData?.rule_id || null,
+        task_title: taskTitle || null,
+      })
+        .then(() => {
+          window.dispatchEvent(new CustomEvent('help-counter-updated'));
+        })
+        .catch((err) => {
+          console.warn('Failed to record hint assistance event:', err);
+        });
     }
   };
 

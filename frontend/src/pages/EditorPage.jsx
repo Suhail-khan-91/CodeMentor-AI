@@ -21,6 +21,7 @@ import DiagnosticCard from '../components/DiagnosticCard';
 import TaskEvaluationPanel from '../components/TaskEvaluationPanel';
 import CustomQuestionPanel from '../components/CustomQuestionPanel';
 import AITutorPanel from '../components/AITutorPanel';
+import HelpUsageWidget from '../components/HelpUsageWidget';
 import { runCode, evaluateTask, getSampleTasks, fetchHints } from '../services/api';
 import './EditorPage.css';
 
@@ -322,6 +323,9 @@ export default function EditorPage() {
               <span aria-hidden="true">↺</span>
               Reset
             </button>
+
+            {/* Phase A11: Help / AI Assistance Counter */}
+            <HelpUsageWidget />
 
             <span className="editor-panel__shortcut-hint">
               <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to {mode === 'task' ? 'evaluate' : 'run'}

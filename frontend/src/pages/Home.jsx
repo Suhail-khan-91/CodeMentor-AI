@@ -99,8 +99,15 @@ const FEATURE_CARDS = [
     href: '/editor?mode=custom',
     live: true,
   },
-
-
+  {
+    id: 'help-counter',
+    icon: '💡',
+    title: 'Help / AI Usage Counter',
+    description: 'Monitor assistance usage across rule-based hints, AI tutor prompts, and error deconstructions in real time.',
+    phase: 'Phase A11',
+    href: '/editor',
+    live: true,
+  },
   {
     id: 'progress',
     icon: '📊',

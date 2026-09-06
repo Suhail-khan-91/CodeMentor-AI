@@ -1,0 +1,276 @@
+/**
+ * HelpUsageWidget.css — Phase A11: Help Usage Counter Styles.
+ */
+
+.help-usage-widget {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ───── Trigger Button / Pill ───── */
+.help-usage-widget__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: var(--color-surface-2, #232635);
+  border: 1px solid var(--color-border, #2e3247);
+  border-radius: var(--radius-sm, 6px);
+  color: var(--color-text-muted, #8b8fa8);
+  font-family: var(--font-family, 'Inter', sans-serif);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.help-usage-widget__trigger:hover {
+  background: #2a2e40;
+  border-color: #3b4059;
+  color: var(--color-text, #e8eaf0);
+}
+
+.help-usage-widget__trigger--active {
+  border-color: rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.08);
+  color: #fbbf24;
+}
+
+.help-usage-widget__trigger--active:hover {
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(245, 158, 11, 0.6);
+}
+
+.help-usage-widget__icon {
+  font-size: 0.88rem;
+  line-height: 1;
+}
+
+.help-usage-widget__label {
+  font-size: 0.78rem;
+}
+
+.help-usage-widget__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.1);
+  color: inherit;
+}
+
+.help-usage-widget__trigger--active .help-usage-widget__badge {
+  background: #f59e0b;
+  color: #111827;
+}
+
+/* ───── Popover Dropdown Card ───── */
+.help-usage-widget__popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 310px;
+  background: rgba(26, 29, 39, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border, #2e3247);
+  border-radius: var(--radius-md, 10px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55), 0 0 20px rgba(108, 99, 255, 0.12);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: popoverFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes popoverFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ───── Header ───── */
+.help-usage-widget__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: rgba(15, 17, 23, 0.6);
+  border-bottom: 1px solid var(--color-border, #2e3247);
+}
+
+.help-usage-widget__header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--color-text, #e8eaf0);
+}
+
+.help-usage-widget__mode-tag {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(108, 99, 255, 0.18);
+  color: #a5b4fc;
+  border: 1px solid rgba(108, 99, 255, 0.3);
+}
+
+.help-usage-widget__btn-close {
+  background: none;
+  border: none;
+  color: var(--color-text-muted, #8b8fa8);
+  font-size: 1.1rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.help-usage-widget__btn-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-text, #e8eaf0);
+}
+
+/* ───── Body ───── */
+.help-usage-widget__body {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Tally Box */
+.help-usage-widget__tally-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border-radius: var(--radius-sm, 6px);
+  background: rgba(35, 38, 53, 0.7);
+  border: 1px solid rgba(46, 50, 71, 0.8);
+}
+
+.help-usage-widget__tally-number {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #fbbf24;
+  line-height: 1.1;
+}
+
+.help-usage-widget__tally-label {
+  font-size: 0.72rem;
+  color: var(--color-text-muted, #8b8fa8);
+  margin-top: 2px;
+}
+
+/* Breakdown List */
+.help-usage-widget__breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.help-usage-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  background: rgba(15, 17, 23, 0.4);
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid rgba(46, 50, 71, 0.4);
+}
+
+.help-usage-row__info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.help-usage-row__icon {
+  font-size: 1rem;
+}
+
+.help-usage-row__title {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--color-text, #e8eaf0);
+}
+
+.help-usage-row__sub {
+  font-size: 0.68rem;
+  color: var(--color-text-muted, #8b8fa8);
+}
+
+.help-usage-row__count {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #a5b4fc;
+  min-width: 20px;
+  text-align: right;
+}
+
+/* Note */
+.help-usage-widget__note {
+  font-size: 0.68rem;
+  color: var(--color-text-muted, #8b8fa8);
+  line-height: 1.35;
+  background: rgba(108, 99, 255, 0.06);
+  padding: 6px 8px;
+  border-radius: 4px;
+  border-left: 2px solid var(--color-primary, #6c63ff);
+}
+
+/* ───── Footer ───── */
+.help-usage-widget__footer {
+  padding: 8px 14px;
+  background: rgba(15, 17, 23, 0.6);
+  border-top: 1px solid var(--color-border, #2e3247);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.help-usage-widget__btn-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  font-size: 0.74rem;
+  font-weight: 500;
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-sm, 6px);
+  color: #fca5a5;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.help-usage-widget__btn-reset:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #ef4444;
+}
+
+.help-usage-widget__btn-reset:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-color: transparent;
+}

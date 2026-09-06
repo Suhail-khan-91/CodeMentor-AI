@@ -6,7 +6,7 @@
  */
 
 import { useState } from 'react';
-import { explainErrorWithAI } from '../services/api';
+import { explainErrorWithAI, recordHelpEvent } from '../services/api';
 import './DiagnosticCard.css';
 
 export default function DiagnosticCard({
@@ -82,6 +82,19 @@ export default function DiagnosticCard({
       const response = await explainErrorWithAI(payload);
       if (response && response.headline) {
         setAiExplanation(response);
+
+        // Phase A11: Track AI Error Explanation assistance event
+        recordHelpEvent('ai_error_explain', {
+          error_type: error_type || executionResult?.error_type || 'Error',
+          line_number: line_number || executionResult?.line_number || null,
+          category: category || 'runtime',
+        })
+          .then(() => {
+            window.dispatchEvent(new CustomEvent('help-counter-updated'));
+          })
+          .catch((err) => {
+            console.warn('Failed to record error explanation assistance event:', err);
+          });
       } else {
         setAiError(response?.error_message || 'Could not generate explanation. Try again.');
       }

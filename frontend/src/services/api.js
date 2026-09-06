@@ -339,3 +339,60 @@ export async function evaluateCustomQuestion(code, question) {
   return apiPost('/api/custom-questions/evaluate', { code, question });
 }
 
+/**
+ * Retrieve session assistance metrics summary (Phase A11).
+ *
+ * @returns {Promise<{
+ *   success: boolean,
+ *   summary: {
+ *     total_assists: number,
+ *     hints: {
+ *       total: number,
+ *       level_1_nudge: number,
+ *       level_2_strategy: number,
+ *       level_3_structure: number
+ *     },
+ *     ai_tutor_queries: number,
+ *     ai_error_explanations: number,
+ *     total_events_logged: number
+ *   }
+ * }>}
+ */
+export async function getHelpSummary() {
+  return apiGet('/api/help-counter/summary');
+}
+
+/**
+ * Record a student assistance event (Phase A11).
+ *
+ * @param {'hint_reveal'|'ai_tutor_ask'|'ai_error_explain'} eventType
+ * @param {object} [details={}]
+ * @returns {Promise<{ success: boolean, event_type: string, summary: object }>}
+ */
+export async function recordHelpEvent(eventType, details = {}) {
+  return apiPost('/api/help-counter/record', {
+    event_type: eventType,
+    details
+  });
+}
+
+/**
+ * Reset session assistance counters (Phase A11).
+ *
+ * @returns {Promise<{ success: boolean, message: string, summary: object }>}
+ */
+export async function resetHelpCounter() {
+  return apiPost('/api/help-counter/reset', {});
+}
+
+/**
+ * Retrieve recent assistance events for active session (Phase A11).
+ *
+ * @param {number} [limit=50]
+ * @returns {Promise<{ success: boolean, events: Array<object> }>}
+ */
+export async function getHelpEvents(limit = 50) {
+  return apiGet(`/api/help-counter/events?limit=${limit}`);
+}
+
+

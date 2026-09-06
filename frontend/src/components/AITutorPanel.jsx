@@ -10,7 +10,7 @@
  */
 
 import { useState } from 'react';
-import { askAITutor } from '../services/api';
+import { askAITutor, recordHelpEvent } from '../services/api';
 import AISettingsModal from './AISettingsModal';
 import './AITutorPanel.css';
 
@@ -48,6 +48,21 @@ export default function AITutorPanel({
       });
 
       setTutorData(response);
+
+      // Phase A11: Track AI Tutor inquiry assistance event
+      if (response && response.success !== false) {
+        recordHelpEvent('ai_tutor_ask', {
+          task_id: activeTask?.id || null,
+          task_title: activeTask?.title || 'Custom/Free Code',
+          question: question.trim() || undefined,
+        })
+          .then(() => {
+            window.dispatchEvent(new CustomEvent('help-counter-updated'));
+          })
+          .catch((err) => {
+            console.warn('Failed to record tutor assistance event:', err);
+          });
+      }
     } catch (err) {
       setApiError(err.message || 'Failed to reach AI Tutor.');
     } finally {
