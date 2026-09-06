@@ -117,6 +117,15 @@ const FEATURE_CARDS = [
     href: '/editor',
     live: true,
   },
+  {
+    id: 'debug-mode',
+    icon: '🐛',
+    title: 'Debug Mode',
+    description: 'Inspect and fix realistic broken Python code using diagnostics, test case diffs, and tiered hints.',
+    phase: 'Phase A13',
+    href: '/editor?mode=debug',
+    live: true,
+  },
 ];
 
 export default function Home() {

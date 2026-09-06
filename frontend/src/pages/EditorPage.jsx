@@ -20,23 +20,32 @@ import CodeEditor, { DEFAULT_PYTHON_CODE } from '../components/CodeEditor';
 import DiagnosticCard from '../components/DiagnosticCard';
 import TaskEvaluationPanel from '../components/TaskEvaluationPanel';
 import CustomQuestionPanel from '../components/CustomQuestionPanel';
+import DebugChallengePanel from '../components/DebugChallengePanel';
 import AITutorPanel from '../components/AITutorPanel';
 import HelpUsageWidget from '../components/HelpUsageWidget';
-import { runCode, evaluateTask, getSampleTasks, fetchHints, recordProgressAttempt } from '../services/api';
+import {
+  runCode,
+  evaluateTask,
+  getSampleTasks,
+  fetchHints,
+  recordProgressAttempt,
+  getDebugChallenges,
+  evaluateDebugChallenge,
+} from '../services/api';
 import './EditorPage.css';
 
 export default function EditorPage() {
   const getInitialMode = () => {
     try {
       const urlMode = new URLSearchParams(window.location.search).get('mode');
-      if (urlMode === 'custom' || urlMode === 'task' || urlMode === 'editor') {
+      if (urlMode === 'custom' || urlMode === 'task' || urlMode === 'editor' || urlMode === 'debug') {
         return urlMode;
       }
     } catch (e) {}
     return 'editor';
   };
 
-  const [mode, setMode] = useState(getInitialMode); // 'editor' | 'task' | 'custom'
+  const [mode, setMode] = useState(getInitialMode); // 'editor' | 'task' | 'custom' | 'debug'
   const [code, setCode] = useState(DEFAULT_PYTHON_CODE);
 
   // Runner & Diagnostics state (Free Play Mode)
@@ -52,6 +61,12 @@ export default function EditorPage() {
   const [evaluationResult, setEvaluationResult] = useState(null);
   const [hintsData, setHintsData] = useState(null);
 
+  // Debug Mode state (Phase A13)
+  const [debugChallenges, setDebugChallenges] = useState([]);
+  const [activeDebugChallenge, setActiveDebugChallenge] = useState(null);
+  const [isDebugEvaluating, setIsDebugEvaluating] = useState(false);
+  const [debugEvaluationResult, setDebugEvaluationResult] = useState(null);
+  const [debugHintsData, setDebugHintsData] = useState(null);
 
   // Load sample practice tasks on mount
   useEffect(() => {
@@ -64,6 +79,21 @@ export default function EditorPage() {
       })
       .catch((err) => {
         console.warn('Failed to load sample tasks:', err);
+      });
+
+    // Load Phase A13 debug challenges
+    getDebugChallenges()
+      .then((data) => {
+        if (data?.challenges?.length > 0) {
+          setDebugChallenges(data.challenges);
+          setActiveDebugChallenge(data.challenges[0]);
+          if (getInitialMode() === 'debug' && data.challenges[0].buggy_code) {
+            setCode(data.challenges[0].buggy_code);
+          }
+        }
+      })
+      .catch((err) => {
+        console.warn('Failed to load debug challenges:', err);
       });
   }, []);
 
@@ -83,25 +113,51 @@ export default function EditorPage() {
     }
   }, [tasks]);
 
+  const handleSelectDebugChallenge = useCallback((challengeId) => {
+    const selected = debugChallenges.find((c) => c.id === challengeId);
+    if (selected) {
+      setActiveDebugChallenge(selected);
+      setDebugEvaluationResult(null);
+      setDebugHintsData(null);
+      if (selected.buggy_code) {
+        setCode(selected.buggy_code);
+      }
+    }
+  }, [debugChallenges]);
+
+  const handleResetToBuggy = useCallback(() => {
+    if (activeDebugChallenge?.buggy_code) {
+      setCode(activeDebugChallenge.buggy_code);
+      setDebugEvaluationResult(null);
+      setDebugHintsData(null);
+    }
+  }, [activeDebugChallenge]);
+
   const handleSwitchMode = (newMode) => {
     setMode(newMode);
     if (newMode === 'task' && activeTask && activeTask.starter_code && code === DEFAULT_PYTHON_CODE) {
       setCode(activeTask.starter_code);
+    } else if (newMode === 'debug' && activeDebugChallenge?.buggy_code) {
+      setCode(activeDebugChallenge.buggy_code);
     }
   };
 
   const handleResetCode = useCallback(() => {
     if (mode === 'task' && activeTask?.starter_code) {
       setCode(activeTask.starter_code);
+    } else if (mode === 'debug' && activeDebugChallenge?.buggy_code) {
+      setCode(activeDebugChallenge.buggy_code);
     } else {
       setCode(DEFAULT_PYTHON_CODE);
     }
     setResult(null);
     setEvaluationResult(null);
+    setDebugEvaluationResult(null);
     setHintsData(null);
+    setDebugHintsData(null);
     setApiError(null);
     setShowDiagnostic(true);
-  }, [mode, activeTask]);
+  }, [mode, activeTask, activeDebugChallenge]);
 
   const handleClearOutput = useCallback(() => {
     setResult(null);
@@ -182,6 +238,37 @@ export default function EditorPage() {
     }
   }, [code, activeTask, isEvaluating, isRunning]);
 
+  /**
+   * Evaluate repaired code against active Debug Mode challenge test cases (Phase A13).
+   */
+  const handleEvaluateDebug = useCallback(async () => {
+    if (!activeDebugChallenge || isDebugEvaluating || isRunning) return;
+
+    setIsDebugEvaluating(true);
+    setApiError(null);
+
+    try {
+      const res = await evaluateDebugChallenge(activeDebugChallenge.id, code);
+      if (res?.evaluation) {
+        setDebugEvaluationResult(res.evaluation);
+        if (res.hints) {
+          setDebugHintsData({
+            has_hints: true,
+            hints: res.hints,
+            rule_name: res.hints.rule_name,
+            matched_mistake: res.hints.matched_mistake,
+            source: res.hints.source || 'rule_based',
+          });
+        }
+        window.dispatchEvent(new CustomEvent('progress-updated'));
+      }
+    } catch (err) {
+      setApiError(err.message || 'Failed to evaluate debug challenge on backend');
+    } finally {
+      setIsDebugEvaluating(false);
+    }
+  }, [code, activeDebugChallenge, isDebugEvaluating, isRunning]);
+
   // Keyboard shortcut: Ctrl+Enter executes or evaluates depending on mode
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -189,6 +276,8 @@ export default function EditorPage() {
         e.preventDefault();
         if (mode === 'task') {
           handleEvaluate();
+        } else if (mode === 'debug') {
+          handleEvaluateDebug();
         } else {
           handleRun();
         }
@@ -197,7 +286,7 @@ export default function EditorPage() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [mode, handleRun, handleEvaluate]);
+  }, [mode, handleRun, handleEvaluate, handleEvaluateDebug]);
 
   // Helper to render status badge in terminal header
   const renderStatusBadge = () => {
@@ -242,13 +331,23 @@ export default function EditorPage() {
       <div className="editor-page__header container">
         <div className="editor-page__title-group">
           <h1 className="editor-page__title">
-            {mode === 'task' ? 'Task Evaluation & Practice' : 'Python Editor & Diagnostics'}
+            {mode === 'task'
+              ? 'Task Evaluation & Practice'
+              : mode === 'debug'
+              ? 'Debug Mode: Fix Broken Code'
+              : mode === 'custom'
+              ? 'Custom Question Playground'
+              : 'Python Editor & Diagnostics'}
           </h1>
-          <span className="editor-page__phase-tag">Phase A7 Live</span>
+          <span className="editor-page__phase-tag">Phase A13 Live</span>
         </div>
         <p className="editor-page__subtitle">
           {mode === 'task'
             ? 'Solve structured programming tasks and evaluate your solution against test cases in real-time.'
+            : mode === 'debug'
+            ? 'Diagnose and fix realistic broken Python code using plain-English diagnostics, test diffs, and tiered hints.'
+            : mode === 'custom'
+            ? 'Author your own programming questions and verify solutions with custom test criteria.'
             : 'Write Python code, execute in an isolated sandbox, and receive instant beginner-friendly error diagnostics.'}
         </p>
 
@@ -281,6 +380,16 @@ export default function EditorPage() {
             id="tab-custom-mode"
           >
             <span aria-hidden="true">✏️</span> Custom Question Mode
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mode === 'debug'}
+            className={`mode-tab ${mode === 'debug' ? 'mode-tab--active' : ''}`}
+            onClick={() => handleSwitchMode('debug')}
+            id="tab-debug-mode"
+          >
+            <span aria-hidden="true">🐛</span> Debug Mode
           </button>
         </div>
       </div>
@@ -319,6 +428,32 @@ export default function EditorPage() {
                   {isRunning ? 'Running…' : 'Run Script'}
                 </button>
               </>
+            ) : mode === 'debug' ? (
+              <>
+                <button
+                  id="btn-evaluate-debug"
+                  className="btn btn--primary"
+                  onClick={handleEvaluateDebug}
+                  disabled={isDebugEvaluating || isRunning}
+                  aria-label="Evaluate fix against test cases"
+                  title="Grade repaired code against tests (Ctrl+Enter)"
+                >
+                  <span aria-hidden="true">{isDebugEvaluating ? '⏳' : '⚡'}</span>
+                  {isDebugEvaluating ? 'Evaluating…' : 'Evaluate Fix'}
+                </button>
+
+                <button
+                  id="btn-run-code"
+                  className="btn btn--secondary"
+                  onClick={handleRun}
+                  disabled={isRunning || isDebugEvaluating}
+                  aria-label="Run code in terminal"
+                  title="Run in terminal without grading"
+                >
+                  <span aria-hidden="true">{isRunning ? '⏳' : '▶'}</span>
+                  {isRunning ? 'Running…' : 'Run Script'}
+                </button>
+              </>
             ) : (
               <button
                 id="btn-run-code"
@@ -337,7 +472,7 @@ export default function EditorPage() {
               id="btn-clear-code"
               className="btn btn--ghost"
               onClick={handleResetCode}
-              disabled={isRunning || isEvaluating}
+              disabled={isRunning || isEvaluating || isDebugEvaluating}
               aria-label="Reset editor code"
               title="Reset code"
             >
@@ -349,7 +484,7 @@ export default function EditorPage() {
             <HelpUsageWidget />
 
             <span className="editor-panel__shortcut-hint">
-              <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to {mode === 'task' ? 'evaluate' : 'run'}
+              <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to {mode === 'task' || mode === 'debug' ? 'evaluate' : 'run'}
             </span>
 
             {/* Character count */}
@@ -386,6 +521,20 @@ export default function EditorPage() {
             <CustomQuestionPanel
               code={code}
               onApplyStarterCode={(starter) => setCode(starter)}
+            />
+          </section>
+        ) : mode === 'debug' ? (
+          /* Debug Mode Panel (Phase A13) */
+          <section className="task-panel" aria-label="Debug Challenge Panel">
+            <DebugChallengePanel
+              code={code}
+              challenges={debugChallenges}
+              activeChallenge={activeDebugChallenge}
+              onSelectChallenge={handleSelectDebugChallenge}
+              onResetToBuggy={handleResetToBuggy}
+              evaluationResult={debugEvaluationResult}
+              isEvaluating={isDebugEvaluating}
+              hintsData={debugHintsData}
             />
           </section>
         ) : (

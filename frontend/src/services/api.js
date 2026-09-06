@@ -471,4 +471,43 @@ export async function resetProgress() {
   return apiPost('/api/progress/reset', {});
 }
 
+/**
+ * Retrieve all curated Debug Mode challenges (Phase A13).
+ *
+ * @returns {Promise<{ success: boolean, challenges: Array<object> }>}
+ */
+export async function getDebugChallenges() {
+  return apiGet('/api/debug/challenges');
+}
+
+/**
+ * Retrieve a single Debug Mode challenge by ID with test cases (Phase A13).
+ *
+ * @param {string} challengeId
+ * @returns {Promise<{ success: boolean, challenge: object }>}
+ */
+export async function getDebugChallenge(challengeId) {
+  return apiGet(`/api/debug/challenges/${encodeURIComponent(challengeId)}`);
+}
+
+/**
+ * Evaluate student's repaired code against a debug challenge's test cases (Phase A13).
+ *
+ * @param {string} challengeId
+ * @param {string} code
+ * @returns {Promise<{
+ *   success: boolean,
+ *   challenge_id: string,
+ *   challenge_title: string,
+ *   evaluation: object,
+ *   hints: object
+ * }>}
+ */
+export async function evaluateDebugChallenge(challengeId, code) {
+  return apiPost('/api/debug/evaluate', {
+    challenge_id: challengeId,
+    code,
+  });
+}
+
 
