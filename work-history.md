@@ -1577,6 +1577,117 @@ python -m pytest tests/ -v
 **Result:** ✅ **195 passed in 11.79s** (100% green, 0 warnings, 0 regressions).  
 **Frontend Build:** ✅ `npm run build` completed in 102ms with zero errors.
 
+---
+
+## PHASE A12 — Progress & Score Engine
+
+**Status:** ✅ COMPLETE  
+**Date completed:** 2026-09-06  
+**Git Commit:** `77d95b3`  
+
+---
+
+### Executive Summary
+
+Phase A12 introduces the **Progress & Score Engine** to CodeMentor AI. This engine establishes the reusable tracking infrastructure that monitors student learning activity over time: tracking task completion, attempts, pass/fail status, score percentages, and assistance correlation across both built-in starter challenges (A5) and student-authored custom challenges (A10).
+
+In strict compliance with Part A architectural rules and the Master PRD:
+- The engine is **purely session- and in-memory based**.
+- No persistent central databases, authentication, or user accounts are introduced.
+- Evaluated attempts and scores are tracked for positive learning reinforcement; failed attempts do not penalize students or lock challenges.
+- No Phase A13 Debug Mode features or extraneous placeholder fields were added.
+
+---
+
+### What Was Built
+
+#### 1. In-Memory Progress Tracking Service (`backend/app/services/progress/`)
+
+- **Data Models (`models.py`):**
+  - `AttemptRecord`: Granular log of a single evaluation attempt (`attempt_id`, `task_id`, `task_title`, `category`, `score_percentage`, `passed_all`, `passed_tests`, `total_tests`, `timestamp`, `assistance_snapshot`).
+  - `TaskProgressRecord`: Cumulative metrics per task (`task_id`, `title`, `category`, `status`, `passed`, `attempts_count`, `best_score`, `latest_score`, `first_attempt_at`, `last_attempt_at`, `completed_at`, `attempts`).
+  - `ProgressSummary`: Aggregated global session statistics (`total_tasks_available`, `tasks_attempted`, `tasks_completed`, `completion_percentage`, `total_attempts`, `average_best_score`, `total_assists_linked`, `tasks`).
+- **ProgressTracker Service (`tracker.py`):**
+  - Thread-safe singleton initialized with all 5 starter tasks from Phase A5 (`task_hello`, `task_greeting`, `task_even_odd`, `task_temp_converter`, `task_sum_two`) in `not_attempted` state.
+  - Dynamically registers custom questions on first attempt.
+  - Preserves student's `best_score` across multiple iterations (does not downgrade on lower subsequent attempts).
+  - Automatically correlates assistance snapshots from Phase A11 with each attempt.
+  - Session reset capability restoring all counters and task progress records to zero.
+
+#### 2. Backend REST API Endpoints (`backend/app/routes/progress.py`)
+
+- **`GET /api/progress/summary`:**
+  - Returns global completion statistics, average scores, attempt counts, and full task-by-task breakdown.
+- **`POST /api/progress/record-attempt`:**
+  - Records an evaluation attempt with strict validation (`task_id`, `score_percentage`, `passed_all`, `passed_tests`, `total_tests`, `category`, `assistance_snapshot`).
+- **`GET /api/progress/task/<task_id>`:**
+  - Retrieves task-specific progress record, best score, status, and attempt audit history.
+- **`POST /api/progress/reset`:**
+  - Resets all progress and score records back to initial session state.
+- Registered blueprint `progress_bp` under `/api` in `backend/app/__init__.py`.
+
+#### 3. Frontend UI Components & Integrations
+
+- **New Component: `ProgressModal.jsx` & `ProgressModal.css`:**
+  - Glassmorphic modal accessible from the top navigation bar.
+  - Hero progress bar showing starter challenges solved (e.g. `2 / 5 Completed • 40%`).
+  - 4 Quick-Metric stat cards: *Average Best Score*, *Evaluation Attempts*, *Assists Linked*, and *Tasks Attempted*.
+  - Task Breakdown Grid with filtering (`All`, `Starter`, `Custom`):
+    - Status pills (`✓ Completed`, `⚡ In Progress`, `○ Not Attempted`).
+    - Best score progress bars and percentages.
+    - Attempt counters and latest score tags.
+  - "↺ Reset Progress" action with confirmation protection.
+- **Cross-Phase Evaluation Integrations:**
+  - **Phase A5 Starter Tasks (`EditorPage.jsx`):** Automatically records attempt outcomes (`score_percentage`, `passed_all`, test counts) upon evaluation completion.
+  - **Phase A10 Custom Questions (`CustomQuestionPanel.jsx`):** Automatically records custom challenge evaluation attempts with `category: 'custom'`.
+  - **Phase A11 Help Counter Correlation:** Snapshots active session help counts with evaluation attempts.
+  - Global event synchronization via `progress-updated`.
+- **Top Navigation Bar (`Navbar.jsx`):**
+  - Added `📊 Progress` trigger button.
+  - Updated phase badge to `Phase A12`.
+- **Dashboard (`Home.jsx`):**
+  - Marked `Progress & Scores` feature card as `live: true`.
+- **Client Service Layer (`frontend/src/services/api.js`):**
+  - Added `getProgressSummary()`, `recordProgressAttempt()`, `getTaskProgress()`, and `resetProgress()`.
+
+---
+
+### Scope & Architectural Boundaries Enforced
+
+- ✅ **Strict A12 Scope:** Dedicated purely to tracking task progress, scores, attempts, completion rates, and assistance snapshots.
+- ❌ **No Scope Creep into A13:** Did NOT implement broken code challenges or debugging mode features.
+- ❌ **No Scope Creep into Part B:** Did NOT implement curriculum lessons, practice banks, or chapter exams.
+- ✅ **Strictly In-Memory / Session:** Compliant with PRD Part A rules; no databases or auth tables.
+- ✅ **Zero Regressions:** Preserved 100% of all Phase A1–A11 functionality.
+
+---
+
+### Automated Test Suite Verification
+
+All backend tests are executed via `pytest`:
+```bash
+cd backend
+.\venv\Scripts\activate
+python -m pytest tests/ -v
+```
+
+#### Final Test Suite Breakdown (210/210 Tests Passing):
+- `tests/test_health.py` — **5 tests** (Health checks, 404 handlers, security headers)
+- `tests/test_runner.py` — **23 tests** (Subprocess execution, syntax/runtime errors, timeouts, memory caps, stdin)
+- `tests/test_diagnostics.py` — **30 tests** (Syntax rules, runtime rules, casing typo corrections, fallback diagnostics)
+- `tests/test_evaluator.py` — **21 tests** (Match modes, logical failures, test crash diagnostics, hidden test masking, evaluator API routes)
+- `tests/test_hints.py` — **28 tests** (Tiered hint models, matchers, task-specific known mistakes, general rules, fallback guarantees, pedagogical integrity, REST API routes)
+- `tests/test_tutor.py` — **16 tests** (AI Tutor models, Socratic prompt assembly, provider abstraction, unconfigured fallbacks, anti-solution safety, REST API routes)
+- `tests/test_ai_config.py` — **14 tests** (Runtime config management, key masking, connection testing, Ollama/Cloud probing, A7 dynamic client sync, REST API routes)
+- `tests/test_ai_error_explainer.py` — **19 tests** (Prompt assembly, mock explanations, JSON client parsing, failure graceful degradation, REST API routes)
+- `tests/test_custom_question.py` — **22 tests** (Templates, validation, evaluation with diffs, diagnostics, AI Tutor prompt integration, REST API routes)
+- `tests/test_help_counter.py` — **17 tests** (Session initial zero state, hint reveal tier increments, AI tutor counter increments, AI error explanation counter increments, combined assistance calculation, invalid event handling, session reset, audit log truncation, REST API summary endpoint, hint reveal recording endpoint, AI tutor recording endpoint, error explanation recording endpoint, missing event validation, invalid event type validation, non-JSON request rejection, counter reset endpoint, audit event log query endpoint)
+- `tests/test_progress.py` — **15 tests** (Initial starter task seeding, first attempt partial score tracking, passing attempt completion, best score preservation on subsequent attempts, custom question progress tracking, completion rate calculation, average best score calculation, tracker reset, REST API summary endpoint, record attempt endpoint, missing task ID validation, invalid score validation, non-JSON request rejection, get task progress endpoint, not found 404 handling, reset progress endpoint)
+
+**Result:** ✅ **210 passed in 11.92s** (100% green, 0 warnings, 0 regressions).  
+**Frontend Build:** ✅ `npm run build` completed in 105ms with zero errors.
+
+
 
 
 
