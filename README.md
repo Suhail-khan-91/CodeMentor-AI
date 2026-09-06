@@ -72,10 +72,3 @@ AI	OpenAI, Claude, Gemini, Ollama
 APIs	REST, JSON
 Testing	Pytest
 Version Control	Git, GitHub
-
-<img width="1157" height="997" alt="1" src="https://github.com/user-attachments/assets/1896e930-2bb9-4bfa-96d5-430fb29ae425" />
-<img width="1071" height="789" alt="3" src="https://github.com/user-attachments/assets/63bb216d-10b1-4598-9b3c-2da1b7e6c981" />
-<img width="764" height="947" alt="4" src="https://github.com/user-attachments/assets/36a854c8-3079-442d-b5fd-4291dd2cf4be" />
-<img width="878" height="746" alt="5" src="https://github.com/user-attachments/assets/fb5feadb-5f16-460a-862d-3dde8e9664d7" />
-
-
