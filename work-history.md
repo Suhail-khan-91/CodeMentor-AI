@@ -1448,6 +1448,136 @@ python -m pytest tests/ -v
 **Result:** ✅ **178 passed in 11.71s** (100% green, 0 warnings, 0 regressions).  
 **Frontend Build:** ✅ `npm run build` completed in 100ms with zero errors.
 
+---
+
+## PHASE A11 — Help / AI Usage Counter
+
+**Status:** ✅ COMPLETE  
+**Date completed:** 2026-09-06  
+**Git Commit:** `ff98cd7`  
+
+---
+
+### Executive Summary
+
+Phase A11 introduces the **Help / AI Usage Counter** to CodeMentor AI. This engine provides real-time, unified visibility into the student's assistance usage across all platform guidance mechanisms: Phase A6 Rule-Based Progressive Hints, Phase A7 Socratic AI Tutor queries, and Phase A9 AI Error Explanations.
+
+In strict compliance with Part A educational and architectural specifications:
+- The counter is **purely session- and in-memory based**.
+- It fosters student **self-awareness and metacognitive learning** rather than imposing punitive restrictions.
+- **Zero score deductions or penalties** are incurred for seeking help.
+- Persistent databases, user accounts, and scoring history are strictly reserved for Phase A12.
+
+---
+
+### What Was Built
+
+#### 1. In-Memory Session Service (`backend/app/services/help_counter/session.py`)
+
+- **State Management (`HelpCounterSession`):**
+  - Tracks categorized counts:
+    - `_hints_l1`: Level 1 Conceptual Nudges revealed.
+    - `_hints_l2`: Level 2 Strategies revealed.
+    - `_hints_l3`: Level 3 Structural Clues revealed.
+    - `_ai_tutor_queries`: Socratic AI Tutor questions submitted.
+    - `_ai_error_explanations`: Deep-dive AI error traceback deconstructions requested.
+  - Computes dynamic aggregates: `total_hints`, `total_assists`, and `total_events_logged`.
+  - Maintains a rolling audit log of the most recent assistance events with timestamps, event types, and context metadata.
+  - Thread-safe singleton pattern via `get_help_counter_session()`.
+  - Supports clean session resets without server reboots.
+
+#### 2. Backend REST API Endpoints (`backend/app/routes/help_counter.py`)
+
+- **`GET /api/help-counter/summary`:**
+  - Returns unified summary JSON:
+    ```json
+    {
+      "success": true,
+      "summary": {
+        "total_assists": 4,
+        "hints": {
+          "total": 2,
+          "level_1_nudge": 1,
+          "level_2_strategy": 1,
+          "level_3_structure": 0
+        },
+        "ai_tutor_queries": 1,
+        "ai_error_explanations": 1,
+        "total_events_logged": 4
+      }
+    }
+    ```
+- **`POST /api/help-counter/record`:**
+  - Records assistance events with input validation (`event_type in {'hint_reveal', 'ai_tutor_ask', 'ai_error_explain'}`).
+  - Validates and unpacks metadata (e.g. hint levels, task ID, question text, error category).
+- **`POST /api/help-counter/reset`:**
+  - Clears all session counters and event logs back to zero.
+- **`GET /api/help-counter/events`:**
+  - Retrieves chronological event logs with configurable query limit.
+- Registered blueprint `help_counter_bp` under `/api` in `backend/app/__init__.py`.
+
+#### 3. Frontend Help Usage Widget & Component Integrations
+
+- **New Component: `HelpUsageWidget.jsx` & `HelpUsageWidget.css`:**
+  - Compact, non-intrusive toolbar pill displaying live assists count (e.g. `💡 Assists: 3`).
+  - Active amber highlight when assistance has been accessed during the session.
+  - Interactive Popover Dropdown Card:
+    - Displays overall assists tally and session-only badge.
+    - Detailed breakdown of Rule-Based Hints (L1, L2, L3), AI Tutor inquiries, and AI Error Explanations.
+    - Educational notice emphasizing self-awareness and zero score penalty.
+    - "↺ Reset Session Counter" action to clear counters anytime.
+    - Accessible, dismissible on outside click or keyboard Escape.
+- **Cross-Engine Event Synchronization (`help-counter-updated`):**
+  - Integrated into **`ProgressiveHintPanel.jsx`**: Triggers `recordHelpEvent('hint_reveal', ...)` on manual hint unlocks.
+  - Integrated into **`AITutorPanel.jsx`**: Triggers `recordHelpEvent('ai_tutor_ask', ...)` on successful tutor inquiries.
+  - Integrated into **`DiagnosticCard.jsx`**: Triggers `recordHelpEvent('ai_error_explain', ...)` on AI error deconstructions.
+  - Dispatches browser event `window.dispatchEvent(new CustomEvent('help-counter-updated'))` to update the widget instantly without requiring React Context or global stores.
+- **Universal Availability:**
+  - Mounted directly inside `EditorPage.jsx` toolbar.
+  - Works consistently across **Free Play Mode**, **Task Evaluation Mode**, and **Custom Question Mode**.
+- **Client Service Layer (`frontend/src/services/api.js`):**
+  - Added `getHelpSummary()`, `recordHelpEvent()`, `resetHelpCounter()`, and `getHelpEvents()`.
+- **Navigation & Dashboard:**
+  - Updated phase badge in `Navbar.jsx` to `Phase A11`.
+  - Added live `Help / AI Usage Counter` feature card to `Home.jsx`.
+
+---
+
+### Scope & Architectural Boundaries Enforced
+
+- ✅ **Strict A11 Scope:** Dedicated purely to tracking assistance metrics across Hints (A6), AI Tutor (A7), and AI Error Explanations (A9).
+- ❌ **No Scope Creep into A12+:** Did NOT implement persistent databases, user authentication, progress dashboards, scoring algorithms, or test penalties (strictly Phase A12).
+- ❌ **No Debug Mode:** Did NOT implement buggy starter code debugging challenges (Phase A13).
+- ✅ **Preserved Existing Behaviors:** All Phase A1–A10 functionality, APIs, and tests remained 100% untouched and functional.
+- ✅ **Purely Educational:** Counters do not deduct points or block students from progressing.
+
+---
+
+### Automated Test Suite Verification
+
+All backend tests are executed via `pytest`:
+```bash
+cd backend
+.\venv\Scripts\activate
+python -m pytest tests/ -v
+```
+
+#### Final Test Suite Breakdown (195/195 Tests Passing):
+- `tests/test_health.py` — **5 tests** (Health checks, 404 handlers, security headers)
+- `tests/test_runner.py` — **23 tests** (Subprocess execution, syntax/runtime errors, timeouts, memory caps, stdin)
+- `tests/test_diagnostics.py` — **30 tests** (Syntax rules, runtime rules, casing typo corrections, fallback diagnostics)
+- `tests/test_evaluator.py` — **21 tests** (Match modes, logical failures, test crash diagnostics, hidden test masking, evaluator API routes)
+- `tests/test_hints.py` — **28 tests** (Tiered hint models, matchers, task-specific known mistakes, general rules, fallback guarantees, pedagogical integrity, REST API routes)
+- `tests/test_tutor.py` — **16 tests** (AI Tutor models, Socratic prompt assembly, provider abstraction, unconfigured fallbacks, anti-solution safety, REST API routes)
+- `tests/test_ai_config.py` — **14 tests** (Runtime config management, key masking, connection testing, Ollama/Cloud probing, A7 dynamic client sync, REST API routes)
+- `tests/test_ai_error_explainer.py` — **19 tests** (Prompt assembly, mock explanations, JSON client parsing, failure graceful degradation, REST API routes)
+- `tests/test_custom_question.py` — **22 tests** (Templates, validation, evaluation with diffs, diagnostics, AI Tutor prompt integration, REST API routes)
+- `tests/test_help_counter.py` — **17 tests** (Session initial zero state, hint reveal tier increments, AI tutor counter increments, AI error explanation counter increments, combined assistance calculation, invalid event handling, session reset, audit log truncation, REST API summary endpoint, hint reveal recording endpoint, AI tutor recording endpoint, error explanation recording endpoint, missing event validation, invalid event type validation, non-JSON request rejection, counter reset endpoint, audit event log query endpoint)
+
+**Result:** ✅ **195 passed in 11.79s** (100% green, 0 warnings, 0 regressions).  
+**Frontend Build:** ✅ `npm run build` completed in 102ms with zero errors.
+
+
 
 
 
