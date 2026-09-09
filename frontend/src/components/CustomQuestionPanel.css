@@ -1,492 +1,162 @@
-/* CustomQuestionPanel.css — Phase A10 */
+/* CustomQuestionPanel.css — Authoring & Solving Styles */
 
-.custom-question-panel {
+.custom-q-shell {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
-  animation: fadeIn 0.25s ease-out;
+  height: 100%;
+  min-height: 0;
+  background: var(--surface);
+  overflow: hidden;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ── Header ── */
-.custom-q__header {
+/* ───── Header ───── */
+.custom-q-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-3) var(--space-4);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  flex-wrap: wrap;
-  gap: var(--space-3);
+  padding: 12px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 }
 
-.custom-q__header-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.custom-q__badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: var(--color-accent);
-}
-
-.custom-q__mode-pill {
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: #38bdf8;
-  background: rgba(56, 189, 248, 0.15);
-  border: 1px solid rgba(56, 189, 248, 0.35);
-  padding: 1px 7px;
-  border-radius: 999px;
-  text-transform: uppercase;
-}
-
-.custom-q__header-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.custom-q__template-select {
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  color: var(--color-text);
-  font-size: 0.82rem;
-  padding: 5px 10px;
-  border-radius: var(--radius-md);
-  outline: none;
-  cursor: pointer;
-}
-
-.custom-q__template-select:focus {
-  border-color: var(--color-accent);
-}
-
-.custom-q__btn-toggle-edit {
-  font-size: 0.82rem;
-  padding: 5px 12px;
-}
-
-/* ── Edit Form ── */
-.custom-q__edit-form {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.custom-q__alert {
-  padding: 10px 14px;
-  border-radius: var(--radius-md);
-  font-size: 0.84rem;
+.custom-q-header__left {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.custom-q__alert--error {
-  background: rgba(239, 68, 68, 0.15);
-  border: 1px solid rgba(239, 68, 68, 0.4);
-  color: #fca5a5;
-}
-
-.custom-q__form-group {
+.custom-q-header__right {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  gap: 8px;
 }
 
-.custom-q__form-label {
+.custom-template-select {
+  width: auto;
   font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  padding: 4px 8px;
 }
 
-.custom-q__input,
-.custom-q__textarea {
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  color: var(--color-text);
-  padding: 8px 12px;
-  border-radius: var(--radius-md);
-  font-size: 0.88rem;
-  font-family: inherit;
-  outline: none;
-  transition: border-color 0.15s;
-}
-
-.custom-q__input:focus,
-.custom-q__textarea:focus {
-  border-color: var(--color-accent);
-}
-
-.custom-q__textarea--code {
-  font-family: 'Fira Code', 'Consolas', monospace;
-  font-size: 0.82rem;
-}
-
-/* ── Test Case Manager ── */
-.custom-q__tc-manager {
-  margin-top: var(--space-2);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  border-top: 1px solid var(--color-border);
-  padding-top: var(--space-3);
-}
-
-.custom-q__tc-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.custom-q__tc-title {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--color-text);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.custom-q__btn-add-tc {
+.custom-toggle-btn {
   font-size: 0.78rem;
-  padding: 4px 10px;
+  font-weight: 600;
 }
 
-.custom-q__tc-card {
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-3);
+/* ───── Authoring Pane ───── */
+.custom-author-pane {
+  padding: 16px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-}
-
-.custom-q__tc-card-top {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.custom-q__tc-desc-input {
+  gap: 14px;
   flex: 1;
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  color: var(--color-text);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.82rem;
 }
 
-.custom-q__tc-mode-select {
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  color: var(--color-text);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.78rem;
+.custom-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: var(--r-sm);
+  font-size: 0.8rem;
+}
+.custom-alert--error {
+  background: var(--red-dim);
+  border: 1px solid var(--red-line);
+  color: var(--red);
 }
 
-.custom-q__tc-btn-remove {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition: background 0.15s;
+.custom-tc-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 6px;
 }
 
-.custom-q__tc-btn-remove:hover {
-  background: rgba(239, 68, 68, 0.2);
+.custom-tc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.custom-q__tc-fields-grid {
+.custom-tc-card {
+  padding: 12px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.custom-tc-card__top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.custom-tc-desc {
+  flex: 1;
+  font-size: 0.8rem;
+  padding: 5px 8px;
+}
+
+.custom-tc-mode {
+  width: auto;
+  font-size: 0.76rem;
+  padding: 5px 8px;
+}
+
+.custom-tc-fields {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
 
-.custom-q__tc-field-label {
-  font-size: 0.72rem;
-  color: var(--color-text-muted);
-  display: block;
-  margin-bottom: 2px;
-}
-
-.custom-q__tc-field-textarea {
-  width: 100%;
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  color: var(--color-text);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-family: 'Fira Code', 'Consolas', monospace;
-  font-size: 0.8rem;
-  resize: vertical;
-}
-
-.custom-q__form-actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: var(--space-2);
-}
-
-.custom-q__btn-save {
-  padding: 8px 18px;
-  font-weight: 700;
-}
-
-/* ── Solve View ── */
-.custom-q__view {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.custom-q__desc-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.custom-q__desc-title {
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--color-text);
-}
-
-.custom-q__desc-text {
-  margin: 0;
-  font-size: 0.9rem;
-  color: var(--color-text-muted);
-  line-height: 1.6;
-  white-space: pre-wrap;
-}
-
-.custom-q__action-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: var(--space-2);
-  border-top: 1px solid var(--color-border);
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.custom-q__btn-grade {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 18px;
-  font-weight: 700;
-}
-
-.custom-q__tc-count-badge {
+.custom-tc-fields .textarea {
   font-size: 0.78rem;
-  color: var(--color-text-muted);
-  background: var(--color-surface-2);
-  padding: 3px 8px;
-  border-radius: 999px;
-  border: 1px solid var(--color-border);
+  min-height: 60px;
 }
 
-/* ── Results Card ── */
-.custom-q__results-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
+.custom-author-actions {
+  margin-top: 10px;
+}
+
+/* ───── Solving View ───── */
+.custom-solve-pane {
   display: flex;
   flex-direction: column;
-}
-
-.custom-q__results-header {
-  padding: var(--space-3) var(--space-4);
-  background: var(--color-surface-2);
-  border-bottom: 1px solid var(--color-border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.custom-q__results-score {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.custom-q__score-pill {
-  font-size: 0.78rem;
-  font-weight: 700;
-  padding: 3px 10px;
-  border-radius: 999px;
-}
-
-.custom-q__score-pill--passed {
-  color: #34d399;
-  background: rgba(52, 211, 153, 0.15);
-  border: 1px solid rgba(52, 211, 153, 0.35);
-}
-
-.custom-q__score-pill--failed {
-  color: #f87171;
-  background: rgba(248, 113, 113, 0.15);
-  border: 1px solid rgba(248, 113, 113, 0.35);
-}
-
-.custom-q__timing-pill {
-  font-size: 0.75rem;
-  font-family: 'Fira Code', 'Consolas', monospace;
-  color: var(--color-text-muted);
-}
-
-.custom-q__summary-msg {
-  margin: 0;
-  font-size: 0.82rem;
-  color: var(--color-text-muted);
-}
-
-.custom-q__results-list {
-  display: flex;
-  flex-direction: column;
-}
-
-.custom-q__res-item {
-  border-bottom: 1px solid var(--color-border);
-}
-
-.custom-q__res-item:last-child {
-  border-bottom: none;
-}
-
-.custom-q__res-btn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  padding: 10px 14px;
-  background: transparent;
-  border: none;
-  color: var(--color-text);
-  font-size: 0.85rem;
-  cursor: pointer;
-  text-align: left;
-  gap: 10px;
-  transition: background 0.15s;
-}
-
-.custom-q__res-btn:hover {
-  background: var(--color-surface-2);
-}
-
-.custom-q__status-icon {
-  font-weight: 700;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  flex-shrink: 0;
-}
-
-.custom-q__status-icon--passed {
-  background: rgba(52, 211, 153, 0.2);
-  color: #34d399;
-}
-
-.custom-q__status-icon--failed {
-  background: rgba(248, 113, 113, 0.2);
-  color: #f87171;
-}
-
-.custom-q__res-desc {
+  height: 100%;
+  min-height: 0;
   flex: 1;
-  font-weight: 500;
 }
 
-.custom-q__res-chevron {
-  font-size: 0.72rem;
-  color: var(--color-text-muted);
+.custom-solve-content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
-.custom-q__res-details {
-  padding: 12px 16px;
-  background: var(--color-bg);
-  border-top: 1px solid var(--color-border);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.custom-q__diff-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 8px;
-}
-
-.custom-q__diff-box {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.custom-q__diff-label {
-  font-size: 0.72rem;
+.custom-solve-title {
+  font-size: 1.05rem;
   font-weight: 700;
-  color: var(--color-text-muted);
-  text-transform: uppercase;
+  color: var(--text-1);
 }
 
-.custom-q__diff-code {
-  margin: 0;
-  padding: 8px;
-  background: #0d1117;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  font-family: 'Fira Code', 'Consolas', monospace;
-  font-size: 0.8rem;
-  color: var(--color-text);
-  white-space: pre-wrap;
-  min-height: 38px;
+.custom-grade-action-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
 }
 
-.custom-q__diff-code--expected {
-  border-color: rgba(52, 211, 153, 0.4);
-  color: #a7f3d0;
-}
-
-.custom-q__diff-code--actual {
-  border-color: rgba(248, 113, 113, 0.4);
-  color: #fecaca;
-}
-
-/* ── Tutor Wrapper ── */
-.custom-q__tutor-wrapper {
-  margin-top: var(--space-2);
+.custom-tc-tag {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--text-3);
 }

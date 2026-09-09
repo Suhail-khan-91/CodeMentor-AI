@@ -137,9 +137,21 @@ export default function AISettingsModal({ isOpen, onClose, onConfigSaved }) {
         {/* Header */}
         <div className="ai-modal__header">
           <div className="ai-modal__title-group">
-            <span aria-hidden="true" style={{ fontSize: '1.2rem' }}>⚙️</span>
-            <h2 className="ai-modal__title">AI Connection & Configuration</h2>
-            <span className="ai-modal__phase-tag">Phase A8</span>
+            <div className="ai-modal__icon-badge">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+              </svg>
+            </div>
+            <div>
+              <div className="ai-modal__title-row">
+                <h2 className="ai-modal__title">AI Provider & Connection Settings</h2>
+                <span className="ai-modal__phase-tag">Provider Engine</span>
+              </div>
+              <p className="ai-modal__header-desc">
+                Select your inference backend for Socratic tutoring, code analysis, and error explanations
+              </p>
+            </div>
           </div>
           <button
             type="button"
@@ -147,38 +159,55 @@ export default function AISettingsModal({ isOpen, onClose, onConfigSaved }) {
             onClick={onClose}
             aria-label="Close modal"
           >
-            ✕
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="18" y1="6" x2="6" y2="18" strokeLinecap="round" />
+              <line x1="6" y1="6" x2="18" y2="18" strokeLinecap="round" />
+            </svg>
           </button>
         </div>
 
-        {/* Provider Tabs */}
-        <div className="ai-provider-tabs" role="tablist">
+        {/* Provider Cards / Tabs */}
+        <div className="ai-provider-nav" role="tablist">
           <button
             type="button"
             role="tab"
             aria-selected={activeTab === 'mock'}
-            className={`ai-provider-tab ${activeTab === 'mock' ? 'ai-provider-tab--active' : ''}`}
+            className={`ai-provider-nav-btn ${activeTab === 'mock' ? 'ai-provider-nav-btn--active' : ''}`}
             onClick={() => { setActiveTab('mock'); setTestResult(null); }}
           >
-            <span>🛡️</span> Offline Mock
+            <div className="ai-provider-nav-btn__top">
+              <span className="ai-provider-nav-btn__icon">🛡️</span>
+              <span className="ai-provider-nav-btn__name">Offline Mock</span>
+            </div>
+            <span className="ai-provider-nav-btn__badge ai-provider-nav-btn__badge--free">Zero Setup</span>
           </button>
+
           <button
             type="button"
             role="tab"
             aria-selected={activeTab === 'ollama'}
-            className={`ai-provider-tab ${activeTab === 'ollama' ? 'ai-provider-tab--active' : ''}`}
+            className={`ai-provider-nav-btn ${activeTab === 'ollama' ? 'ai-provider-nav-btn--active' : ''}`}
             onClick={() => { setActiveTab('ollama'); setTestResult(null); }}
           >
-            <span>🦙</span> Local AI (Ollama)
+            <div className="ai-provider-nav-btn__top">
+              <span className="ai-provider-nav-btn__icon">🦙</span>
+              <span className="ai-provider-nav-btn__name">Local Ollama</span>
+            </div>
+            <span className="ai-provider-nav-btn__badge ai-provider-nav-btn__badge--local">Private & Free</span>
           </button>
+
           <button
             type="button"
             role="tab"
             aria-selected={activeTab === 'cloud'}
-            className={`ai-provider-tab ${activeTab === 'cloud' ? 'ai-provider-tab--active' : ''}`}
+            className={`ai-provider-nav-btn ${activeTab === 'cloud' ? 'ai-provider-nav-btn--active' : ''}`}
             onClick={() => { setActiveTab('cloud'); setTestResult(null); }}
           >
-            <span>☁️</span> Cloud AI (OpenAI/API)
+            <div className="ai-provider-nav-btn__top">
+              <span className="ai-provider-nav-btn__icon">☁️</span>
+              <span className="ai-provider-nav-btn__name">Cloud Model</span>
+            </div>
+            <span className="ai-provider-nav-btn__badge ai-provider-nav-btn__badge--cloud">OpenAI API</span>
           </button>
         </div>
 
@@ -187,67 +216,84 @@ export default function AISettingsModal({ isOpen, onClose, onConfigSaved }) {
           {/* Tab 1: Mock Mode */}
           {activeTab === 'mock' && (
             <div className="ai-info-box">
-              <div className="ai-info-box__title">
-                <span>🛡️</span> Built-in Socratic Tutor (Zero-Cost Offline Mode)
+              <div className="ai-info-box__header">
+                <span className="ai-info-box__icon">🛡️</span>
+                <div>
+                  <h4 className="ai-info-box__title">Built-in Socratic Engine (Deterministic Offline)</h4>
+                  <span className="ai-info-box__status">Active Default • Zero Latency • 100% Privacy</span>
+                </div>
               </div>
-              <p>
-                The offline mock provider simulates the AI Tutor using deterministic pedagogical models. It requires <strong>zero API keys</strong>, works completely offline with zero latency, and has zero running costs.
+              <p className="ai-info-box__desc">
+                The offline mock provider simulates AI mentoring using deterministic pedagogical rules and curated educational templates. It requires <strong>no API keys</strong>, runs completely offline, and incurs zero usage costs.
               </p>
-              <p style={{ marginTop: '8px', color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>
-                Ideal for testing, studying without internet, or getting started immediately.
-              </p>
+              <div className="ai-info-box__perks">
+                <span className="ai-info-box__perk">✓ Instant 0ms response time</span>
+                <span className="ai-info-box__perk">✓ No external network calls</span>
+                <span className="ai-info-box__perk">✓ Ideal for offline study</span>
+              </div>
             </div>
           )}
 
           {/* Tab 2: Local Ollama */}
           {activeTab === 'ollama' && (
-            <>
+            <div className="ai-form-stack">
               <div className="ai-form-group">
                 <label className="ai-form-label" htmlFor="ollama-url">
-                  Ollama Base URL
+                  <span>Ollama Base URL</span>
                   <span className="ai-form-help">Default: http://localhost:11434</span>
                 </label>
-                <input
-                  id="ollama-url"
-                  type="text"
-                  className="ai-form-input"
-                  value={ollamaUrl}
-                  onChange={(e) => setOllamaUrl(e.target.value)}
-                  placeholder="http://localhost:11434"
-                />
+                <div className="ai-input-wrapper">
+                  <input
+                    id="ollama-url"
+                    type="text"
+                    className="ai-form-input"
+                    value={ollamaUrl}
+                    onChange={(e) => setOllamaUrl(e.target.value)}
+                    placeholder="http://localhost:11434"
+                  />
+                </div>
               </div>
 
               <div className="ai-form-group">
                 <label className="ai-form-label" htmlFor="ollama-model">
-                  Model Name
-                  <span className="ai-form-help">e.g. llama3, mistral, qwen</span>
+                  <span>Target Model Name</span>
+                  <span className="ai-form-help">e.g., llama3, mistral, qwen2.5-coder</span>
                 </label>
-                <input
-                  id="ollama-model"
-                  type="text"
-                  className="ai-form-input"
-                  value={ollamaModel}
-                  onChange={(e) => setOllamaModel(e.target.value)}
-                  placeholder="llama3"
-                />
+                <div className="ai-input-wrapper">
+                  <input
+                    id="ollama-model"
+                    type="text"
+                    className="ai-form-input"
+                    value={ollamaModel}
+                    onChange={(e) => setOllamaModel(e.target.value)}
+                    placeholder="llama3"
+                  />
+                </div>
               </div>
 
-              <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: 0 }}>
-                💡 Tip: Ensure Ollama is running on your machine (<code>ollama serve</code>) and you have pulled your desired model (<code>ollama pull {ollamaModel || 'llama3'}</code>).
-              </p>
-            </>
+              <div className="ai-callout-note">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="16" x2="12" y2="12"/>
+                  <line x1="12" y1="8" x2="12.01" y2="8"/>
+                </svg>
+                <span>
+                  Make sure Ollama is actively running (<code>ollama serve</code>) and pull your model (<code>ollama pull {ollamaModel || 'llama3'}</code>) before testing connection.
+                </span>
+              </div>
+            </div>
           )}
 
           {/* Tab 3: Cloud AI */}
           {activeTab === 'cloud' && (
-            <>
+            <div className="ai-form-stack">
               <div className="ai-form-group">
                 <label className="ai-form-label" htmlFor="cloud-provider">
-                  Provider Preset
+                  <span>Provider Preset</span>
                 </label>
                 <select
                   id="cloud-provider"
-                  className="ai-form-input"
+                  className="ai-form-input ai-form-select"
                   value={cloudProvider}
                   onChange={(e) => {
                     setCloudProvider(e.target.value);
@@ -257,35 +303,37 @@ export default function AISettingsModal({ isOpen, onClose, onConfigSaved }) {
                     }
                   }}
                 >
-                  <option value="openai">OpenAI (Official)</option>
+                  <option value="openai">OpenAI (Official API)</option>
                   <option value="custom">Custom / OpenAI-Compatible Endpoint</option>
                 </select>
               </div>
 
               <div className="ai-form-group">
                 <label className="ai-form-label" htmlFor="cloud-url">
-                  Base URL / Endpoint
+                  <span>Base URL / Endpoint</span>
                 </label>
-                <input
-                  id="cloud-url"
-                  type="text"
-                  className="ai-form-input"
-                  value={cloudUrl}
-                  onChange={(e) => setCloudUrl(e.target.value)}
-                  placeholder="https://api.openai.com/v1"
-                />
+                <div className="ai-input-wrapper">
+                  <input
+                    id="cloud-url"
+                    type="text"
+                    className="ai-form-input"
+                    value={cloudUrl}
+                    onChange={(e) => setCloudUrl(e.target.value)}
+                    placeholder="https://api.openai.com/v1"
+                  />
+                </div>
               </div>
 
               <div className="ai-form-group">
                 <label className="ai-form-label" htmlFor="cloud-key">
-                  API Key
-                  <span className="ai-form-help">Securely masked on backend</span>
+                  <span>API Key</span>
+                  <span className="ai-form-help">Never exposed in plain text</span>
                 </label>
                 <div className="ai-input-password-wrapper">
                   <input
                     id="cloud-key"
                     type={showApiKey ? 'text' : 'password'}
-                    className="ai-form-input"
+                    className="ai-form-input ai-form-input--key"
                     value={cloudApiKey}
                     onChange={(e) => setCloudApiKey(e.target.value)}
                     placeholder="sk-..."
@@ -296,55 +344,74 @@ export default function AISettingsModal({ isOpen, onClose, onConfigSaved }) {
                     onClick={() => setShowApiKey(!showApiKey)}
                     title={showApiKey ? 'Hide key' : 'Show key'}
                   >
-                    {showApiKey ? '👁️' : '👁️‍🗨️'}
+                    {showApiKey ? (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                        <line x1="1" y1="1" x2="23" y2="23"/>
+                      </svg>
+                    ) : (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                    )}
                   </button>
                 </div>
               </div>
 
               <div className="ai-form-group">
                 <label className="ai-form-label" htmlFor="cloud-model">
-                  Model Identifier
+                  <span>Model Identifier</span>
                 </label>
-                <input
-                  id="cloud-model"
-                  type="text"
-                  className="ai-form-input"
-                  value={cloudModel}
-                  onChange={(e) => setCloudModel(e.target.value)}
-                  placeholder="gpt-4o-mini"
-                />
+                <div className="ai-input-wrapper">
+                  <input
+                    id="cloud-model"
+                    type="text"
+                    className="ai-form-input"
+                    value={cloudModel}
+                    onChange={(e) => setCloudModel(e.target.value)}
+                    placeholder="gpt-4o-mini"
+                  />
+                </div>
               </div>
-            </>
+            </div>
           )}
 
           {/* Testing State */}
           {isTesting && (
-            <div className="ai-test-result ai-test-result--testing">
+            <div className="ai-test-banner ai-test-banner--testing">
               <span className="output-spinner" aria-hidden="true" />
-              <span>Pinging provider endpoint and validating response…</span>
+              <span>Pinging provider endpoint and validating model handshake…</span>
             </div>
           )}
 
           {/* Test Connection Results Banner */}
           {!isTesting && testResult && (
             <div
-              className={`ai-test-result ${testResult.success ? 'ai-test-result--success' : 'ai-test-result--error'}`}
+              className={`ai-test-banner ${testResult.success ? 'ai-test-banner--success' : 'ai-test-banner--error'}`}
               role="status"
             >
-              <div className="ai-test-result__header">
-                <span>{testResult.success ? '✓ Connection Verified' : '✕ Connection Test Failed'}</span>
+              <div className="ai-test-banner__header">
+                <div className="ai-test-banner__status">
+                  <span className="ai-test-banner__dot" />
+                  <strong>{testResult.success ? 'Handshake Successful' : 'Connection Handshake Failed'}</strong>
+                </div>
                 {testResult.latency_ms > 0 && (
-                  <span className="ai-test-result__latency">{testResult.latency_ms} ms</span>
+                  <span className="ai-test-banner__latency">{testResult.latency_ms} ms</span>
                 )}
               </div>
-              <p style={{ margin: 0 }}>{testResult.message}</p>
+              <p className="ai-test-banner__msg">{testResult.message}</p>
             </div>
           )}
 
           {/* Save Success Toast */}
           {saveSuccess && (
-            <div className="ai-test-result ai-test-result--success" role="status">
-              <strong>✓ Saved:</strong> {saveSuccess}
+            <div className="ai-test-banner ai-test-banner--saved" role="status">
+              <div className="ai-test-banner__status">
+                <span className="ai-test-banner__dot" />
+                <strong>Configuration Saved</strong>
+              </div>
+              <p className="ai-test-banner__msg">{saveSuccess}</p>
             </div>
           )}
         </div>
@@ -358,10 +425,13 @@ export default function AISettingsModal({ isOpen, onClose, onConfigSaved }) {
             disabled={isTesting || isSaving}
             id="btn-test-ai-connection"
           >
-            {isTesting ? 'Testing…' : '⚡ Test Connection'}
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </svg>
+            {isTesting ? 'Probing Endpoint…' : 'Test Connection'}
           </button>
 
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div className="ai-modal__footer-actions">
             <button
               type="button"
               className="btn btn--ghost"
@@ -372,7 +442,7 @@ export default function AISettingsModal({ isOpen, onClose, onConfigSaved }) {
             </button>
             <button
               type="button"
-              className="ai-modal__btn-save"
+              className="btn btn--primary"
               onClick={handleSave}
               disabled={isSaving}
               id="btn-save-ai-settings"

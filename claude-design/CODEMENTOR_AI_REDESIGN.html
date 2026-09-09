@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeMentor AI — Learn Python with an AI mentor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root{
+  --bg:#0a0d12;
+  --bg-raised:#0d1119;
+  --surface:#131822;
+  --surface-2:#181f2c;
+  --surface-hover:#1e2636;
+  --border:#232b3a;
+  --border-strong:#313c50;
+  --text-1:#e9ecf3;
+  --text-2:#9aa4b8;
+  --text-3:#606a7e;
+
+  --accent:#45d6b0;
+  --accent-strong:#2fbe97;
+  --accent-dim:rgba(69,214,176,.13);
+  --accent-line:rgba(69,214,176,.35);
+
+  --amber:#f2b84b;
+  --amber-dim:rgba(242,184,75,.14);
+
+  --blue:#5b9bf2;
+  --blue-dim:rgba(91,155,242,.14);
+
+  --violet:#b18cf5;
+  --violet-dim:rgba(177,140,245,.14);
+
+  --red:#f2555f;
+  --red-dim:rgba(242,85,95,.14);
+
+  --r-sm:4px;
+  --r-md:8px;
+  --r-lg:14px;
+  --r-pill:999px;
+
+  --shadow-sm:0 2px 8px rgba(0,0,0,.28);
+  --shadow-lg:0 16px 40px rgba(0,0,0,.45);
+
+  --font-head:'Sora',sans-serif;
+  --font-body:'Inter',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--bg);
+  color:var(--text-1);
+  font-family:var(--font-body);
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+h1,h2,h3,h4{font-family:var(--font-head);font-weight:600;margin:0;color:var(--text-1);letter-spacing:-0.01em;}
+p{margin:0;color:var(--text-2);}
+button{font-family:var(--font-body);}
+a{color:inherit;text-decoration:none;}
+::selection{background:var(--accent-dim);color:var(--text-1);}
+::-webkit-scrollbar{width:10px;height:10px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:8px;border:2px solid var(--bg);}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px;}
+.mono{font-family:var(--font-mono);}
+.hidden{display:none !important;}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
+
+/* ============================================================
+   PRIMITIVES
+   ============================================================ */
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:9px 16px;border-radius:var(--r-md);
+  border:1px solid var(--border-strong);
+  background:var(--surface-2);color:var(--text-1);
+  font-size:13.5px;font-weight:600;cursor:pointer;
+  transition:background .15s ease, border-color .15s ease, transform .08s ease;
+  white-space:nowrap;
+}
+.btn:hover{background:var(--surface-hover);border-color:var(--border-strong);}
+.btn:active{transform:translateY(1px);}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#06231b;}
+.btn-primary:hover{background:var(--accent-strong);border-color:var(--accent-strong);}
+.btn-ghost{background:transparent;border-color:transparent;color:var(--text-2);}
+.btn-ghost:hover{background:var(--surface-2);color:var(--text-1);}
+.btn-sm{padding:6px 12px;font-size:12.5px;border-radius:var(--r-sm);}
+.btn-icon{padding:8px;width:34px;height:34px;justify-content:center;}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+
+.badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:3px 9px;border-radius:var(--r-pill);
+  font-size:11.5px;font-weight:600;
+  border:1px solid var(--border-strong);color:var(--text-2);
+}
+.badge-accent{background:var(--accent-dim);color:var(--accent);border-color:transparent;}
+.badge-amber{background:var(--amber-dim);color:var(--amber);border-color:transparent;}
+.badge-blue{background:var(--blue-dim);color:var(--blue);border-color:transparent;}
+.badge-violet{background:var(--violet-dim);color:var(--violet);border-color:transparent;}
+.badge-red{background:var(--red-dim);color:var(--red);border-color:transparent;}
+
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r-lg);
+}
+
+.input, .textarea, select.input{
+  width:100%;
+  background:var(--bg-raised);
+  border:1px solid var(--border-strong);
+  color:var(--text-1);
+  border-radius:var(--r-sm);
+  padding:9px 11px;
+  font-size:13.5px;
+  font-family:var(--font-body);
+}
+.textarea{resize:vertical;min-height:70px;font-family:var(--font-mono);font-size:13px;}
+.input:focus, .textarea:focus{border-color:var(--accent);}
+.field-label{display:block;font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:6px;text-transform:none;}
+
+.tooltip{position:relative;}
+.tooltip::after{
+  content:attr(data-tip);
+  position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+  background:#000;color:#fff;font-size:11.5px;padding:5px 9px;border-radius:6px;
+  white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .12s ease;
+  box-shadow:var(--shadow-sm); z-index:80;
+}
+.tooltip:hover::after{opacity:1;}
+
+.toast-stack{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:900;}
+.toast{
+  background:var(--surface-2);border:1px solid var(--border-strong);border-left:3px solid var(--accent);
+  border-radius:var(--r-md);padding:11px 16px;font-size:13px;color:var(--text-1);
+  box-shadow:var(--shadow-lg);animation:toast-in .22s ease;min-width:220px;
+}
+@keyframes toast-in{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* ============================================================
+   HOME
+   ============================================================ */
+#view-home{display:block;}
+.home-nav{
+  position:sticky;top:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 40px;
+  background:rgba(10,13,18,.82);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--font-head);font-weight:700;font-size:16px;color:var(--text-1);}
+.brand-mark{
+  width:28px;height:28px;border-radius:8px;
+  background:linear-gradient(155deg, var(--accent) 0%, #1c8f72 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-mono);font-weight:700;color:#06231b;font-size:13px;
+}
+.home-nav-links{display:flex;gap:28px;align-items:center;}
+.home-nav-links a{font-size:13.5px;color:var(--text-2);font-weight:500;}
+.home-nav-links a:hover{color:var(--text-1);}
+.home-nav-cta{display:flex;gap:10px;}
+
+.hero{
+  display:grid;grid-template-columns:1.05fr .95fr;gap:56px;
+  padding:88px 40px 96px;max-width:1280px;margin:0 auto;align-items:center;
+}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;color:var(--accent);font-size:13px;font-weight:600;margin-bottom:18px;}
+.hero-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
+.hero h1{font-size:44px;line-height:1.12;max-width:560px;}
+.hero p.lead{margin-top:18px;font-size:16.5px;color:var(--text-2);max-width:480px;line-height:1.6;}
+.hero-cta{display:flex;gap:12px;margin-top:32px;}
+.hero-cta .btn{padding:12px 20px;font-size:14px;}
+.hero-meta{display:flex;gap:26px;margin-top:44px;}
+.hero-meta div{display:flex;flex-direction:column;gap:2px;}
+.hero-meta .num{font-family:var(--font-head);font-size:20px;font-weight:700;color:var(--text-1);}
+.hero-meta .lbl{font-size:12px;color:var(--text-3);}
+
+.hero-demo{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
+  box-shadow:var(--shadow-lg);overflow:hidden;
+}
+.hero-demo-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;border-bottom:1px solid var(--border);background:var(--bg-raised);
+}
+.win-dots{display:flex;gap:6px;}
+.win-dots span{width:9px;height:9px;border-radius:50%;background:var(--border-strong);}
+.hero-demo-bar .fname{font-family:var(--font-mono);font-size:12px;color:var(--text-3);}
+.hero-demo-body{padding:18px 20px;font-family:var(--font-mono);font-size:13px;line-height:1.75;}
+.code-line{white-space:pre;color:var(--text-2);}
+.tok-kw{color:#c792ea;}
+.tok-fn{color:#82aaff;}
+.tok-str{color:var(--accent);}
+.tok-num{color:var(--amber);}
+.tok-com{color:var(--text-3);}
+.tok-var{color:var(--text-1);}
+.hero-demo-out{
+  border-top:1px solid var(--border);padding:14px 20px;background:var(--bg-raised);
+  font-family:var(--font-mono);font-size:12.5px;
+}
+.hero-demo-out .line{color:var(--text-2);display:flex;gap:8px;}
+.hero-demo-out .ok{color:var(--accent);}
+.hero-demo-out .tag{color:var(--text-3);}
+.blink-cursor{display:inline-block;width:7px;height:15px;background:var(--accent);animation:blink 1.1s steps(1) infinite;vertical-align:-2px;}
+@keyframes blink{50%{opacity:0;}}
+
+.section-head{max-width:640px;margin:0 auto 40px;text-align:center;}
+.section-head h2{font-size:28px;}
+.section-head p{margin-top:10px;font-size:15px;}
+
+.features{padding:20px 40px 100px;max-width:1280px;margin:0 auto;}
+.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.feature-card{
+  padding:20px;border-radius:var(--r-md);background:var(--surface);
+  border:1px solid var(--border);border-left:3px solid var(--fc, var(--accent));
+  transition:background .15s ease, border-color .15s ease;
+}
+.feature-card:hover{background:var(--surface-2);}
+.feature-icon{
+  width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  background:var(--fc-dim, var(--accent-dim));color:var(--fc, var(--accent));margin-bottom:14px;
+}
+.feature-card h3{font-size:14.5px;margin-bottom:6px;}
+.feature-card p{font-size:13px;line-height:1.55;}
+
+.home-footer{
+  border-top:1px solid var(--border);padding:32px 40px;
+  display:flex;align-items:center;justify-content:space-between;color:var(--text-3);font-size:12.5px;
+}
+
+/* ============================================================
+   WORKSPACE SHELL
+   ============================================================ */
+#view-workspace{display:none;flex-direction:column;height:100vh;}
+.ws-nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 18px;height:52px;flex:0 0 auto;
+  background:var(--bg-raised);border-bottom:1px solid var(--border);
+}
+.ws-nav-left{display:flex;align-items:center;gap:16px;}
+.ws-crumb{font-size:12.5px;color:var(--text-3);display:flex;align-items:center;gap:6px;}
+.ws-crumb b{color:var(--text-2);font-weight:600;}
+.ws-nav-right{display:flex;align-items:center;gap:8px;}
+
+.help-pill{
+  display:flex;align-items:center;gap:7px;padding:6px 11px;border-radius:var(--r-pill);
+  background:var(--surface-2);border:1px solid var(--border-strong);cursor:pointer;font-size:12.5px;font-weight:600;color:var(--text-2);
+}
+.help-pill:hover{color:var(--text-1);border-color:var(--accent-line);}
+.help-pill .count{color:var(--accent);font-family:var(--font-mono);}
+
+.ws-toolbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 18px;flex:0 0 auto;background:var(--bg);border-bottom:1px solid var(--border);gap:16px;
+}
+.mode-tabs{display:flex;gap:4px;background:var(--surface);padding:3px;border-radius:var(--r-md);border:1px solid var(--border);}
+.mode-tab{
+  padding:7px 14px;border-radius:6px;font-size:13px;font-weight:600;color:var(--text-2);
+  background:transparent;border:none;cursor:pointer;display:flex;align-items:center;gap:7px;
+}
+.mode-tab .dotm{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.5;}
+.mode-tab.active{background:var(--surface-hover);color:var(--text-1);}
+.mode-tab.active .dotm{opacity:1;}
+.mode-tab[data-mode="free"].active{color:var(--accent);}
+.mode-tab[data-mode="task"].active{color:var(--amber);}
+.mode-tab[data-mode="custom"].active{color:var(--blue);}
+.mode-tab[data-mode="debug"].active{color:var(--violet);}
+
+.toolbar-actions{display:flex;align-items:center;gap:8px;}
+.run-btn{background:var(--accent);border-color:var(--accent);color:#06231b;}
+.run-btn:hover{background:var(--accent-strong);}
+.eval-btn{background:var(--amber);border-color:var(--amber);color:#2a1c02;}
+.eval-btn:hover{filter:brightness(1.06);}
+
+.ws-main{flex:1 1 auto;display:grid;grid-template-columns:1fr 360px;grid-template-rows:1fr auto;min-height:0;}
+.editor-pane{grid-column:1;grid-row:1;display:flex;flex-direction:column;min-width:0;border-right:1px solid var(--border);background:var(--bg-raised);}
+.right-pane{grid-column:2;grid-row:1 / span 2;display:flex;flex-direction:column;min-width:0;background:var(--surface);border-left:1px solid var(--border);overflow:hidden;}
+.terminal-pane{grid-column:1;grid-row:2;background:var(--bg-raised);border-top:1px solid var(--border);display:flex;flex-direction:column;height:230px;}
+
+.editor-toolbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 14px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text-3);
+}
+.editor-toolbar .file{display:flex;align-items:center;gap:8px;font-family:var(--font-mono);color:var(--text-2);}
+.editor-toolbar .file .pydot{width:8px;height:8px;border-radius:50%;background:var(--amber);}
+.editor-shortcuts{display:flex;gap:14px;}
+.kbd{font-family:var(--font-mono);background:var(--surface-2);border:1px solid var(--border-strong);border-radius:4px;padding:1px 6px;font-size:11px;color:var(--text-2);}
+
+.editor-body{flex:1;overflow:auto;display:flex;}
+.gutter{padding:14px 12px 14px 16px;text-align:right;font-family:var(--font-mono);font-size:13px;line-height:1.75;color:var(--text-3);user-select:none;background:var(--bg-raised);border-right:1px solid var(--border);}
+.code-area{padding:14px 20px;font-family:var(--font-mono);font-size:13px;line-height:1.75;flex:1;white-space:pre;}
+.code-area .cur-line{background:rgba(255,255,255,.025);display:block;margin:0 -20px;padding:0 20px;}
+
+.editor-status{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:5px 14px;border-top:1px solid var(--border);font-size:11.5px;color:var(--text-3);background:var(--bg-raised);
+}
+.editor-status .left{display:flex;gap:16px;}
+.status-dot{display:inline-flex;align-items:center;gap:6px;}
+.status-dot .d{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+
+/* terminal */
+.terminal-head{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;border-bottom:1px solid var(--border);}
+.term-tabs{display:flex;gap:4px;}
+.term-tab{background:transparent;border:none;color:var(--text-3);font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:6px;cursor:pointer;letter-spacing:.02em;}
+.term-tab.active{background:var(--surface-2);color:var(--text-1);}
+.terminal-body{flex:1;overflow:auto;padding:12px 16px;font-family:var(--font-mono);font-size:12.5px;line-height:1.7;}
+.term-line{white-space:pre-wrap;color:var(--text-2);}
+.term-line.out{color:var(--text-1);}
+.term-line.err{color:var(--red);}
+.term-line.prompt{color:var(--text-3);}
+.term-empty{color:var(--text-3);font-style:normal;}
+.spinner{
+  width:13px;height:13px;border-radius:50%;border:2px solid var(--border-strong);border-top-color:var(--accent);
+  display:inline-block;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:8px;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* right panel generic */
+.mode-panel{display:none;flex-direction:column;height:100%;min-height:0;}
+.mode-panel.active{display:flex;}
+.panel-header{padding:16px 18px 12px;border-bottom:1px solid var(--border);flex:0 0 auto;}
+.panel-tabs{display:flex;gap:2px;padding:0 12px;border-bottom:1px solid var(--border);flex:0 0 auto;}
+.ptab{background:transparent;border:none;color:var(--text-3);font-size:12px;font-weight:600;padding:11px 10px;cursor:pointer;border-bottom:2px solid transparent;}
+.ptab.active{color:var(--text-1);border-color:var(--accent);}
+.mode-panel[data-mode="task"] .ptab.active{border-color:var(--amber);}
+.mode-panel[data-mode="custom"] .ptab.active{border-color:var(--blue);}
+.mode-panel[data-mode="debug"] .ptab.active{border-color:var(--violet);}
+.panel-tab-content{display:none;flex:1;overflow:auto;padding:16px 18px;min-height:0;}
+.panel-tab-content.active{display:block;}
+
+/* task selector */
+.task-select-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;}
+.task-select-row select{width:auto;}
+.task-card-mini{
+  display:flex;flex-direction:column;gap:4px;padding:12px 14px;border-radius:var(--r-md);
+  background:var(--bg-raised);border:1px solid var(--border);margin-top:10px;
+}
+.task-card-mini .cat{font-size:11px;color:var(--text-3);font-weight:600;}
+.task-card-mini .ttl{font-size:15px;font-weight:600;color:var(--text-1);font-family:var(--font-head);}
+.task-card-mini .meta{display:flex;gap:8px;margin-top:2px;}
+
+/* requirements / description */
+.req-block p{font-size:13px;line-height:1.65;color:var(--text-2);margin-bottom:12px;}
+.req-block h4{font-size:12px;color:var(--text-3);text-transform:none;margin:16px 0 8px;font-weight:600;}
+.req-list{margin:0;padding-left:18px;color:var(--text-2);font-size:13px;line-height:1.7;}
+
+/* score */
+.score-block{padding:14px 16px;background:var(--bg-raised);border:1px solid var(--border);border-radius:var(--r-md);margin-bottom:16px;}
+.score-block .row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;}
+.score-block .row .lbl{font-size:11.5px;color:var(--text-3);font-weight:600;}
+.score-block .row .val{font-family:var(--font-head);font-size:20px;font-weight:700;color:var(--text-1);}
+.score-track{height:8px;border-radius:var(--r-pill);background:var(--surface-2);overflow:hidden;}
+.score-fill{height:100%;border-radius:var(--r-pill);background:linear-gradient(90deg, var(--accent-strong), var(--accent));transition:width .5s ease;}
+
+/* test list */
+.test-list{display:flex;flex-direction:column;gap:8px;}
+.test-row{border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;}
+.test-row summary{
+  list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:9px 12px;cursor:pointer;font-size:12.5px;background:var(--bg-raised);color:var(--text-2);
+}
+.test-row summary::-webkit-details-marker{display:none;}
+.test-row summary .ic{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex:0 0 auto;}
+.ic-pass{background:var(--accent-dim);color:var(--accent);}
+.ic-fail{background:var(--red-dim);color:var(--red);}
+.ic-pending{background:var(--surface-2);color:var(--text-3);}
+.test-row .name{flex:1;color:var(--text-1);font-weight:500;}
+.test-row .body{padding:11px 12px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:12px;display:flex;flex-direction:column;gap:8px;}
+.test-row .body .tl{color:var(--text-3);font-size:10.5px;font-weight:600;margin-bottom:2px;font-family:var(--font-body);}
+.test-row .body .tv{background:var(--bg-raised);padding:6px 9px;border-radius:4px;color:var(--text-2);}
+.test-row .body .tv.mismatch{color:var(--red);}
+.hidden-note{font-size:11.5px;color:var(--text-3);padding:8px 2px;display:flex;align-items:center;gap:6px;}
+
+/* diagnostics */
+.diag-card{border:1px solid var(--red-line, rgba(242,85,95,.35));border-radius:var(--r-md);overflow:hidden;background:var(--bg-raised);}
+.diag-head{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--red-dim);}
+.diag-head .ic{width:28px;height:28px;border-radius:7px;background:var(--red);color:#2a0509;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex:0 0 auto;}
+.diag-head .txt strong{display:block;font-size:13.5px;color:var(--text-1);font-family:var(--font-head);}
+.diag-head .txt span{font-size:11.5px;color:var(--text-3);}
+.diag-code{font-family:var(--font-mono);font-size:12px;color:var(--red);padding:10px 14px;border-bottom:1px solid var(--border);background:rgba(242,85,95,.05);}
+.diag-section{padding:12px 14px;border-bottom:1px solid var(--border);}
+.diag-section:last-child{border-bottom:none;}
+.diag-section h5{font-size:11px;color:var(--text-3);font-weight:600;margin-bottom:6px;}
+.diag-section p{font-size:12.5px;color:var(--text-2);line-height:1.6;}
+.diag-actions{padding:12px 14px;}
+.empty-diag{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:36px 14px;color:var(--text-3);}
+.empty-diag .ic{width:36px;height:36px;border-radius:10px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:16px;}
+.empty-diag p{font-size:12.5px;color:var(--text-3);}
+
+/* hints */
+.hint-progress{display:flex;align-items:center;gap:6px;margin-bottom:16px;}
+.hp-dot{width:11px;height:11px;border-radius:50%;background:var(--surface-2);border:2px solid var(--border-strong);flex:0 0 auto;}
+.hp-dot.done{background:var(--amber);border-color:var(--amber);}
+.hp-line{flex:1;height:2px;background:var(--border-strong);}
+.hp-line.done{background:var(--amber);}
+.hint-card{border:1px solid var(--border);border-radius:var(--r-md);padding:14px;margin-bottom:10px;background:var(--bg-raised);}
+.hint-card.locked{opacity:.55;}
+.hint-card .lvl-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.hint-card .lvl-lbl{font-size:11px;color:var(--amber);font-weight:600;}
+.hint-card .lvl-title{font-size:13.5px;color:var(--text-1);font-weight:600;font-family:var(--font-head);}
+.hint-card .lvl-body{font-size:12.5px;color:var(--text-2);line-height:1.6;margin-top:8px;}
+.lock-tag{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-3);}
+
+/* AI tutor */
+.tutor-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);}
+.tutor-head .title{display:flex;align-items:center;gap:9px;}
+.tutor-head .avatar{width:30px;height:30px;border-radius:8px;background:linear-gradient(155deg,var(--accent),#1c8f72);display:flex;align-items:center;justify-content:center;font-size:14px;}
+.tutor-head .status{font-size:11px;color:var(--accent);display:flex;align-items:center;gap:5px;}
+.tutor-head .status .d{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+.tutor-chat{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:14px;}
+.msg{max-width:88%;}
+.msg .who{font-size:10.5px;color:var(--text-3);font-weight:600;margin-bottom:4px;}
+.msg .bubble{padding:10px 13px;border-radius:10px;font-size:13px;line-height:1.55;}
+.msg.student{align-self:flex-end;}
+.msg.student .bubble{background:var(--surface-2);color:var(--text-1);border:1px solid var(--border-strong);}
+.msg.ai .bubble{background:var(--accent-dim);color:var(--text-1);border:1px solid var(--accent-line);}
+.msg.ai .who{color:var(--accent);}
+.suggested{display:flex;flex-wrap:wrap;gap:7px;margin-top:2px;}
+.chip{padding:6px 11px;border-radius:var(--r-pill);border:1px solid var(--border-strong);background:var(--surface-2);font-size:12px;color:var(--text-2);cursor:pointer;}
+.chip:hover{color:var(--text-1);border-color:var(--accent-line);}
+.typing{display:flex;gap:4px;padding:4px 0;}
+.typing span{width:5px;height:5px;background:var(--accent);border-radius:50%;animation:tdot 1s infinite ease-in-out;}
+.typing span:nth-child(2){animation-delay:.15s;}
+.typing span:nth-child(3){animation-delay:.3s;}
+@keyframes tdot{0%,60%,100%{opacity:.25;}30%{opacity:1;}}
+.tutor-input{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--border);}
+.tutor-input input{flex:1;}
+
+/* custom author */
+.tc-row{border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;margin-bottom:10px;background:var(--bg-raised);}
+.tc-row .tc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.tc-row .tc-head span{font-size:11.5px;color:var(--text-3);font-weight:600;}
+.tc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.match-row{display:flex;align-items:center;gap:8px;margin-top:8px;}
+.match-row select{width:auto;flex:1;}
+.starter-tpl{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.tpl-chip{font-family:var(--font-mono);font-size:11.5px;padding:6px 10px;border-radius:6px;background:var(--surface-2);border:1px solid var(--border-strong);cursor:pointer;color:var(--text-2);}
+.tpl-chip:hover{color:var(--text-1);border-color:var(--blue);}
+
+/* debug bug list */
+.bug-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r-sm);border:1px solid var(--border);margin-bottom:8px;cursor:pointer;background:var(--bg-raised);}
+.bug-item:hover{border-color:var(--violet);}
+.bug-item.active{border-color:var(--violet);background:var(--violet-dim);}
+.bug-item .num{font-family:var(--font-mono);font-size:11px;color:var(--text-3);width:34px;flex:0 0 auto;}
+.bug-item .info strong{display:block;font-size:12.5px;color:var(--text-1);}
+.bug-item .info span{font-size:11px;color:var(--text-3);}
+
+.divider{height:1px;background:var(--border);margin:16px 0;border:none;}
+
+/* ============================================================
+   MODALS / OVERLAYS
+   ============================================================ */
+.overlay{position:fixed;inset:0;background:rgba(4,6,9,.65);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:200;}
+.overlay.show{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--r-lg);box-shadow:var(--shadow-lg);width:520px;max-width:92vw;max-height:86vh;display:flex;flex-direction:column;}
+.modal.wide{width:640px;}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border);flex:0 0 auto;}
+.modal-body{padding:22px;overflow:auto;}
+.modal-foot{padding:16px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;flex:0 0 auto;}
+
+/* settings modal */
+.provider-pills{display:flex;gap:8px;margin-bottom:20px;}
+.pill-opt{flex:1;text-align:center;padding:11px 8px;border-radius:var(--r-md);border:1px solid var(--border-strong);background:var(--bg-raised);cursor:pointer;font-size:12.5px;font-weight:600;color:var(--text-2);}
+.pill-opt.active{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
+.field-group{margin-bottom:14px;}
+.pw-wrap{position:relative;}
+.pw-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-3);cursor:pointer;font-size:11px;font-weight:600;}
+.conn-result{display:none;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r-sm);background:var(--accent-dim);border:1px solid var(--accent-line);margin-top:14px;font-size:12.5px;color:var(--accent);}
+.conn-result.show{display:flex;}
+.conn-result.err{background:var(--red-dim);border-color:rgba(242,85,95,.35);color:var(--red);}
+
+/* progress modal */
+.progress-hero{display:flex;align-items:center;gap:22px;margin-bottom:22px;}
+.ring{width:96px;height:96px;border-radius:50%;flex:0 0 auto;position:relative;background:conic-gradient(var(--accent) 0 78%, var(--surface-2) 78% 100%);display:flex;align-items:center;justify-content:center;}
+.ring::before{content:'';position:absolute;inset:9px;border-radius:50%;background:var(--surface);}
+.ring span{position:relative;font-family:var(--font-head);font-size:22px;font-weight:700;}
+.progress-hero .lbl{font-size:12.5px;color:var(--text-3);margin-top:2px;}
+.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px;}
+.metric{background:var(--bg-raised);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;}
+.metric .v{font-family:var(--font-head);font-size:19px;font-weight:700;}
+.metric .k{font-size:11px;color:var(--text-3);margin-top:2px;}
+.filter-tabs{display:flex;gap:4px;margin-bottom:12px;background:var(--bg-raised);padding:3px;border-radius:var(--r-sm);width:fit-content;border:1px solid var(--border);}
+.ftab{padding:6px 12px;border-radius:5px;border:none;background:transparent;color:var(--text-3);font-size:12px;font-weight:600;cursor:pointer;}
+.ftab.active{background:var(--surface-2);color:var(--text-1);}
+.plist{display:flex;flex-direction:column;gap:6px;max-height:200px;overflow:auto;}
+.pitem{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r-sm);font-size:13px;}
+.pitem .st{width:16px;height:16px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:9px;}
+.st-done{background:var(--accent-dim);color:var(--accent);}
+.st-partial{background:var(--amber-dim);color:var(--amber);}
+.st-todo{background:var(--surface-2);color:var(--text-3);}
+
+/* help popover */
+.help-pop{position:absolute;top:50px;right:120px;width:260px;background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--r-md);box-shadow:var(--shadow-lg);z-index:150;display:none;overflow:hidden;}
+.help-pop.show{display:block;}
+.help-pop-head{padding:13px 16px;border-bottom:1px solid var(--border);font-size:12.5px;font-weight:700;font-family:var(--font-head);}
+.help-pop-body{padding:12px 16px;display:flex;flex-direction:column;gap:9px;}
+.hp-row{display:flex;justify-content:space-between;font-size:12.5px;color:var(--text-2);}
+.hp-row.total{font-weight:700;color:var(--text-1);padding-top:8px;border-top:1px solid var(--border);}
+.hp-row b{font-family:var(--font-mono);color:var(--text-1);font-weight:600;}
+.help-pop-foot{padding:10px 16px;border-top:1px solid var(--border);}
+
+@media (max-width: 980px){
+  .hero{grid-template-columns:1fr;padding:60px 24px;}
+  .feature-grid{grid-template-columns:repeat(2,1fr);}
+  .ws-main{grid-template-columns:1fr;}
+  .right-pane{grid-row:3;grid-column:1;height:320px;border-left:none;border-top:1px solid var(--border);}
+  .terminal-pane{grid-row:2;}
+}
+@media (max-width: 620px){
+  .home-nav{padding:14px 18px;}
+  .home-nav-links{display:none;}
+  .feature-grid{grid-template-columns:1fr;}
+  .metric-grid{grid-template-columns:repeat(2,1fr);}
+  .hero h1{font-size:32px;}
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important; transition-duration:.001ms !important;}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     HOME VIEW
+============================================================ -->
+<div id="view-home">
+  <nav class="home-nav">
+    <div class="brand"><span class="brand-mark">C</span>CodeMentor AI</div>
+    <div class="home-nav-links">
+      <a href="#features">Product</a>
+      <a href="#how">How it works</a>
+      <a href="#" onclick="openSettings();return false;">AI Settings</a>
+    </div>
+    <div class="home-nav-cta">
+      <button class="btn btn-ghost" onclick="openProgress()">Progress</button>
+      <button class="btn btn-primary" onclick="goWorkspace()">Open Workspace</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div>
+      <div class="hero-eyebrow"><span class="dot"></span>AI-assisted Python practice</div>
+      <h1>Learn Python by writing it, with a mentor reading over your shoulder.</h1>
+      <p class="lead">CodeMentor AI pairs a real code editor with an AI tutor that explains errors, gives progressive hints, and evaluates your solutions — so you build understanding, not just working code.</p>
+      <div class="hero-cta">
+        <button class="btn btn-primary" onclick="goWorkspace()">Open Workspace</button>
+        <button class="btn btn-ghost" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">See how it works</button>
+      </div>
+      <div class="hero-meta">
+        <div><span class="num">4</span><span class="lbl">workspace modes</span></div>
+        <div><span class="num">3</span><span class="lbl">hint levels</span></div>
+        <div><span class="num">24/7</span><span class="lbl">AI tutor</span></div>
+      </div>
+    </div>
+
+    <div class="hero-demo">
+      <div class="hero-demo-bar">
+        <div class="win-dots"><span></span><span></span><span></span></div>
+        <span class="fname">sum_two_numbers.py</span>
+        <span style="width:40px"></span>
+      </div>
+      <div class="hero-demo-body">
+<div class="code-line"><span class="tok-kw">def</span> <span class="tok-fn">sum_two_numbers</span>(a, b):</div>
+<div class="code-line">    <span class="tok-com"># return the sum of a and b</span></div>
+<div class="code-line">    <span class="tok-kw">return</span> a + b<span class="blink-cursor"></span></div>
+<div class="code-line">&nbsp;</div>
+<div class="code-line"><span class="tok-var">result</span> = <span class="tok-fn">sum_two_numbers</span>(<span class="tok-num">4</span>, <span class="tok-num">5</span>)</div>
+<div class="code-line"><span class="tok-fn">print</span>(<span class="tok-str">f"Result: {result}"</span>)</div>
+      </div>
+      <div class="hero-demo-out">
+        <div class="line prompt">$ run sum_two_numbers.py</div>
+        <div class="line ok">Result: 9</div>
+        <div class="line"><span class="tag">✓ 3/3 tests passed</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="features" id="features">
+    <div class="section-head">
+      <h2>Everything you need to actually learn</h2>
+      <p>Four ways to practice, backed by hints and an AI tutor that never just hands you the answer.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card" style="--fc:var(--accent);--fc-dim:var(--accent-dim);">
+        <div class="feature-icon">▶</div>
+        <h3>Free Play</h3>
+        <p>An open Python editor to experiment, run code, and get live diagnostics with no task attached.</p>
+      </div>
+      <div class="feature-card" style="--fc:var(--amber);--fc-dim:var(--amber-dim);">
+        <div class="feature-icon">✓</div>
+        <h3>Task Evaluation</h3>
+        <p>Structured challenges with requirements, test cases, and a live score as you work toward a solution.</p>
+      </div>
+      <div class="feature-card" style="--fc:var(--blue);--fc-dim:var(--blue-dim);">
+        <div class="feature-icon">✎</div>
+        <h3>Custom Questions</h3>
+        <p>Write your own prompt and test cases, then switch straight into solving it yourself.</p>
+      </div>
+      <div class="feature-card" style="--fc:var(--violet);--fc-dim:var(--violet-dim);">
+        <div class="feature-icon">◆</div>
+        <h3>Debug Mode</h3>
+        <p>Real bugs planted in working code — find and fix them using diagnostics and test feedback.</p>
+      </div>
+      <div class="feature-card" style="--fc:var(--accent);--fc-dim:var(--accent-dim);">
+        <div class="feature-icon">✦</div>
+        <h3>AI Tutor</h3>
+        <p>Ask questions in plain language. The tutor reasons with you instead of writing the fix for you.</p>
+      </div>
+      <div class="feature-card" style="--fc:var(--amber);--fc-dim:var(--amber-dim);">
+        <div class="feature-icon">◐</div>
+        <h3>Progressive Hints</h3>
+        <p>Three levels — conceptual, strategic, structural — unlocked one at a time as you need them.</p>
+      </div>
+      <div class="feature-card" style="--fc:var(--blue);--fc-dim:var(--blue-dim);">
+        <div class="feature-icon">%</div>
+        <h3>Progress Tracking</h3>
+        <p>See completion, average score, and attempt history across every task and custom question.</p>
+      </div>
+      <div class="feature-card" style="--fc:var(--violet);--fc-dim:var(--violet-dim);">
+        <div class="feature-icon">?</div>
+        <h3>Help Counter</h3>
+        <p>A transparent tally of hints, tutor messages, and error explanations used per session.</p>
+      </div>
+      <div class="feature-card" style="--fc:var(--text-2);--fc-dim:var(--surface-2);">
+        <div class="feature-icon">⚙</div>
+        <h3>AI Settings</h3>
+        <p>Bring your own model — offline mock, local Ollama, or a cloud provider, tested before you save.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="home-footer">
+    <div class="brand" style="font-size:13px;">CodeMentor AI</div>
+    <div>Built for learning Python, one reasoning step at a time.</div>
+  </footer>
+</div>
+
+<!-- ============================================================
+     WORKSPACE VIEW
+============================================================ -->
+<div id="view-workspace">
+  <nav class="ws-nav">
+    <div class="ws-nav-left">
+      <div class="brand" style="font-size:14px;cursor:pointer;" onclick="goHome()"><span class="brand-mark" style="width:24px;height:24px;font-size:11px;">C</span>CodeMentor AI</div>
+      <div class="ws-crumb">Workspace <span>/</span> <b id="crumb-mode">Free Play</b></div>
+    </div>
+    <div class="ws-nav-right">
+      <div class="help-pill" onclick="toggleHelp(event)">Help · <span class="count" id="help-total-pill">3</span></div>
+      <button class="btn btn-icon btn-ghost tooltip" data-tip="Progress" onclick="openProgress()">%</button>
+      <button class="btn btn-icon btn-ghost tooltip" data-tip="AI Settings" onclick="openSettings()">⚙</button>
+    </div>
+  </nav>
+
+  <div class="ws-toolbar">
+    <div class="mode-tabs" id="mode-tabs">
+      <button class="mode-tab active" data-mode="free"><span class="dotm"></span>Free Play</button>
+      <button class="mode-tab" data-mode="task"><span class="dotm"></span>Tasks</button>
+      <button class="mode-tab" data-mode="custom"><span class="dotm"></span>Custom</button>
+      <button class="mode-tab" data-mode="debug"><span class="dotm"></span>Debug</button>
+    </div>
+    <div class="toolbar-actions">
+      <button class="btn run-btn btn-sm" id="btn-run" onclick="runCode()">▶ Run Code <span class="kbd" style="margin-left:4px;">⌘⏎</span></button>
+      <button class="btn eval-btn btn-sm" id="btn-eval" onclick="evaluateCode()">Evaluate</button>
+      <button class="btn btn-ghost btn-sm" onclick="resetEditor()">Reset</button>
+    </div>
+  </div>
+
+  <div class="ws-main">
+    <!-- EDITOR -->
+    <div class="editor-pane">
+      <div class="editor-toolbar">
+        <div class="file"><span class="pydot"></span><span id="editor-filename">main.py</span></div>
+        <div class="editor-shortcuts">
+          <span class="badge">Python 3</span>
+          <span class="kbd">⌘S save</span>
+        </div>
+      </div>
+      <div class="editor-body">
+        <div class="gutter" id="gutter"></div>
+        <div class="code-area" id="code-area"></div>
+      </div>
+      <div class="editor-status">
+        <div class="left">
+          <span class="status-dot"><span class="d"></span>Ready</span>
+          <span>Ln 6, Col 12</span>
+          <span>Spaces: 4</span>
+        </div>
+        <div>UTF-8</div>
+      </div>
+    </div>
+
+    <!-- TERMINAL -->
+    <div class="terminal-pane">
+      <div class="terminal-head">
+        <div class="term-tabs">
+          <button class="term-tab active">Output</button>
+          <button class="term-tab">Problems</button>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="clearTerminal()">Clear</button>
+      </div>
+      <div class="terminal-body" id="terminal-body">
+        <div class="term-line term-empty">Run your code to see output here.</div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-pane">
+
+      <!-- FREE PLAY -->
+      <div class="mode-panel active" data-mode="free">
+        <div class="panel-header">
+          <h4>Free Play</h4>
+          <p style="font-size:12.5px;margin-top:4px;">Nothing to evaluate — just run code and explore.</p>
+        </div>
+        <div class="panel-tabs">
+          <button class="ptab active" data-target="free-info">Session</button>
+          <button class="ptab" data-target="free-diag">Diagnostics</button>
+          <button class="ptab" data-target="free-tutor">AI Tutor</button>
+        </div>
+        <div class="panel-tab-content active" data-content="free-info">
+          <div class="req-block">
+            <h4>Execution info</h4>
+            <p>Every run in Free Play executes your file in an isolated sandbox with a 5 second timeout.</p>
+          </div>
+          <hr class="divider">
+          <div class="req-block">
+            <h4>Tips</h4>
+            <ul class="req-list">
+              <li>Use <span class="mono">print()</span> freely — output streams to the terminal below.</li>
+              <li>Runtime errors show up in the Diagnostics tab with a plain-language explanation.</li>
+              <li>Nothing here is scored — switch to Tasks when you want feedback on correctness.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="panel-tab-content" data-content="free-diag" id="free-diag-content">
+          <div class="empty-diag">
+            <div class="ic">◆</div>
+            <p>No errors yet. Diagnostics will appear here the moment something breaks.</p>
+          </div>
+        </div>
+        <div class="panel-tab-content" data-content="free-tutor" style="padding:0;display:flex;">
+          <!-- filled by JS clone of tutor template -->
+        </div>
+      </div>
+
+      <!-- TASK -->
+      <div class="mode-panel" data-mode="task">
+        <div class="panel-header">
+          <div class="task-select-row">
+            <span style="font-size:11px;color:var(--text-3);font-weight:600;">CHALLENGE</span>
+            <select class="input" style="width:auto;padding:4px 8px;font-size:12px;">
+              <option>1 of 12</option>
+            </select>
+          </div>
+          <div class="task-card-mini">
+            <span class="cat">Python Basics</span>
+            <span class="ttl">Sum Two Numbers</span>
+            <div class="meta"><span class="badge badge-accent">Beginner</span><span class="badge">2 tests</span></div>
+          </div>
+        </div>
+        <div class="panel-tabs">
+          <button class="ptab active" data-target="task-req">Requirements</button>
+          <button class="ptab" data-target="task-tests">Tests</button>
+          <button class="ptab" data-target="task-hints">Hints</button>
+          <button class="ptab" data-target="task-tutor">AI Tutor</button>
+        </div>
+        <div class="panel-tab-content active" data-content="task-req">
+          <div class="score-block">
+            <div class="row"><span class="lbl">SCORE</span><span class="val" id="task-score-val">0%</span></div>
+            <div class="score-track"><div class="score-fill" id="task-score-fill" style="width:0%"></div></div>
+          </div>
+          <div class="req-block">
+            <h4>Requirements</h4>
+            <ul class="req-list">
+              <li>Define a function <span class="mono">sum_two_numbers(a, b)</span>.</li>
+              <li>Return the sum of <span class="mono">a</span> and <span class="mono">b</span>.</li>
+              <li>Do not print inside the function — return the value.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="panel-tab-content" data-content="task-tests">
+          <div class="test-list" id="task-test-list">
+            <details class="test-row"><summary><span class="ic ic-pending">·</span><span class="name">sum_two_numbers(4, 5) → 9</span></summary>
+              <div class="body"><div><div class="tl">Expected</div><div class="tv">9</div></div><div><div class="tl">Actual</div><div class="tv">—</div></div></div>
+            </details>
+            <details class="test-row"><summary><span class="ic ic-pending">·</span><span class="name">sum_two_numbers(-2, 2) → 0</span></summary>
+              <div class="body"><div><div class="tl">Expected</div><div class="tv">0</div></div><div><div class="tl">Actual</div><div class="tv">—</div></div></div>
+            </details>
+          </div>
+          <div class="hidden-note">🔒 1 hidden test — revealed after evaluation</div>
+        </div>
+        <div class="panel-tab-content" data-content="task-hints">
+          <div id="task-hints-widget"></div>
+        </div>
+        <div class="panel-tab-content" data-content="task-tutor" style="padding:0;display:flex;"></div>
+      </div>
+
+      <!-- CUSTOM -->
+      <div class="mode-panel" data-mode="custom">
+        <!-- AUTHOR STATE -->
+        <div id="custom-author">
+          <div class="panel-header">
+            <h4>Create a question</h4>
+            <p style="font-size:12.5px;margin-top:4px;">Write a prompt, then add test cases to check any solution against.</p>
+          </div>
+          <div class="panel-tab-content active" style="display:block;">
+            <div class="field-group">
+              <label class="field-label">Title</label>
+              <input class="input" value="Reverse a String" id="custom-title">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Description</label>
+              <textarea class="textarea" style="font-family:var(--font-body);font-size:13px;" rows="3" id="custom-desc">Write a function reverse_string(s) that returns the input string reversed.</textarea>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Starter templates</label>
+              <div class="starter-tpl">
+                <span class="tpl-chip" onclick="applyStarter('function')">function stub</span>
+                <span class="tpl-chip" onclick="applyStarter('class')">class stub</span>
+                <span class="tpl-chip" onclick="applyStarter('blank')">blank file</span>
+              </div>
+            </div>
+            <hr class="divider">
+            <div class="field-group" style="display:flex;justify-content:space-between;align-items:center;">
+              <label class="field-label" style="margin:0;">Test cases</label>
+              <button class="btn btn-sm btn-ghost" onclick="addTestCase()">+ Add Test Case</button>
+            </div>
+            <div id="custom-tc-list">
+              <div class="tc-row">
+                <div class="tc-head"><span>TEST 1</span><button class="btn btn-icon btn-ghost btn-sm" onclick="this.closest('.tc-row').remove()">✕</button></div>
+                <div class="tc-grid">
+                  <div><label class="field-label">Input</label><input class="input mono" value='"hello"'></div>
+                  <div><label class="field-label">Expected Output</label><input class="input mono" value='"olleh"'></div>
+                </div>
+                <div class="match-row">
+                  <span style="font-size:11.5px;color:var(--text-3);">Matching</span>
+                  <select class="input"><option>Exact match</option><option>Trimmed</option><option>Case-insensitive</option></select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:14px 18px;border-top:1px solid var(--border);display:flex;gap:8px;">
+            <button class="btn btn-ghost" style="flex:1;" onclick="toast('Question saved')">Save Question</button>
+            <button class="btn btn-primary" style="flex:1;" onclick="startSolvingCustom()">Start Solving →</button>
+          </div>
+        </div>
+
+        <!-- SOLVE STATE -->
+        <div id="custom-solve" style="display:none;flex-direction:column;height:100%;">
+          <div class="panel-header">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span class="badge badge-blue">Custom question</span>
+              <button class="btn btn-ghost btn-sm" onclick="backToAuthor()">← Edit</button>
+            </div>
+            <h4 style="margin-top:10px;" id="custom-solve-title">Reverse a String</h4>
+          </div>
+          <div class="panel-tabs">
+            <button class="ptab active" data-target="custom-q">Question</button>
+            <button class="ptab" data-target="custom-tests">Tests</button>
+            <button class="ptab" data-target="custom-hints">Hints</button>
+            <button class="ptab" data-target="custom-tutor">AI Tutor</button>
+          </div>
+          <div class="panel-tab-content active" data-content="custom-q">
+            <div class="score-block">
+              <div class="row"><span class="lbl">SCORE</span><span class="val" id="custom-score-val">0%</span></div>
+              <div class="score-track"><div class="score-fill" id="custom-score-fill" style="width:0%"></div></div>
+            </div>
+            <div class="req-block">
+              <h4>Description</h4>
+              <p id="custom-solve-desc">Write a function reverse_string(s) that returns the input string reversed.</p>
+            </div>
+          </div>
+          <div class="panel-tab-content" data-content="custom-tests">
+            <div class="test-list">
+              <details class="test-row"><summary><span class="ic ic-pending">·</span><span class="name">reverse_string("hello") → "olleh"</span></summary>
+                <div class="body"><div><div class="tl">Expected</div><div class="tv">"olleh"</div></div><div><div class="tl">Actual</div><div class="tv">—</div></div></div>
+              </details>
+            </div>
+          </div>
+          <div class="panel-tab-content" data-content="custom-hints"><div id="custom-hints-widget"></div></div>
+          <div class="panel-tab-content" data-content="custom-tutor" style="padding:0;display:flex;"></div>
+        </div>
+      </div>
+
+      <!-- DEBUG -->
+      <div class="mode-panel" data-mode="debug">
+        <div class="panel-header">
+          <h4 style="margin-bottom:10px;">Debug challenges</h4>
+          <div class="bug-item active" data-bug="3">
+            <span class="num">#03</span>
+            <div class="info"><strong>Off-by-one error</strong><span>Logic · Beginner</span></div>
+          </div>
+          <div class="bug-item" data-bug="7">
+            <span class="num">#07</span>
+            <div class="info"><strong>Wrong comparison operator</strong><span>Logic · Beginner</span></div>
+          </div>
+          <div class="bug-item" data-bug="12">
+            <span class="num">#12</span>
+            <div class="info"><strong>Unhandled exception</strong><span>Runtime · Intermediate</span></div>
+          </div>
+        </div>
+        <div class="panel-tabs">
+          <button class="ptab active" data-target="debug-info">Bug Info</button>
+          <button class="ptab" data-target="debug-diag">Diagnostics</button>
+          <button class="ptab" data-target="debug-hints">Hints</button>
+          <button class="ptab" data-target="debug-tutor">AI Tutor</button>
+        </div>
+        <div class="panel-tab-content active" data-content="debug-info">
+          <span class="badge badge-violet">LOGIC</span>
+          <div class="req-block" style="margin-top:12px;">
+            <h4>Description</h4>
+            <p>The loop does not process the final item in the list. Find and fix the off-by-one error.</p>
+          </div>
+          <div class="toolbar-actions" style="margin-top:16px;">
+            <button class="btn btn-ghost btn-sm" onclick="resetEditor()">Reset Bug</button>
+            <button class="btn eval-btn btn-sm" onclick="evaluateCode()" style="background:var(--violet);border-color:var(--violet);color:#1a0f2e;">Evaluate Fix</button>
+          </div>
+          <hr class="divider">
+          <div id="debug-test-results">
+            <h4 style="font-size:12px;color:var(--text-3);margin-bottom:10px;">Test results</h4>
+            <div class="test-list">
+              <div class="test-row" style="padding:9px 12px;display:flex;align-items:center;gap:10px;background:var(--bg-raised);font-size:12.5px;color:var(--text-3);"><span class="ic ic-pending">·</span>Run "Evaluate Fix" to check</div>
+            </div>
+          </div>
+        </div>
+        <div class="panel-tab-content" data-content="debug-diag" id="debug-diag-content">
+          <div class="empty-diag">
+            <div class="ic" style="color:var(--violet);">◆</div>
+            <p>Diagnostics will appear here if your fix throws an error.</p>
+          </div>
+        </div>
+        <div class="panel-tab-content" data-content="debug-hints"><div id="debug-hints-widget"></div></div>
+        <div class="panel-tab-content" data-content="debug-tutor" style="padding:0;display:flex;"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TEMPLATES (cloned by JS)
+============================================================ -->
+<template id="tutor-template">
+  <div style="display:flex;flex-direction:column;height:100%;width:100%;">
+    <div class="tutor-head">
+      <div class="title"><div class="avatar">✦</div><div><strong style="font-size:13px;font-family:var(--font-head);">AI Tutor</strong></div></div>
+      <div class="status"><span class="d"></span>Online</div>
+    </div>
+    <div class="tutor-chat">
+      <div class="msg student"><div class="who">You</div><div class="bubble">Why is my loop not working?</div></div>
+      <div class="msg ai"><div class="who">AI Tutor</div><div class="bubble">Let's reason through it together. What value does the loop variable hold during the final iteration — and does <span class="mono">range()</span> include that value?</div></div>
+      <div class="suggested">
+        <span class="chip" onclick="sendSuggested(this,'Check loop condition')">Check loop condition</span>
+        <span class="chip" onclick="sendSuggested(this,'Trace variable')">Trace variable</span>
+        <span class="chip" onclick="sendSuggested(this,'Review range()')">Review range()</span>
+      </div>
+    </div>
+    <div class="tutor-input">
+      <input class="input" placeholder="Ask your tutor..." onkeydown="if(event.key==='Enter')sendTutorMsg(this)">
+      <button class="btn btn-primary btn-sm" onclick="sendTutorMsg(this.previousElementSibling)">Send</button>
+    </div>
+  </div>
+</template>
+
+<template id="hints-template">
+  <div class="hint-progress">
+    <div class="hp-dot" data-hp="1"></div><div class="hp-line" data-hpl="1"></div>
+    <div class="hp-dot" data-hp="2"></div><div class="hp-line" data-hpl="2"></div>
+    <div class="hp-dot" data-hp="3"></div>
+  </div>
+  <div class="hint-card" data-lvl="1">
+    <div class="lvl-row"><span class="lvl-lbl">LEVEL 1</span></div>
+    <div class="lvl-title">Conceptual Nudge</div>
+    <div class="lvl-body hidden">Think about what happens when you add two numbers that already have a sign — does your operator behave the same for negatives?</div>
+    <button class="btn btn-sm btn-ghost" style="margin-top:10px;" onclick="revealHint(this,1)">Reveal Hint</button>
+  </div>
+  <div class="hint-card locked" data-lvl="2">
+    <div class="lvl-row"><span class="lvl-lbl">LEVEL 2</span><span class="lock-tag">🔒 Locked</span></div>
+    <div class="lvl-title">Strategy</div>
+    <div class="lvl-body hidden">Try returning the expression directly instead of storing it in an unused variable first.</div>
+  </div>
+  <div class="hint-card locked" data-lvl="3">
+    <div class="lvl-row"><span class="lvl-lbl">LEVEL 3</span><span class="lock-tag">🔒 Locked</span></div>
+    <div class="lvl-title">Structural Clue</div>
+    <div class="lvl-body hidden">Your function signature and return type are correct — the issue is isolated to a single line inside the function body.</div>
+  </div>
+</template>
+
+<!-- ============================================================
+     MODALS
+============================================================ -->
+<div class="overlay" id="overlay-settings">
+  <div class="modal">
+    <div class="modal-head"><h3>AI Settings</h3><button class="btn btn-icon btn-ghost" onclick="closeModal('overlay-settings')">✕</button></div>
+    <div class="modal-body">
+      <div class="provider-pills">
+        <div class="pill-opt active" data-p="mock" onclick="selectProvider(this)">Offline Mock</div>
+        <div class="pill-opt" data-p="ollama" onclick="selectProvider(this)">Local Ollama</div>
+        <div class="pill-opt" data-p="cloud" onclick="selectProvider(this)">Cloud AI</div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Endpoint</label>
+        <input class="input" id="endpoint-field" value="http://localhost:11434" disabled>
+      </div>
+      <div class="field-group">
+        <label class="field-label">API Key</label>
+        <div class="pw-wrap">
+          <input class="input" id="apikey-field" type="password" value="sk-mock-0000000000" disabled>
+          <button class="pw-toggle" onclick="togglePw()">SHOW</button>
+        </div>
+      </div>
+      <button class="btn btn-ghost" style="width:100%;justify-content:center;" onclick="testConnection()">Test Connection</button>
+      <div class="conn-result" id="conn-result"><span id="conn-spinner"></span><span id="conn-text">✓ Connection successful — Latency: 142ms</span></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('overlay-settings')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay-progress">
+  <div class="modal wide">
+    <div class="modal-head"><h3>Your Progress</h3><button class="btn btn-icon btn-ghost" onclick="closeModal('overlay-progress')">✕</button></div>
+    <div class="modal-body">
+      <div class="progress-hero">
+        <div class="ring"><span>78%</span></div>
+        <div><h4 style="font-size:15px;">Completion</h4><p style="font-size:12.5px;">Across all starter and custom tasks attempted so far.</p></div>
+      </div>
+      <div class="metric-grid">
+        <div class="metric"><div class="v">12</div><div class="k">Tasks Attempted</div></div>
+        <div class="metric"><div class="v">24</div><div class="k">Attempts</div></div>
+        <div class="metric"><div class="v">86%</div><div class="k">Avg Best Score</div></div>
+        <div class="metric"><div class="v">8</div><div class="k">Assists Used</div></div>
+      </div>
+      <div class="filter-tabs">
+        <button class="ftab active" onclick="filterProgress(this)">All</button>
+        <button class="ftab" onclick="filterProgress(this)">Starter</button>
+        <button class="ftab" onclick="filterProgress(this)">Custom</button>
+      </div>
+      <div class="plist">
+        <div class="pitem"><span class="st st-done">✓</span>Hello World</div>
+        <div class="pitem"><span class="st st-done">✓</span>Greeting</div>
+        <div class="pitem"><span class="st st-done">✓</span>Even or Odd</div>
+        <div class="pitem"><span class="st st-partial">◐</span>Temperature Converter</div>
+        <div class="pitem"><span class="st st-todo">○</span>Sum Two Numbers</div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="confirmResetProgress()">Reset Progress</button>
+      <button class="btn btn-primary" onclick="closeModal('overlay-progress')">Done</button>
+    </div>
+  </div>
+</div>
+
+<div class="help-pop" id="help-pop">
+  <div class="help-pop-head">Session assistance</div>
+  <div class="help-pop-body">
+    <div class="hp-row">Hints · L1 <b>1</b></div>
+    <div class="hp-row">Hints · L2 <b>1</b></div>
+    <div class="hp-row">Hints · L3 <b>0</b></div>
+    <div class="hp-row">AI Tutor <b>1</b></div>
+    <div class="hp-row">AI Error Explanation <b>0</b></div>
+    <div class="hp-row total">Total <b>3</b></div>
+  </div>
+  <div class="help-pop-foot"><button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;" onclick="resetHelp()">Reset Assistance</button></div>
+</div>
+
+<div class="toast-stack" id="toast-stack"></div>
+
+<script>
+/* ================= NAVIGATION ================= */
+function goWorkspace(){
+  document.getElementById('view-home').style.display='none';
+  document.getElementById('view-workspace').style.display='flex';
+  initEditor();
+}
+function goHome(){
+  document.getElementById('view-workspace').style.display='none';
+  document.getElementById('view-home').style.display='block';
+  window.scrollTo(0,0);
+}
+
+/* ================= CODE SAMPLES PER MODE ================= */
+const CODE_SAMPLES = {
+  free: [
+    ['kw','def '],['fn','explore'],['p','():'],
+    ['ind','    numbers = [1, 2, 3, 4, 5]'],
+    ['ind','    total = 0'],
+    ['ind','    for n in numbers:'],
+    ['ind','        total += n'],
+    ['ind','    return total'],
+    [''],
+    ['p','print(explore())']
+  ],
+  task: [
+    ['kw','def '],['fn','sum_two_numbers'],['p','(a, b):'],
+    ['ind','    # TODO: return the sum of a and b'],
+    ['ind','    pass'],
+    [''],
+    ['p','print(sum_two_numbers(4, 5))']
+  ],
+  custom: [
+    ['kw','def '],['fn','reverse_string'],['p','(s):'],
+    ['ind','    # TODO: return s reversed'],
+    ['ind','    pass'],
+    [''],
+    ['p','print(reverse_string("hello"))']
+  ],
+  debug: [
+    ['kw','def '],['fn','process_all'],['p','(items):'],
+    ['ind','    results = []'],
+    ['ind','    for i in range(1, len(items)):        # bug: skips index 0'],
+    ['ind','        results.append(items[i] * 2)'],
+    ['ind','    return results'],
+    [''],
+    ['p','print(process_all([1, 2, 3, 4]))']
+  ]
+};
+
+function renderCode(mode){
+  const lines = CODE_SAMPLES[mode];
+  const gutter = document.getElementById('gutter');
+  const area = document.getElementById('code-area');
+  gutter.innerHTML = lines.map((_,i)=>`<div>${i+1}</div>`).join('');
+  area.innerHTML = lines.map(l=>{
+    const txt = Array.isArray(l) ? l[1] : l;
+    return `<span class="code-line-inner">${escapeHtml(txt)}</span>`;
+  }).map((l,i)=> i===lines.length-1 ? `<span class="cur-line">${l}</span>` : l ).join('\n');
+}
+function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function initEditor(){ renderCode('free'); }
+
+/* ================= MODE SWITCHING ================= */
+const MODE_LABEL = {free:'Free Play', task:'Task Evaluation', custom:'Custom Question', debug:'Debug Mode'};
+document.getElementById('mode-tabs').addEventListener('click', e=>{
+  const btn = e.target.closest('.mode-tab');
+  if(!btn) return;
+  document.querySelectorAll('.mode-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const mode = btn.dataset.mode;
+  document.querySelectorAll('.mode-panel').forEach(p=>p.classList.toggle('active', p.dataset.mode===mode));
+  document.getElementById('crumb-mode').textContent = MODE_LABEL[mode];
+  document.getElementById('editor-filename').textContent = mode==='free'?'main.py':mode==='task'?'sum_two_numbers.py':mode==='custom'?'reverse_string.py':'process_all.py';
+  renderCode(mode);
+  clearTerminal();
+});
+
+/* panel-local tabs (scoped) */
+document.addEventListener('click', e=>{
+  const t = e.target.closest('.ptab');
+  if(!t) return;
+  const scope = t.closest('.mode-panel') || t.closest('#custom-solve');
+  scope.querySelectorAll('.ptab').forEach(b=>b.classList.remove('active'));
+  t.classList.add('active');
+  scope.querySelectorAll('.panel-tab-content').forEach(c=>c.classList.toggle('active', c.dataset.content===t.dataset.target));
+});
+
+/* ================= TERMINAL / RUN / EVALUATE ================= */
+function activeMode(){ return document.querySelector('.mode-tab.active').dataset.mode; }
+function termBody(){ return document.getElementById('terminal-body'); }
+function clearTerminal(){ termBody().innerHTML = '<div class="term-line term-empty">Run your code to see output here.</div>'; }
+function appendTerm(html){ termBody().insertAdjacentHTML('beforeend', html); termBody().scrollTop = termBody().scrollHeight; }
+
+function runCode(){
+  const mode = activeMode();
+  termBody().innerHTML = '<div class="term-line prompt"><span class="spinner"></span>Running...</div>';
+  setTimeout(()=>{
+    termBody().innerHTML = '';
+    appendTerm(`<div class="term-line prompt">$ python ${document.getElementById('editor-filename').textContent}</div>`);
+    if(mode==='free'){
+      appendTerm('<div class="term-line out">15</div>');
+      appendTerm('<div class="term-line" style="color:var(--accent);">Process finished — exit code 0</div>');
+      showEmptyDiag('free');
+    } else if(mode==='debug'){
+      appendTerm('<div class="term-line out">[4, 6, 8]</div>');
+      appendTerm('<div class="term-line" style="color:var(--text-3);">Note: expected 4 items, got 3 — index 0 was skipped</div>');
+    } else if(mode==='task'){
+      appendTerm('<div class="term-line err">TypeError: unsupported operand type(s) for +: \'NoneType\' and \'int\'</div>');
+      showErrorDiag('task-diag-fallback');
+      appendTerm('<div class="term-line" style="color:var(--text-3);">Open the Diagnostics tab for an explanation.</div>');
+    } else {
+      appendTerm('<div class="term-line out">olleh</div>');
+      appendTerm('<div class="term-line" style="color:var(--accent);">Process finished — exit code 0</div>');
+    }
+  }, 650);
+}
+
+function evaluateCode(){
+  const mode = activeMode();
+  termBody().innerHTML = '<div class="term-line prompt"><span class="spinner"></span>Evaluating...</div>';
+  setTimeout(()=>{
+    termBody().innerHTML = '';
+    appendTerm('<div class="term-line prompt">$ evaluate</div>');
+    if(mode==='task'){
+      appendTerm('<div class="term-line out">2 / 3 tests passed</div>');
+      setScore('task', 80);
+      markTests('task-test-list', [true, false]);
+    } else if(mode==='custom'){
+      appendTerm('<div class="term-line out">1 / 1 tests passed</div>');
+      setScore('custom', 100);
+      markTests('custom-solve', [true]);
+    } else if(mode==='debug'){
+      appendTerm('<div class="term-line out">2 / 3 tests passed</div>');
+      renderDebugResults([true, true, false]);
+    } else {
+      appendTerm('<div class="term-line" style="color:var(--text-3);">Free Play has nothing to evaluate — switch to Tasks, Custom, or Debug.</div>');
+    }
+  }, 800);
+}
+
+function setScore(mode, pct){
+  document.getElementById(mode+'-score-val').textContent = pct+'%';
+  document.getElementById(mode+'-score-fill').style.width = pct+'%';
+}
+
+function markTests(containerIdOrEl, results){
+  const el = document.getElementById(containerIdOrEl) || document.getElementById(containerIdOrEl);
+  const scope = document.getElementById(containerIdOrEl) ? document.getElementById(containerIdOrEl) : document;
+  const rows = (containerIdOrEl==='task-test-list') ? document.querySelectorAll('#task-test-list .test-row')
+             : document.querySelectorAll('#custom-solve [data-content="custom-tests"] .test-row');
+  rows.forEach((row,i)=>{
+    const ic = row.querySelector('.ic');
+    const actual = row.querySelectorAll('.tv')[1];
+    if(results[i]){
+      ic.className='ic ic-pass'; ic.textContent='✓';
+      if(actual) actual.textContent = row.querySelectorAll('.tv')[0].textContent;
+    } else {
+      ic.className='ic ic-fail'; ic.textContent='✕';
+      if(actual){ actual.textContent = 'None'; actual.classList.add('mismatch'); }
+    }
+  });
+}
+
+function renderDebugResults(results){
+  const wrap = document.getElementById('debug-test-results');
+  const rows = results.map((r,i)=>`
+    <div style="display:flex;align-items:center;gap:9px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;margin-bottom:6px;background:var(--bg-raised);font-size:12.5px;">
+      <span class="ic ${r?'ic-pass':'ic-fail'}">${r?'✓':'✕'}</span> Test ${i+1}
+    </div>`).join('');
+  wrap.innerHTML = '<h4 style="font-size:12px;color:var(--text-3);margin-bottom:10px;">Test results</h4>' + rows;
+  if(!results.every(Boolean)){
+    document.getElementById('debug-diag-content').innerHTML = diagCardHtml('violet');
+  }
+}
+
+function showErrorDiag(){
+  document.getElementById('free-diag-content').innerHTML = diagCardHtml('red');
+}
+function showEmptyDiag(mode){
+  document.getElementById(mode+'-diag-content').innerHTML = `<div class="empty-diag"><div class="ic">◆</div><p>No errors yet. Diagnostics will appear here the moment something breaks.</p></div>`;
+}
+function diagCardHtml(color){
+  return `
+  <div class="diag-card">
+    <div class="diag-head"><div class="ic">!</div><div class="txt"><strong>NameError</strong><span>Line 8</span></div></div>
+    <div class="diag-code">print(totalAmount)</div>
+    <div class="diag-section"><h5>What happened?</h5><p>Python cannot find a variable named <span class="mono">totalAmount</span> in this scope — it may be misspelled or defined after this line.</p></div>
+    <div class="diag-section"><h5>How to think about it</h5><p>Check whether the variable was assigned before it was used, and that the spelling matches exactly.</p></div>
+    <div class="diag-actions"><button class="btn btn-sm btn-primary" onclick="explainWithAI()">Explain with AI</button></div>
+  </div>`;
+}
+function explainWithAI(){ toast('Opening AI Tutor with this error...'); }
+
+function resetEditor(){
+  renderCode(activeMode());
+  clearTerminal();
+  toast('Editor reset to starter code');
+}
+
+/* ================= TUTOR + HINTS: inject templates into every mode ================= */
+document.querySelectorAll('[data-target$="-tutor"]').forEach(()=>{});
+document.querySelectorAll('.panel-tab-content[data-content$="-tutor"]').forEach(slot=>{
+  const tpl = document.getElementById('tutor-template').content.cloneNode(true);
+  slot.appendChild(tpl);
+});
+document.getElementById('task-hints-widget').appendChild(document.getElementById('hints-template').content.cloneNode(true));
+document.getElementById('debug-hints-widget').appendChild(document.getElementById('hints-template').content.cloneNode(true));
+document.getElementById('custom-hints-widget').appendChild(document.getElementById('hints-template').content.cloneNode(true));
+
+function sendTutorMsg(input){
+  const val = input.value.trim();
+  if(!val) return;
+  const chat = input.closest('.mode-panel, #custom-solve').querySelector('.tutor-chat');
+  chat.insertAdjacentHTML('beforeend', `<div class="msg student"><div class="who">You</div><div class="bubble">${escapeHtml(val)}</div></div>`);
+  input.value='';
+  chat.scrollTop = chat.scrollHeight;
+  const typingId = 't'+Date.now();
+  chat.insertAdjacentHTML('beforeend', `<div class="msg ai" id="${typingId}"><div class="who">AI Tutor</div><div class="bubble typing"><span></span><span></span><span></span></div></div>`);
+  chat.scrollTop = chat.scrollHeight;
+  setTimeout(()=>{
+    const node = document.getElementById(typingId);
+    node.querySelector('.bubble').innerHTML = "Good question — try tracing through the code line by line with a small example. What does each variable hold right before the line that fails?";
+    chat.scrollTop = chat.scrollHeight;
+  }, 1100);
+}
+function sendSuggested(chip, text){
+  const input = chip.closest('.tutor-chat').nextElementSibling.querySelector('input');
+  input.value = text;
+  sendTutorMsg(input);
+}
+
+function revealHint(btn, lvl){
+  const card = btn.closest('.hint-card');
+  card.querySelector('.lvl-body').classList.remove('hidden');
+  btn.remove();
+  card.insertAdjacentHTML('beforeend', '<div class="lvl-row" style="margin-top:8px;"><span style="font-size:11.5px;color:var(--accent);">✓ Revealed</span></div>');
+  const widget = card.closest('div[id$="-hints-widget"]');
+  const dot = widget.querySelector(`.hp-dot[data-hp="${lvl}"]`);
+  dot.classList.add('done');
+  const line = widget.querySelector(`.hp-line[data-hpl="${lvl}"]`);
+  if(line) line.classList.add('done');
+  const next = widget.querySelector(`.hint-card[data-lvl="${lvl+1}"]`);
+  if(next){
+    next.classList.remove('locked');
+    next.querySelector('.lock-tag').remove();
+    const body = next.querySelector('.lvl-body');
+    next.insertAdjacentHTML('beforeend', `<button class="btn btn-sm btn-ghost" style="margin-top:10px;" onclick="revealHint(this,${lvl+1})">Reveal Hint</button>`);
+  }
+  bumpHelp('hint');
+}
+
+/* ================= CUSTOM QUESTION AUTHOR/SOLVE ================= */
+function addTestCase(){
+  const list = document.getElementById('custom-tc-list');
+  const n = list.children.length+1;
+  const row = document.createElement('div');
+  row.className='tc-row';
+  row.innerHTML = `<div class="tc-head"><span>TEST ${n}</span><button class="btn btn-icon btn-ghost btn-sm" onclick="this.closest('.tc-row').remove()">✕</button></div>
+    <div class="tc-grid"><div><label class="field-label">Input</label><input class="input mono" placeholder='e.g. "abc"'></div>
+    <div><label class="field-label">Expected Output</label><input class="input mono" placeholder='e.g. "cba"'></div></div>
+    <div class="match-row"><span style="font-size:11.5px;color:var(--text-3);">Matching</span><select class="input"><option>Exact match</option><option>Trimmed</option><option>Case-insensitive</option></select></div>`;
+  list.appendChild(row);
+}
+function applyStarter(kind){
+  toast('Starter template applied: '+kind);
+}
+function startSolvingCustom(){
+  document.getElementById('custom-author').style.display='none';
+  const solve = document.getElementById('custom-solve');
+  solve.style.display='flex';
+  document.getElementById('custom-solve-title').textContent = document.getElementById('custom-title').value;
+  document.getElementById('custom-solve-desc').textContent = document.getElementById('custom-desc').value;
+  renderCode('custom');
+  clearTerminal();
+}
+function backToAuthor(){
+  document.getElementById('custom-solve').style.display='none';
+  document.getElementById('custom-author').style.display='block';
+}
+
+/* ================= DEBUG BUG LIST ================= */
+document.querySelectorAll('.bug-item').forEach(item=>{
+  item.addEventListener('click', ()=>{
+    document.querySelectorAll('.bug-item').forEach(i=>i.classList.remove('active'));
+    item.classList.add('active');
+    renderCode('debug');
+    clearTerminal();
+    document.getElementById('debug-test-results').innerHTML = `<h4 style="font-size:12px;color:var(--text-3);margin-bottom:10px;">Test results</h4>
+      <div class="test-list"><div class="test-row" style="padding:9px 12px;display:flex;align-items:center;gap:10px;background:var(--bg-raised);font-size:12.5px;color:var(--text-3);"><span class="ic ic-pending">·</span>Run "Evaluate Fix" to check</div></div>`;
+  });
+});
+
+/* ================= MODALS ================= */
+function openSettings(){ document.getElementById('overlay-settings').classList.add('show'); }
+function openProgress(){ document.getElementById('overlay-progress').classList.add('show'); }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+document.querySelectorAll('.overlay').forEach(ov=>{
+  ov.addEventListener('click', e=>{ if(e.target===ov) ov.classList.remove('show'); });
+});
+
+function selectProvider(el){
+  document.querySelectorAll('.pill-opt').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  const p = el.dataset.p;
+  const ep = document.getElementById('endpoint-field');
+  const key = document.getElementById('apikey-field');
+  document.getElementById('conn-result').classList.remove('show');
+  if(p==='mock'){ ep.value='(not required)'; ep.disabled=true; key.value=''; key.disabled=true; }
+  if(p==='ollama'){ ep.value='http://localhost:11434'; ep.disabled=false; key.value=''; key.disabled=true; }
+  if(p==='cloud'){ ep.value='https://api.openai.com/v1'; ep.disabled=false; key.value='sk-••••••••••••1234'; key.disabled=false; }
+}
+function togglePw(){
+  const f = document.getElementById('apikey-field');
+  f.type = f.type==='password' ? 'text' : 'password';
+}
+function testConnection(){
+  const box = document.getElementById('conn-result');
+  box.className = 'conn-result show';
+  document.getElementById('conn-text').innerHTML = '<span class="spinner"></span>Testing connection...';
+  setTimeout(()=>{
+    document.getElementById('conn-text').textContent = '✓ Connection successful — Latency: 142ms';
+  }, 900);
+}
+function saveSettings(){
+  toast('AI settings saved');
+  closeModal('overlay-settings');
+}
+
+function filterProgress(el){
+  document.querySelectorAll('.ftab').forEach(f=>f.classList.remove('active'));
+  el.classList.add('active');
+}
+function confirmResetProgress(){
+  if(confirm('Reset all progress? This cannot be undone.')){
+    toast('Progress reset');
+    closeModal('overlay-progress');
+  }
+}
+
+/* ================= HELP COUNTER ================= */
+let helpTotal = 3;
+function toggleHelp(e){
+  e.stopPropagation();
+  document.getElementById('help-pop').classList.toggle('show');
+}
+document.addEventListener('click', e=>{
+  const pop = document.getElementById('help-pop');
+  if(pop.classList.contains('show') && !pop.contains(e.target) && !e.target.closest('.help-pill')){
+    pop.classList.remove('show');
+  }
+});
+function bumpHelp(){
+  helpTotal++;
+  document.getElementById('help-total-pill').textContent = helpTotal;
+}
+function resetHelp(){
+  helpTotal = 0;
+  document.getElementById('help-total-pill').textContent = 0;
+  document.querySelectorAll('.hp-row b').forEach(b=>b.textContent='0');
+  toast('Assistance counters reset');
+}
+
+/* ================= TOAST ================= */
+function toast(msg){
+  const stack = document.getElementById('toast-stack');
+  const el = document.createElement('div');
+  el.className='toast';
+  el.textContent = msg;
+  stack.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(),300); }, 2600);
+}
+</script>
+</body>
+</html>

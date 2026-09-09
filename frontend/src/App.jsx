@@ -15,6 +15,7 @@ import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import EditorPage from './pages/EditorPage';
+import Toast from './components/Toast';
 import './App.css';
 
 /** Derive which page to render from the current URL path. */
@@ -52,6 +53,7 @@ export default function App() {
     <div className="app">
       <Navbar />
       {page === 'editor' ? <EditorPage /> : <Home />}
+      <Toast />
     </div>
   );
 }

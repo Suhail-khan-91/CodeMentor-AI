@@ -1898,10 +1898,86 @@ python -m pytest tests/ -v
 **Result:** ✅ **233 passed in 18.09s** (100% green, 0 warnings, 0 regressions).  
 **Frontend Build:** ✅ `npm run build` completed in 113ms with zero errors and zero warnings.
 
+---
 
+## PHASE A14-REDESIGN — Commercial Frontend UI/UX Redesign & Elevation
 
+**Status:** ✅ COMPLETE  
+**Date completed:** 2026-09-09  
 
+---
 
+### Overview & Visual Philosophy
+Following the successful completion and verification of Phase A14, the user initiated a comprehensive frontend overhaul to elevate CodeMentor AI from an educational prototype into a world-class, commercial developer environment. The target aesthetic was defined as:
+> **"Modern developer IDE + premium SaaS product + AI coding mentor"**  
+> (Dark-first, high depth, subtle gradients, mode-specific accent lighting, zero clutter, zero childish tropes).
 
+Using `CODEMENTOR_AI_REDESIGN.html` as foundational inspiration, the entire React frontend architecture was systematically redesigned and elevated far beyond the reference prototype while preserving 100% of the functional contracts and test suites across all Part A (A1–A14) subsystems.
 
+---
 
+### What Was Redesigned & Built
+
+#### 1. Global Design System & Typography (`frontend/src/index.css`, `frontend/index.html`)
+- **Typography Stack:** Integrated Google Fonts (`Sora` for headings, `Inter` for UI body, `JetBrains Mono` for code and telemetry).
+- **Surface Elevation Hierarchy:** Multi-tier dark surface tokens (`--color-bg: #080a0f`, `--color-surface: #0f131c`, `--color-surface-2: #141926`, `--color-border: #1e2538`).
+- **Mode-Specific Accent System:**
+  - **Free Play Mode:** Emerald / Mint (`#38efbd`)
+  - **Task Evaluation Mode:** Sun Amber (`#fbbf24`)
+  - **Custom Question Mode:** Electric Blue (`#3b82f6`)
+  - **Debug Mode:** Amethyst Violet (`#a855f7`)
+  - **Diagnostics / Errors:** Coral Rose (`#f43f5e`)
+
+#### 2. Toast Notification Infrastructure (`frontend/src/components/Toast.jsx`, `Toast.css`)
+- Replaced intrusive modal alerts with a floating, non-blocking notification stack supporting `success`, `error`, `warning`, and `info` toasts with auto-dismiss and pause-on-hover.
+
+#### 3. High-End Navigation Header (`frontend/src/components/Navbar.jsx`, `Navbar.css`, `StatusBadge.jsx`)
+- Dual-state rendering:
+  - **Landing Page:** Brand logo with glowing emerald dot, documentation & GitHub links, AI Settings & Progress triggers, and CTA button.
+  - **Workspace Mode:** Active mode breadcrumbs, real-time live assistance counter widget, status ping pill, and back-to-home navigation.
+
+#### 4. Commercial SaaS Landing Page (`frontend/src/pages/Home.jsx`, `Home.css`)
+- **Metrics Ticker:** Instant visual validation showing 11 subsystems, 5 practice tasks, 3 hint tiers, 100% offline mode.
+- **Interactive Syntax Demo Card:** Live IDE preview demonstrating compiler-grade diagnostics and instant pro-tip explanations.
+- **4-Mode Interactive Showcase:** Distinct feature cards highlighting Free Play, Task Evaluation, Custom Question, and Debug Mode.
+- **Curated 12-Feature Architecture Grid:** Color-coded feature badges mapped to phases A1–A14.
+
+#### 5. 3-Zone Professional IDE Workspace (`frontend/src/pages/EditorPage.jsx`, `EditorPage.css`)
+- **Zone 1 (Top-Left):** Monaco Editor with filename tab (`solution.py`), Python 3.10 badge, keyboard shortcut chips, line/column status, and custom `codementor-dark` theme.
+- **Zone 2 (Bottom-Left):** Integrated Execution Console with `Terminal Output` and `Compiler Diagnostic` tabs, execution duration badge, exit code indicator, stdout/stderr streams, and clear button.
+- **Zone 3 (Right Column):** Dedicated contextual learning pane hosting mode-specific tools:
+  - In Free Play: Interactive Socratic AI Tutor Panel (`AITutorPanel`).
+  - In Task Evaluation: Multi-test suite grader with diffs and progressive hints (`TaskEvaluationPanel`).
+  - In Custom Mode: Authoring form, template loader, and custom test evaluator (`CustomQuestionPanel`).
+  - In Debug Mode: Bug catalog cards `#01`–`#05`, bug taxonomy tags, and fix evaluation (`DebugChallengePanel`).
+
+#### 6. Compiler-Grade Diagnostic Card (`frontend/src/components/DiagnosticCard.jsx`, `DiagnosticCard.css`)
+- Structured diagnosis rendering error category pill, line number badge, culprit code snippet with error pointer, plain-English explanation, actionable "How to Fix" callout, and expandable "Deep-Dive Explanation" AI drawer.
+
+#### 7. Tiered Progressive Hints (`frontend/src/components/ProgressiveHintPanel.jsx`, `ProgressiveHintPanel.css`)
+- 3-dot connected progress meter (`0/3` to `3/3`), tiered cards (Nudge, Strategy, Skeleton clue) with sequential unlocking, anti-spoiler guards, and session assistance tracking.
+
+#### 8. Conversational Socratic AI Tutor (`frontend/src/components/AITutorPanel.jsx`, `AITutorPanel.css`)
+- Socratic chat stream with tutor avatar, student/tutor chat bubbles, quick action suggestion pills ("💡 Explain This Concept", "🐛 Find Bug", "🚀 Optimize Code", "📝 Add Comments"), structural code hint boxes, and settings shortcut.
+
+#### 9. Performance & Mastery Analytics Modal (`frontend/src/components/ProgressModal.jsx`, `ProgressModal.css`)
+- Circular SVG progress meter with animated stroke-dashoffset, 4 executive metric cards, category filter tabs (`All`, `Starter`, `Custom`), task breakdown cards with peak score bars, and two-stage reset confirmation.
+
+#### 10. AI Provider Configuration Modal (`frontend/src/components/AISettingsModal.jsx`, `AISettingsModal.css`)
+- Provider selector pills (`Offline Mock`, `Local Ollama`, `Cloud AI`), styled form fields with password eye toggle, live connection test handshake probe with millisecond latency pill, and save feedback.
+
+#### 11. Live Assistance Tracking Widget (`frontend/src/components/HelpUsageWidget.jsx`, `HelpUsageWidget.css`)
+- Toolbar assist pill showing total assists linked, and floating breakdown popover displaying hint reveals, tutor queries, and error explanations with session reset.
+
+---
+
+### Verification & Automated Testing
+1. **Backend Test Suite:**
+   - Command: `python -m pytest tests/ -v`
+   - Result: ✅ **233 / 233 tests passed in 19.28s** (100% green, 0 regressions).
+2. **Frontend Production Build:**
+   - Command: `npm run build`
+   - Result: ✅ Clean build in **136ms** (`dist/` generated with zero errors).
+3. **Browser Automation Verification:**
+   - Evaluated live browser interaction across all 4 modes, modal dialogs, Python code execution, error diagnostics, progressive hints, AI tutor chat, custom question authoring, and debug challenges.
+   - Browser console logs: **0 errors / 0 warnings**.

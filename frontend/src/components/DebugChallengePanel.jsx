@@ -1,12 +1,14 @@
 /**
- * DebugChallengePanel.jsx — Phase A13: Debug Mode Component.
+ * DebugChallengePanel.jsx — Phase A13: Debug Mode Component (Upgraded)
  *
- * Interactive panel for selecting buggy starter challenges, reviewing requirements,
- * inspecting Expected vs Actual output diffs, viewing diagnostics (A4/A9),
- * unlocking progressive hints (A6), and consulting the Socratic AI Tutor (A7).
+ * Provides a dedicated debugging laboratory:
+ * - Bug catalog selector with taxonomy badges (#01–#05)
+ * - Scoped sub-tabs: Bug Info, Test Results, Progressive Hints, and AI Tutor
+ * - Revert to original broken code action
+ * - Automated fix verification with diffs
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DiagnosticCard from './DiagnosticCard';
 import ProgressiveHintPanel from './ProgressiveHintPanel';
 import AITutorPanel from './AITutorPanel';
@@ -22,7 +24,19 @@ export default function DebugChallengePanel({
   isEvaluating,
   hintsData,
 }) {
+  const [activeSubTab, setActiveSubTab] = useState('info'); // 'info' | 'tests' | 'hints' | 'tutor'
   const [expandedTc, setExpandedTc] = useState(null);
+
+  // Auto-switch to tests upon evaluation
+  useEffect(() => {
+    if (evaluationResult) {
+      setActiveSubTab('tests');
+      const firstFail = evaluationResult.test_results?.find((t) => !t.passed);
+      if (firstFail) {
+        setExpandedTc(firstFail.test_case_id);
+      }
+    }
+  }, [evaluationResult]);
 
   const toggleAccordion = (tcId) => {
     setExpandedTc((prev) => (prev === tcId ? null : tcId));
@@ -31,15 +45,15 @@ export default function DebugChallengePanel({
   const getBugTypeBadge = (bugType) => {
     switch (bugType) {
       case 'syntax':
-        return <span className="debug-type-badge debug-type-badge--syntax">🔍 Syntax Bug</span>;
+        return <span className="badge badge--rose">🔍 Syntax Bug</span>;
       case 'type_error':
-        return <span className="debug-type-badge debug-type-badge--type">⚡ Type Error</span>;
+        return <span className="badge badge--amber">⚡ Type Error</span>;
       case 'logic':
-        return <span className="debug-type-badge debug-type-badge--logic">🧩 Logic Bug</span>;
+        return <span className="badge badge--violet">🧩 Logic Bug</span>;
       case 'runtime':
-        return <span className="debug-type-badge debug-type-badge--runtime">💥 Runtime Bug</span>;
+        return <span className="badge badge--rose">💥 Runtime Bug</span>;
       default:
-        return <span className="debug-type-badge">🐛 Buggy Code</span>;
+        return <span className="badge">🐛 Buggy Code</span>;
     }
   };
 
@@ -57,223 +71,290 @@ export default function DebugChallengePanel({
     }
   };
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'passed':
-        return '✓ Passed';
-      case 'failed':
-        return '✗ Failed';
-      case 'timeout':
-        return '⏱ Timed Out';
-      case 'error':
-      default:
-        return '⚠ Error';
-    }
-  };
-
   return (
-    <div className="debug-panel" aria-label="Debug Mode Workspace">
-      {/* 1. Challenge Selector Bar */}
-      <div className="debug-panel__selector">
-        <label htmlFor="debug-select" className="debug-panel__selector-label">
-          🐛 Select Buggy Challenge:
-        </label>
-        <select
-          id="debug-select"
-          className="debug-panel__select"
-          value={activeChallenge?.id || ''}
-          onChange={(e) => onSelectChallenge(e.target.value)}
-        >
-          {challenges.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.title}
-            </option>
-          ))}
-        </select>
+    <div className="debug-shell" aria-label="Debug Mode Workspace">
+      {/* ── Top: Bug Catalog Carousel / List ── */}
+      <div className="debug-header">
+        <div className="debug-catalog-title">
+          <span>DEBUGGING CHALLENGES</span>
+          <select
+            id="debug-select"
+            className="input debug-dropdown"
+            value={activeChallenge?.id || ''}
+            onChange={(e) => onSelectChallenge(e.target.value)}
+          >
+            {challenges.map((c, i) => (
+              <option key={c.id} value={c.id}>
+                #{i + 1 < 10 ? `0${i + 1}` : i + 1} — {c.title}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Challenge Cards Carousel */}
+        <div className="debug-cards-scroll">
+          {challenges.map((c, i) => {
+            const isActive = activeChallenge?.id === c.id;
+            return (
+              <div
+                key={c.id}
+                className={`debug-item-card ${isActive ? 'debug-item-card--active' : ''}`}
+                onClick={() => onSelectChallenge(c.id)}
+                role="button"
+                tabIndex={0}
+              >
+                <div className="debug-item-card__top">
+                  <span className="debug-item-num">
+                    #{i + 1 < 10 ? `0${i + 1}` : i + 1}
+                  </span>
+                  {getBugTypeBadge(c.bug_type)}
+                </div>
+                <strong className="debug-item-title">{c.title}</strong>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      {/* 2. Challenge Scenario & Bug Description Card */}
-      {activeChallenge && (
-        <div className="debug-card">
-          <div className="debug-card__top">
-            <div className="debug-card__title-group">
-              <span className="debug-card__mode-tag">Phase A13 • Debug Challenge</span>
-              <h2 className="debug-card__title">{activeChallenge.title}</h2>
+      {/* ── Scoped Tabs ── */}
+      <div className="task-scoped-tabs" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeSubTab === 'info'}
+          className={`task-tab ${activeSubTab === 'info' ? 'task-tab--active' : ''}`}
+          style={activeSubTab === 'info' ? { color: 'var(--violet)', borderBottomColor: 'var(--violet)' } : {}}
+          onClick={() => setActiveSubTab('info')}
+        >
+          Bug Info
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeSubTab === 'tests'}
+          className={`task-tab ${activeSubTab === 'tests' ? 'task-tab--active' : ''}`}
+          style={activeSubTab === 'tests' ? { color: 'var(--violet)', borderBottomColor: 'var(--violet)' } : {}}
+          onClick={() => setActiveSubTab('tests')}
+        >
+          Test Results {evaluationResult ? `(${evaluationResult.passed_tests}/${evaluationResult.total_tests})` : ''}
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeSubTab === 'hints'}
+          className={`task-tab ${activeSubTab === 'hints' ? 'task-tab--active' : ''}`}
+          style={activeSubTab === 'hints' ? { color: 'var(--violet)', borderBottomColor: 'var(--violet)' } : {}}
+          onClick={() => setActiveSubTab('hints')}
+        >
+          Hints
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeSubTab === 'tutor'}
+          className={`task-tab ${activeSubTab === 'tutor' ? 'task-tab--active' : ''}`}
+          style={activeSubTab === 'tutor' ? { color: 'var(--violet)', borderBottomColor: 'var(--violet)' } : {}}
+          onClick={() => setActiveSubTab('tutor')}
+        >
+          AI Tutor
+        </button>
+      </div>
+
+      {/* ── Sub-Tab Contents ── */}
+      <div className="debug-tab-content">
+        {/* TAB 1: BUG INFO */}
+        {activeSubTab === 'info' && (
+          <div className="task-tab-pane">
+            {activeChallenge && (
+              <div className="debug-scenario-card">
+                <div className="debug-scenario-card__header">
+                  <span className="debug-phase-tag">Phase A13 • Debug Challenge</span>
+                  {getBugTypeBadge(activeChallenge.bug_type)}
+                </div>
+
+                <h3 className="debug-scenario-title">{activeChallenge.title}</h3>
+                <p className="debug-scenario-desc">{activeChallenge.description}</p>
+
+                <div className="debug-actions-bar">
+                  <button
+                    type="button"
+                    className="btn btn--ghost debug-revert-btn"
+                    onClick={onResetToBuggy}
+                    id="btn-revert-buggy-code"
+                    title="Reset code editor back to the original broken snippet"
+                  >
+                    <span>↺</span> Revert to Buggy Code
+                  </button>
+                  <span className="debug-tc-count">
+                    {activeChallenge.test_cases?.length || 1} Verification Tests
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <div className="debug-instructions-card">
+              <h4 className="task-block-title">Debugging Protocol</h4>
+              <ul className="task-instructions-list">
+                <li>Inspect the broken Python code in Monaco Editor.</li>
+                <li>Analyze variable bindings, loop conditions, and exception traces.</li>
+                <li>Press <strong>Evaluate Fix</strong> in the toolbar to grade your repairs.</li>
+              </ul>
             </div>
-            {getBugTypeBadge(activeChallenge.bug_type)}
           </div>
+        )}
 
-          <p className="debug-card__desc">{activeChallenge.description}</p>
+        {/* TAB 2: TEST RESULTS */}
+        {activeSubTab === 'tests' && (
+          <div className="task-tab-pane">
+            {isEvaluating && (
+              <div className="task-eval-loader" role="status">
+                <div className="task-eval-spinner" style={{ borderTopColor: 'var(--violet)' }} />
+                <span>Running repaired code against verification suite…</span>
+              </div>
+            )}
 
-          <div className="debug-card__actions">
-            <button
-              type="button"
-              className="btn btn--ghost debug-btn-revert"
-              onClick={onResetToBuggy}
-              title="Reset editor back to the original broken code"
-              id="btn-revert-buggy-code"
-            >
-              <span aria-hidden="true">↺</span> Revert to Buggy Code
-            </button>
-            <span className="debug-card__test-count">
-              {activeChallenge.test_cases?.length || activeChallenge.test_cases_count || 1} Test Cases
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* 3. Evaluating loader */}
-      {isEvaluating && (
-        <div className="eval-loading">
-          <div className="eval-spinner" aria-hidden="true" />
-          <p className="eval-loading__text">Running repaired code against test cases…</p>
-        </div>
-      )}
-
-      {/* 4. Evaluation Outcome Summary */}
-      {!isEvaluating && evaluationResult && (
-        <div className="debug-result-section">
-          {/* Passed All Banner */}
-          {evaluationResult.passed_all ? (
-            <div className="debug-success-card" role="status">
-              <div className="debug-success-card__icon" aria-hidden="true">🎉</div>
-              <div>
-                <h3 className="debug-success-card__title">Bug Successfully Fixed!</h3>
-                <p className="debug-success-card__msg">
-                  All test cases passed with a 100% score! Progress and attempts have been recorded.
+            {!isEvaluating && !evaluationResult && (
+              <div className="task-tests-empty">
+                <div className="tests-empty-icon" style={{ color: 'var(--violet)' }}>🐛</div>
+                <h4 className="tests-empty-title">Ready to Verify Fix</h4>
+                <p className="tests-empty-desc">
+                  Click the <strong>🎯 Evaluate Fix</strong> button in the toolbar to test whether the bug has been resolved.
                 </p>
               </div>
-            </div>
-          ) : (
-            <div className={`eval-summary-card eval-summary-card--${evaluationResult.status}`}>
-              <div className="eval-summary__top">
-                <div className="eval-summary__score-badge">
-                  Score: <strong>{evaluationResult.score_percentage}%</strong>
-                </div>
-                <div className="eval-summary__ratio-badge">
-                  {evaluationResult.passed_tests} / {evaluationResult.total_tests} Passed
-                </div>
-              </div>
+            )}
 
-              <div className="eval-progress-bar">
-                <div
-                  className={`eval-progress-bar__fill eval-progress-bar__fill--${evaluationResult.status}`}
-                  style={{ width: `${evaluationResult.score_percentage}%` }}
-                />
-              </div>
-
-              <p className="eval-summary__message">
-                {evaluationResult.summary_message}
-              </p>
-            </div>
-          )}
-
-          {/* Test Case Breakdown List */}
-          {evaluationResult.test_results && evaluationResult.test_results.length > 0 && (
-            <div className="eval-tc-list">
-              <h3 className="eval-tc-list__title">Test Case Breakdown</h3>
-
-              {evaluationResult.test_results.map((tr, index) => {
-                const isExpanded = expandedTc === tr.test_case_id || !tr.passed;
-
-                return (
-                  <div
-                    key={tr.test_case_id || index}
-                    className={`eval-tc-card eval-tc-card--${tr.status}`}
-                  >
-                    {/* Header trigger */}
-                    <button
-                      type="button"
-                      className="eval-tc-card__header"
-                      onClick={() => toggleAccordion(tr.test_case_id)}
-                      aria-expanded={isExpanded}
-                    >
-                      <div className="eval-tc-card__header-left">
-                        <span className={`tc-status-pill ${getStatusBadgeClass(tr.status)}`}>
-                          {getStatusIcon(tr.status)}
+            {!isEvaluating && evaluationResult && (
+              <div className="task-results-container">
+                {/* Celebratory or Status Banner */}
+                {evaluationResult.passed_all ? (
+                  <div className="debug-celebration-banner" role="status">
+                    <span className="celebration-icon" aria-hidden="true">🎉</span>
+                    <div>
+                      <h4 className="celebration-title">Bug Successfully Fixed!</h4>
+                      <p className="celebration-msg">
+                        All test cases passed with a 100% score. Great debugging work!
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className={`task-eval-banner task-eval-banner--${evaluationResult.status}`}>
+                    <div className="banner-score-group">
+                      <span className="banner-score-num">{evaluationResult.score_percentage}%</span>
+                      <div>
+                        <span className="banner-score-ratio">
+                          {evaluationResult.passed_tests} / {evaluationResult.total_tests} Passed
                         </span>
-                        <span className="eval-tc-card__name">
-                          Test {index + 1}: {tr.description}
-                        </span>
-                        {tr.is_hidden && (
-                          <span className="eval-tc-card__hidden-tag">Hidden</span>
-                        )}
+                        <p className="banner-score-msg">{evaluationResult.summary_message}</p>
                       </div>
+                    </div>
+                    <div className="task-score-track">
+                      <div
+                        className={`task-score-fill task-score-fill--${evaluationResult.status}`}
+                        style={{ width: `${evaluationResult.score_percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
 
-                      <div className="eval-tc-card__header-right">
-                        <span className="eval-tc-card__time">{tr.execution_time_ms} ms</span>
-                        <span className="eval-tc-card__toggle-icon" aria-hidden="true">
-                          {isExpanded ? '▲' : '▼'}
-                        </span>
-                      </div>
-                    </button>
+                {/* Test case breakdown accordions */}
+                <div className="test-cards-list">
+                  {evaluationResult.test_results?.map((tr, index) => {
+                    const isExpanded = expandedTc === tr.test_case_id || !tr.passed;
 
-                    {/* Expanded details */}
-                    {isExpanded && (
-                      <div className="eval-tc-card__body">
-                        {/* Diagnostic Card if code threw an exception */}
-                        {tr.diagnostic && tr.diagnostic.has_diagnostic && (
-                          <DiagnosticCard
-                            diagnostic={tr.diagnostic}
-                            code={code}
-                            executionResult={tr}
-                          />
-                        )}
+                    return (
+                      <div key={tr.test_case_id || index} className={`test-card test-card--${tr.status}`}>
+                        <button
+                          type="button"
+                          className="test-card__trigger"
+                          onClick={() => toggleAccordion(tr.test_case_id)}
+                        >
+                          <div className="test-card__trigger-left">
+                            <span className={`tc-status-pill ${getStatusBadgeClass(tr.status)}`}>
+                              {tr.passed ? '✓ Passed' : '✗ Failed'}
+                            </span>
+                            <span className="test-card__name">Test {index + 1}: {tr.description}</span>
+                          </div>
+                          <span className="test-chevron">{isExpanded ? '▲' : '▼'}</span>
+                        </button>
 
-                        {!tr.is_hidden ? (
-                          <div className="eval-diff-grid">
-                            {tr.stdin && (
-                              <div className="eval-diff-box">
-                                <span className="eval-diff-box__label">Standard Input (stdin):</span>
-                                <pre className="eval-diff-box__code"><code>{tr.stdin}</code></pre>
-                              </div>
+                        {isExpanded && (
+                          <div className="test-card__details">
+                            {tr.diagnostic && tr.diagnostic.has_diagnostic && (
+                              <DiagnosticCard
+                                diagnostic={tr.diagnostic}
+                                code={code}
+                                executionResult={tr}
+                              />
                             )}
 
-                            <div className="eval-diff-box">
-                              <span className="eval-diff-box__label">Expected Output:</span>
-                              <pre className="eval-diff-box__code eval-diff-box__code--expected">
-                                <code>{tr.expected_output}</code>
-                              </pre>
-                            </div>
-
-                            <div className="eval-diff-box">
-                              <span className="eval-diff-box__label">Your Actual Output:</span>
-                              <pre className={`eval-diff-box__code ${tr.passed ? 'eval-diff-box__code--actual-pass' : 'eval-diff-box__code--actual-fail'}`}>
-                                <code>{tr.actual_output || '[No output produced]'}</code>
-                              </pre>
-                            </div>
+                            {!tr.is_hidden ? (
+                              <div className="test-diff-grid">
+                                {tr.stdin && (
+                                  <div className="diff-box">
+                                    <span className="diff-box__label">Input (stdin):</span>
+                                    <pre className="diff-box__code"><code>{tr.stdin}</code></pre>
+                                  </div>
+                                )}
+                                <div className="diff-box">
+                                  <span className="diff-box__label">Expected Output:</span>
+                                  <pre className="diff-box__code diff-box__code--expected">
+                                    <code>{tr.expected_output}</code>
+                                  </pre>
+                                </div>
+                                <div className="diff-box">
+                                  <span className="diff-box__label">Your Actual Output:</span>
+                                  <pre className={`diff-box__code ${tr.passed ? 'diff-box__code--pass' : 'diff-box__code--fail'}`}>
+                                    <code>{tr.actual_output || '[No output produced]'}</code>
+                                  </pre>
+                                </div>
+                              </div>
+                            ) : (
+                              <p className="test-hidden-shield-msg">
+                                🔒 Hidden verification test case.
+                              </p>
+                            )}
                           </div>
-                        ) : (
-                          <p className="eval-tc-card__hidden-msg">
-                            🔒 This is a hidden verification test case.
-                          </p>
                         )}
                       </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
-          {/* 5. Progressive Hint Engine Panel (Phase A6) */}
-          {hintsData && !evaluationResult.passed_all && (
-            <ProgressiveHintPanel
-              hintsData={hintsData}
-              taskTitle={activeChallenge?.title}
-            />
-          )}
+        {/* TAB 3: HINTS */}
+        {activeSubTab === 'hints' && (
+          <div className="task-tab-pane">
+            {hintsData ? (
+              <ProgressiveHintPanel
+                hintsData={hintsData}
+                taskTitle={activeChallenge?.title}
+              />
+            ) : (
+              <div className="task-tests-empty">
+                <div className="tests-empty-icon" style={{ color: 'var(--violet)' }}>💡</div>
+                <h4 className="tests-empty-title">Debugging Hints</h4>
+                <p className="tests-empty-desc">
+                  Hints unlock when you run evaluation on your repaired code.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
-          {/* 6. AI Tutor Engine Panel (Phase A7) */}
-          {!evaluationResult.passed_all && (
+        {/* TAB 4: AI TUTOR */}
+        {activeSubTab === 'tutor' && (
+          <div className="task-tab-pane">
             <AITutorPanel
               code={code}
               activeTask={activeChallenge}
               evaluationResult={evaluationResult}
             />
-          )}
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

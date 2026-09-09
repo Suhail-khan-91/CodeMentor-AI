@@ -1,15 +1,8 @@
 /**
- * HelpUsageWidget.jsx — Phase A11: Help / AI Usage Counter Component.
+ * HelpUsageWidget.jsx — Phase A11: Assistance Counter Component (Upgraded)
  *
- * Displays live, session-based assistance usage metrics across:
- * - Phase A6: Tiered hints (Level 1 Nudge, Level 2 Strategy, Level 3 Structure)
- * - Phase A7: AI Tutor queries
- * - Phase A9: AI Error Explanations
- *
- * Session-based / in-memory only:
- * - No score penalties or deductions (educational awareness only)
- * - No persistence or database tracking
- * - Real-time synchronization via custom event 'help-counter-updated'
+ * Tracks session-only learning assistance (hints, AI tutor inquiries, AI error explanations)
+ * with zero scoring penalties.
  */
 
 import { useState, useEffect, useRef } from 'react';
@@ -18,7 +11,6 @@ import './HelpUsageWidget.css';
 
 export default function HelpUsageWidget() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const [summary, setSummary] = useState({
     total_assists: 0,
@@ -46,7 +38,6 @@ export default function HelpUsageWidget() {
     }
   };
 
-  // Fetch initial summary and listen for update events
   useEffect(() => {
     fetchSummary();
 
@@ -103,98 +94,87 @@ export default function HelpUsageWidget() {
   };
 
   return (
-    <div className="help-usage-widget" ref={popoverRef}>
-      {/* Compact Trigger Button / Pill */}
+    <div className="help-widget-container" ref={popoverRef}>
+      {/* Pill Trigger */}
       <button
         type="button"
-        className={`help-usage-widget__trigger ${totalAssists > 0 ? 'help-usage-widget__trigger--active' : ''}`}
+        className={`help-widget-pill ${totalAssists > 0 ? 'help-widget-pill--active' : ''}`}
         onClick={() => setIsOpen((prev) => !prev)}
         aria-expanded={isOpen}
-        aria-label={`Assistance Usage: ${totalAssists} total assists`}
+        aria-label={`Assistance Usage: ${totalAssists} assists`}
         title="View session assistance metrics (hints & AI guidance)"
         id="btn-help-usage-widget"
       >
-        <span className="help-usage-widget__icon" aria-hidden="true">💡</span>
-        <span className="help-usage-widget__label">Assists:</span>
-        <span className="help-usage-widget__badge">{totalAssists}</span>
+        <span className="help-widget-dot" aria-hidden="true" />
+        <span className="help-widget-label">Assists:</span>
+        <span className="help-widget-count">{totalAssists}</span>
       </button>
 
-      {/* Popover Dropdown Card */}
+      {/* Popover Dropdown */}
       {isOpen && (
-        <div className="help-usage-widget__popover" role="dialog" aria-label="Assistance Usage Breakdown">
-          <div className="help-usage-widget__header">
-            <div className="help-usage-widget__header-title">
-              <span>📊 Assistance Tracker</span>
-              <span className="help-usage-widget__mode-tag">Session Only</span>
+        <div className="help-popover-card" role="dialog" aria-label="Assistance Breakdown">
+          <div className="help-popover-header">
+            <div className="popover-title-group">
+              <span className="popover-icon" aria-hidden="true">📊</span>
+              <strong className="popover-title">Session Assistance</strong>
             </div>
-            <button
-              type="button"
-              className="help-usage-widget__btn-close"
-              onClick={() => setIsOpen(false)}
-              aria-label="Close assistance tracker"
-            >
-              ×
-            </button>
+            <span className="popover-tag">Zero Penalty</span>
           </div>
 
-          <div className="help-usage-widget__body">
-            {/* Total summary tally */}
-            <div className="help-usage-widget__tally-box">
-              <div className="help-usage-widget__tally-number">{totalAssists}</div>
-              <div className="help-usage-widget__tally-label">
-                Total Assists Used This Session
+          <div className="help-popover-body">
+            {/* Big Tally Box */}
+            <div className="help-tally-box">
+              <span className="help-tally-num">{totalAssists}</span>
+              <span className="help-tally-label">Total Assists Utilized</span>
+            </div>
+
+            {/* Breakdown Items */}
+            <div className="help-rows-list">
+              <div className="help-metric-row">
+                <div className="help-row-left">
+                  <span>💡</span>
+                  <div>
+                    <strong className="help-row-name">Progressive Hints</strong>
+                    <span className="help-row-sub">
+                      L1: {hints.level_1_nudge} • L2: {hints.level_2_strategy} • L3: {hints.level_3_structure}
+                    </span>
+                  </div>
+                </div>
+                <span className="help-row-val">{hints.total}</span>
+              </div>
+
+              <div className="help-metric-row">
+                <div className="help-row-left">
+                  <span>🤖</span>
+                  <div>
+                    <strong className="help-row-name">AI Tutor Queries</strong>
+                    <span className="help-row-sub">Socratic prompts & questions</span>
+                  </div>
+                </div>
+                <span className="help-row-val">{summary?.ai_tutor_queries || 0}</span>
+              </div>
+
+              <div className="help-metric-row">
+                <div className="help-row-left">
+                  <span>✨</span>
+                  <div>
+                    <strong className="help-row-name">AI Error Deconstructions</strong>
+                    <span className="help-row-sub">Deep-dive exception trace analyses</span>
+                  </div>
+                </div>
+                <span className="help-row-val">{summary?.ai_error_explanations || 0}</span>
               </div>
             </div>
 
-            {/* Assistance Breakdown Table */}
-            <div className="help-usage-widget__breakdown">
-              <div className="help-usage-row">
-                <div className="help-usage-row__info">
-                  <span className="help-usage-row__icon">🧩</span>
-                  <div>
-                    <div className="help-usage-row__title">Rule-Based Hints (A6)</div>
-                    <div className="help-usage-row__sub">
-                      L1: {hints.level_1_nudge} | L2: {hints.level_2_strategy} | L3: {hints.level_3_structure}
-                    </div>
-                  </div>
-                </div>
-                <span className="help-usage-row__count">{hints.total}</span>
-              </div>
-
-              <div className="help-usage-row">
-                <div className="help-usage-row__info">
-                  <span className="help-usage-row__icon">🤖</span>
-                  <div>
-                    <div className="help-usage-row__title">AI Tutor Inquiries (A7)</div>
-                    <div className="help-usage-row__sub">Socratic prompts & questions</div>
-                  </div>
-                </div>
-                <span className="help-usage-row__count">{summary?.ai_tutor_queries || 0}</span>
-              </div>
-
-              <div className="help-usage-row">
-                <div className="help-usage-row__info">
-                  <span className="help-usage-row__icon">🔍</span>
-                  <div>
-                    <div className="help-usage-row__title">AI Error Explanations (A9)</div>
-                    <div className="help-usage-row__sub">Deep dive traceback analyses</div>
-                  </div>
-                </div>
-                <span className="help-usage-row__count">{summary?.ai_error_explanations || 0}</span>
-              </div>
-            </div>
-
-            {/* Educational note */}
-            <p className="help-usage-widget__note">
-              💡 Tracked for learning self-awareness. No scoring penalty is applied.
+            <p className="help-disclaimer-text">
+              Tracked purely for self-awareness. No scoring deductions are ever applied.
             </p>
           </div>
 
-          {/* Popover Footer / Reset action */}
-          <div className="help-usage-widget__footer">
+          <div className="help-popover-footer">
             <button
               type="button"
-              className="help-usage-widget__btn-reset"
+              className="btn btn--ghost btn-sm help-reset-btn"
               onClick={handleReset}
               disabled={isResetting || totalAssists === 0}
               id="btn-reset-help-counter"

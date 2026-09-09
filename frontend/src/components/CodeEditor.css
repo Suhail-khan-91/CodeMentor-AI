@@ -1,81 +1,160 @@
-/* CodeEditor.css */
+/* CodeEditor.css — IDE Editor Shell Styling */
 
-.code-editor {
+.code-editor-shell {
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  height: 100%;
+  width: 100%;
+  min-height: 0;
+  background: var(--bg-raised);
+  border-right: 1px solid var(--border);
   overflow: hidden;
-  background: #1e1e1e;           /* matches Monaco vs-dark bg exactly */
-  box-shadow: var(--shadow-md), var(--shadow-glow);
-  transition: border-color 0.25s, box-shadow 0.25s;
 }
 
-.code-editor:focus-within {
-  border-color: rgba(108, 99, 255, 0.5);
-  box-shadow: var(--shadow-md), 0 0 28px rgba(108, 99, 255, 0.2);
-}
-
-/* ── Top bar ── */
-.code-editor__header {
+/* ───── Chrome Header ───── */
+.code-editor__chrome-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-2) var(--space-4);
-  background: #252526;           /* Monaco title-bar colour */
-  border-bottom: 1px solid #3c3c3c;
+  height: 38px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 14px;
   flex-shrink: 0;
 }
 
-.code-editor__lang-badge {
+.code-editor__tabs-group {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  font-size: var(--font-size-sm);
+  gap: 6px;
+  height: 100%;
+}
+
+.editor-file-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  height: 100%;
+  background: var(--bg-raised);
+  border-bottom: 2px solid var(--accent);
+  color: var(--text-1);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
   font-weight: 600;
-  color: var(--color-text);
 }
 
-.code-editor__lang-dot {
-  width: 8px;
-  height: 8px;
+.file-py-dot {
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: #3572a5;           /* Python brand blue */
-  flex-shrink: 0;
+  background: #3b82f6;
+  box-shadow: 0 0 6px rgba(59, 130, 246, 0.4);
 }
 
-.code-editor__hint {
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
+.code-editor__header-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-/* ── Editor body — must fill remaining height ── */
+.editor-meta-pill {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-3);
+}
+
+.editor-lang-badge {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-line);
+  padding: 2px 7px;
+  border-radius: var(--r-pill);
+}
+
+.editor-shortcut-chip {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-2);
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* ───── Editor Body ───── */
 .code-editor__body {
   flex: 1;
-  min-height: 0;                 /* required for flex children with overflow */
+  min-height: 0;
+  position: relative;
+  background: var(--bg-raised);
 }
 
-/* ── Loading state ── */
 .code-editor__loading {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-3);
+  gap: 10px;
   height: 100%;
-  min-height: 200px;
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-  background: #1e1e1e;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  background: var(--bg-raised);
 }
 
 .code-editor__loading-spinner {
   display: inline-block;
-  width: 18px;
-  height: 18px;
-  border: 2px solid var(--color-border);
-  border-top-color: var(--color-primary);
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border-strong);
+  border-top-color: var(--accent);
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: spin 0.7s linear infinite;
+}
+
+/* ───── Status Bar ───── */
+.code-editor__status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 26px;
+  padding: 0 14px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-3);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.status-bar__left, .status-bar__right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.status-indicator__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent);
+}
+
+.status-bar__item {
+  color: var(--text-3);
 }
 
 @keyframes spin {

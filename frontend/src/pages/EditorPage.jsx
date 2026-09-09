@@ -1,18 +1,22 @@
 /**
- * EditorPage.jsx — Coding workspace page (Phase A5)
+ * EditorPage.jsx — Professional Coding Workspace (Phase A14 Live Integration).
  *
- * What this page does:
- *   - Renders the Monaco-based Python code editor.
- *   - Manages the code state (controlled).
- *   - Supports Free Play Mode (isolated execution via POST /api/run).
- *   - Supports Task Evaluation Mode (multi-test case grading via POST /api/evaluate).
- *   - Renders educational Code Diagnostic cards (Phase A4).
- *   - Renders Task Evaluation breakdown and diffs (Phase A5).
- *   - Supports Ctrl+Enter shortcut to run/evaluate code.
+ * 3-Zone Modern IDE Architecture:
+ * - Zone 1: Monaco Code Editor with filename tabs, language tag, keyboard shortcuts
+ * - Zone 2: Interactive Terminal & Diagnostic Console (stdout/stderr streams, exit codes, execution telemetry)
+ * - Zone 3: Contextual Learning Pane (AI Socratic Tutor in Free Play, Task Evaluation in Practice, Custom Question Engine, Debug Challenge Console)
  *
- * What this page deliberately does NOT do:
- *   - Call any AI / LLM APIs (Phase A7+).
- *   - Store progress to persistent database (Phase A12).
+ * Full compliance with Part A requirements:
+ * - Free Play execution (POST /api/run)
+ * - Task grading (POST /api/evaluate)
+ * - Educational diagnostic cards (Phase A4)
+ * - Progressive hints (Phase A6)
+ * - AI Tutor Socratic chat (Phase A7)
+ * - Custom questions (Phase A10)
+ * - Assistance tracking (Phase A11)
+ * - Progress & score synchronization (Phase A12)
+ * - Debug mode challenges (Phase A13)
+ * - Ctrl+Enter execution shortcut
  */
 
 import { useState, useCallback, useEffect } from 'react';
@@ -47,6 +51,9 @@ export default function EditorPage() {
 
   const [mode, setMode] = useState(getInitialMode); // 'editor' | 'task' | 'custom' | 'debug'
   const [code, setCode] = useState(DEFAULT_PYTHON_CODE);
+
+  // Terminal active tab: 'output' | 'diagnostics'
+  const [terminalTab, setTerminalTab] = useState('output');
 
   // Runner & Diagnostics state (Free Play Mode)
   const [isRunning, setIsRunning] = useState(false);
@@ -135,6 +142,13 @@ export default function EditorPage() {
 
   const handleSwitchMode = (newMode) => {
     setMode(newMode);
+    // Sync URL query parameter without full reload
+    try {
+      const url = new URL(window.location);
+      url.searchParams.set('mode', newMode);
+      window.history.replaceState({}, '', url);
+    } catch (e) {}
+
     if (newMode === 'task' && activeTask && activeTask.starter_code && code === DEFAULT_PYTHON_CODE) {
       setCode(activeTask.starter_code);
     } else if (newMode === 'debug' && activeDebugChallenge?.buggy_code) {
@@ -166,27 +180,31 @@ export default function EditorPage() {
   }, []);
 
   /**
-   * Execute code via the backend Code Runner API (Free Play).
+   * Execute code via backend Code Runner API (Free Play / Script execution).
    */
   const handleRun = useCallback(async () => {
-    if (isRunning || isEvaluating) return;
+    if (isRunning || isEvaluating || isDebugEvaluating) return;
 
     setIsRunning(true);
     setApiError(null);
     setShowDiagnostic(true);
+    setTerminalTab('output');
 
     try {
       const executionResult = await runCode(code);
       setResult(executionResult);
+      if (executionResult?.diagnostic?.has_diagnostic) {
+        setTerminalTab('diagnostics');
+      }
     } catch (err) {
       setApiError(err.message || 'Failed to connect to backend code runner');
     } finally {
       setIsRunning(false);
     }
-  }, [code, isRunning, isEvaluating]);
+  }, [code, isRunning, isEvaluating, isDebugEvaluating]);
 
   /**
-   * Evaluate code against all test cases for the active task (Phase A5/A6).
+   * Evaluate code against all test cases for active task (Phase A5/A6).
    */
   const handleEvaluate = useCallback(async () => {
     if (!activeTask || isEvaluating || isRunning) return;
@@ -325,225 +343,237 @@ export default function EditorPage() {
     }
   };
 
+  const getModeBadgeInfo = () => {
+    switch (mode) {
+      case 'task':
+        return {
+          tag: 'Task Practice Track',
+          accentClass: 'mode-accent--amber',
+          title: 'Curriculum & Test Grading',
+          desc: 'Code against comprehensive unit tests with instant evaluation, score breakdown, and tiered hints.',
+        };
+      case 'debug':
+        return {
+          tag: 'Bug Diagnosis Track',
+          accentClass: 'mode-accent--violet',
+          title: 'Debug Mode: Fix Broken Code',
+          desc: 'Diagnose and fix real-world Python bugs with pedagogical hints, syntax explanations, and unit tests.',
+        };
+      case 'custom':
+        return {
+          tag: 'Challenge Authoring Engine',
+          accentClass: 'mode-accent--blue',
+          title: 'Custom Question Playground',
+          desc: 'Design bespoke Python coding questions with custom input/output test specifications and automated grading.',
+        };
+      default:
+        return {
+          tag: 'Sandbox Environment',
+          accentClass: 'mode-accent--mint',
+          title: 'Python Free Play & Diagnostics',
+          desc: 'Isolated Python sandbox with instant plain-English syntax diagnostics and interactive Socratic AI guidance.',
+        };
+    }
+  };
+
+  const modeInfo = getModeBadgeInfo();
+
   return (
     <main className="editor-page" id="main-content">
-      {/* Page header */}
-      <div className="editor-page__header container">
-        <div className="editor-page__title-group">
-          <h1 className="editor-page__title">
-            {mode === 'task'
-              ? 'Task Evaluation & Practice'
-              : mode === 'debug'
-              ? 'Debug Mode: Fix Broken Code'
-              : mode === 'custom'
-              ? 'Custom Question Playground'
-              : 'Python Editor & Diagnostics'}
-          </h1>
-          <span className="editor-page__phase-tag">Phase A14 Live</span>
+      {/* Sleek Workspace Top Bar */}
+      <div className="workspace-header-bar container">
+        <div className="workspace-header-bar__left">
+          <div className="workspace-header-bar__title-wrap">
+            <h1 className="workspace-header-bar__title">{modeInfo.title}</h1>
+            <span className={`workspace-header-bar__tag ${modeInfo.accentClass}`}>
+              {modeInfo.tag}
+            </span>
+          </div>
+          <p className="workspace-header-bar__subtitle">{modeInfo.desc}</p>
         </div>
-        <p className="editor-page__subtitle">
-          {mode === 'task'
-            ? 'Solve structured programming tasks and evaluate your solution against test cases in real-time.'
-            : mode === 'debug'
-            ? 'Diagnose and fix realistic broken Python code using plain-English diagnostics, test diffs, and tiered hints.'
-            : mode === 'custom'
-            ? 'Author your own programming questions and verify solutions with custom test criteria.'
-            : 'Write Python code, execute in an isolated sandbox, and receive instant beginner-friendly error diagnostics.'}
-        </p>
 
-        {/* Mode Switcher Tabs */}
-        <div className="mode-switcher" role="tablist" aria-label="Editor Modes">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={mode === 'editor'}
-            className={`mode-tab ${mode === 'editor' ? 'mode-tab--active' : ''}`}
-            onClick={() => handleSwitchMode('editor')}
-          >
-            <span aria-hidden="true">⚡</span> Free Play Mode
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={mode === 'task'}
-            className={`mode-tab ${mode === 'task' ? 'mode-tab--active' : ''}`}
-            onClick={() => handleSwitchMode('task')}
-          >
-            <span aria-hidden="true">🎯</span> Task Evaluation Mode
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={mode === 'custom'}
-            className={`mode-tab ${mode === 'custom' ? 'mode-tab--active' : ''}`}
-            onClick={() => handleSwitchMode('custom')}
-            id="tab-custom-mode"
-          >
-            <span aria-hidden="true">✏️</span> Custom Question Mode
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={mode === 'debug'}
-            className={`mode-tab ${mode === 'debug' ? 'mode-tab--active' : ''}`}
-            onClick={() => handleSwitchMode('debug')}
-            id="tab-debug-mode"
-          >
-            <span aria-hidden="true">🐛</span> Debug Mode
-          </button>
+        <div className="workspace-header-bar__right">
+          {/* Mode Switcher Tabs */}
+          <div className="mode-switcher" role="tablist" aria-label="Editor Modes">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mode === 'editor'}
+              className={`mode-tab mode-tab--editor ${mode === 'editor' ? 'mode-tab--active' : ''}`}
+              onClick={() => handleSwitchMode('editor')}
+            >
+              <span className="mode-tab__dot" />
+              <span>Free Play</span>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mode === 'task'}
+              className={`mode-tab mode-tab--task ${mode === 'task' ? 'mode-tab--active' : ''}`}
+              onClick={() => handleSwitchMode('task')}
+            >
+              <span className="mode-tab__dot" />
+              <span>Task Eval</span>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mode === 'custom'}
+              className={`mode-tab mode-tab--custom ${mode === 'custom' ? 'mode-tab--active' : ''}`}
+              onClick={() => handleSwitchMode('custom')}
+              id="tab-custom-mode"
+            >
+              <span className="mode-tab__dot" />
+              <span>Custom</span>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mode === 'debug'}
+              className={`mode-tab mode-tab--debug ${mode === 'debug' ? 'mode-tab--active' : ''}`}
+              onClick={() => handleSwitchMode('debug')}
+              id="tab-debug-mode"
+            >
+              <span className="mode-tab__dot" />
+              <span>Debug</span>
+            </button>
+          </div>
         </div>
       </div>
 
+      {/* Main IDE 3-Zone Workspace Grid */}
+      <div className="workspace-layout container">
+        {/* Left Column: Monaco Code Editor + Integrated Execution Terminal */}
+        <div className="workspace-left-column">
+          {/* Section 1: Code Editor & Action Toolbar */}
+          <section className="editor-panel" aria-label="Code editor">
+            {/* Primary Action Toolbar */}
+            <div className="editor-panel__toolbar">
+              <div className="editor-panel__toolbar-left">
+                {mode === 'task' ? (
+                  <>
+                    <button
+                      id="btn-evaluate-task"
+                      className="btn btn--primary btn--accent-amber"
+                      onClick={handleEvaluate}
+                      disabled={isEvaluating || isRunning}
+                      aria-label="Evaluate task against all test cases"
+                      title="Run test suite against solution (Ctrl+Enter)"
+                    >
+                      <span aria-hidden="true">{isEvaluating ? '⏳' : '⚡'}</span>
+                      {isEvaluating ? 'Evaluating…' : 'Evaluate Task'}
+                    </button>
 
-      {/* Main workspace: editor + (output OR task panel) side-by-side */}
-      <div className="editor-page__workspace container">
+                    <button
+                      id="btn-run-code"
+                      className="btn btn--secondary"
+                      onClick={handleRun}
+                      disabled={isRunning || isEvaluating}
+                      aria-label="Run code in terminal"
+                      title="Run script in terminal without grading"
+                    >
+                      <span aria-hidden="true">{isRunning ? '⏳' : '▶'}</span>
+                      {isRunning ? 'Running…' : 'Run Script'}
+                    </button>
+                  </>
+                ) : mode === 'debug' ? (
+                  <>
+                    <button
+                      id="btn-evaluate-debug"
+                      className="btn btn--primary btn--accent-violet"
+                      onClick={handleEvaluateDebug}
+                      disabled={isDebugEvaluating || isRunning}
+                      aria-label="Evaluate fix against test cases"
+                      title="Grade repaired code against tests (Ctrl+Enter)"
+                    >
+                      <span aria-hidden="true">{isDebugEvaluating ? '⏳' : '⚡'}</span>
+                      {isDebugEvaluating ? 'Evaluating…' : 'Evaluate Fix'}
+                    </button>
 
-        {/* Left — Editor panel */}
-        <section className="editor-panel" aria-label="Code editor">
-          {/* Toolbar */}
-          <div className="editor-panel__toolbar">
-            {mode === 'task' ? (
-              <>
+                    <button
+                      id="btn-run-code"
+                      className="btn btn--secondary"
+                      onClick={handleRun}
+                      disabled={isRunning || isDebugEvaluating}
+                      aria-label="Run code in terminal"
+                      title="Run script in terminal without grading"
+                    >
+                      <span aria-hidden="true">{isRunning ? '⏳' : '▶'}</span>
+                      {isRunning ? 'Running…' : 'Run Script'}
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    id="btn-run-code"
+                    className="btn btn--primary btn--accent-mint"
+                    onClick={handleRun}
+                    disabled={isRunning}
+                    aria-label={isRunning ? 'Executing code…' : 'Run code (Ctrl+Enter)'}
+                    title="Execute Python code (Shortcut: Ctrl+Enter)"
+                  >
+                    <span aria-hidden="true">{isRunning ? '⏳' : '▶'}</span>
+                    {isRunning ? 'Running…' : 'Run Code'}
+                  </button>
+                )}
+
                 <button
-                  id="btn-evaluate-task"
-                  className="btn btn--primary"
-                  onClick={handleEvaluate}
-                  disabled={isEvaluating || isRunning}
-                  aria-label="Evaluate task against all test cases"
-                  title="Run test suite against solution (Ctrl+Enter)"
+                  id="btn-clear-code"
+                  className="btn btn--ghost"
+                  onClick={handleResetCode}
+                  disabled={isRunning || isEvaluating || isDebugEvaluating}
+                  aria-label="Reset editor code"
+                  title="Reset code to initial template"
                 >
-                  <span aria-hidden="true">{isEvaluating ? '⏳' : '⚡'}</span>
-                  {isEvaluating ? 'Evaluating…' : 'Evaluate Task'}
+                  <span aria-hidden="true">↺</span>
+                  Reset
                 </button>
+              </div>
 
-                <button
-                  id="btn-run-code"
-                  className="btn btn--secondary"
-                  onClick={handleRun}
-                  disabled={isRunning || isEvaluating}
-                  aria-label="Run code in terminal"
-                  title="Run in terminal without grading"
-                >
-                  <span aria-hidden="true">{isRunning ? '⏳' : '▶'}</span>
-                  {isRunning ? 'Running…' : 'Run Script'}
-                </button>
-              </>
-            ) : mode === 'debug' ? (
-              <>
-                <button
-                  id="btn-evaluate-debug"
-                  className="btn btn--primary"
-                  onClick={handleEvaluateDebug}
-                  disabled={isDebugEvaluating || isRunning}
-                  aria-label="Evaluate fix against test cases"
-                  title="Grade repaired code against tests (Ctrl+Enter)"
-                >
-                  <span aria-hidden="true">{isDebugEvaluating ? '⏳' : '⚡'}</span>
-                  {isDebugEvaluating ? 'Evaluating…' : 'Evaluate Fix'}
-                </button>
+              <div className="editor-panel__toolbar-right">
+                {/* Phase A11: Help / AI Assistance Counter */}
+                <HelpUsageWidget />
 
-                <button
-                  id="btn-run-code"
-                  className="btn btn--secondary"
-                  onClick={handleRun}
-                  disabled={isRunning || isDebugEvaluating}
-                  aria-label="Run code in terminal"
-                  title="Run in terminal without grading"
-                >
-                  <span aria-hidden="true">{isRunning ? '⏳' : '▶'}</span>
-                  {isRunning ? 'Running…' : 'Run Script'}
-                </button>
-              </>
-            ) : (
-              <button
-                id="btn-run-code"
-                className="btn btn--primary"
-                onClick={handleRun}
-                disabled={isRunning}
-                aria-label={isRunning ? 'Executing code…' : 'Run code (Ctrl+Enter)'}
-                title="Execute Python code (Shortcut: Ctrl+Enter)"
-              >
-                <span aria-hidden="true">{isRunning ? '⏳' : '▶'}</span>
-                {isRunning ? 'Running…' : 'Run Code'}
-              </button>
-            )}
+                <span className="editor-panel__shortcut-hint">
+                  <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to {mode === 'task' || mode === 'debug' ? 'evaluate' : 'run'}
+                </span>
 
-            <button
-              id="btn-clear-code"
-              className="btn btn--ghost"
-              onClick={handleResetCode}
-              disabled={isRunning || isEvaluating || isDebugEvaluating}
-              aria-label="Reset editor code"
-              title="Reset code"
-            >
-              <span aria-hidden="true">↺</span>
-              Reset
-            </button>
+                <span className="editor-panel__char-count" aria-live="polite">
+                  {code.length} chars
+                </span>
+              </div>
+            </div>
 
-            {/* Phase A11: Help / AI Assistance Counter */}
-            <HelpUsageWidget />
-
-            <span className="editor-panel__shortcut-hint">
-              <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to {mode === 'task' || mode === 'debug' ? 'evaluate' : 'run'}
-            </span>
-
-            {/* Character count */}
-            <span className="editor-panel__char-count" aria-live="polite">
-              {code.length} chars
-            </span>
-          </div>
-
-          {/* Monaco editor */}
-          <CodeEditor
-            value={code}
-            onChange={handleCodeChange}
-            height="500px"
-          />
-        </section>
-
-        {/* Right — Panel changes based on Mode */}
-        {mode === 'task' ? (
-          /* Task Evaluation Mode Panel */
-          <section className="task-panel" aria-label="Task Evaluation Results">
-            <TaskEvaluationPanel
-              code={code}
-              tasks={tasks}
-              activeTask={activeTask}
-              onSelectTask={handleSelectTask}
-              evaluationResult={evaluationResult}
-              isEvaluating={isEvaluating}
-              hintsData={hintsData}
+            {/* Monaco editor */}
+            <CodeEditor
+              value={code}
+              onChange={handleCodeChange}
+              height="460px"
             />
           </section>
-        ) : mode === 'custom' ? (
-          /* Custom Question Mode Panel (Phase A10) */
-          <section className="task-panel" aria-label="Custom Question Panel">
-            <CustomQuestionPanel
-              code={code}
-              onApplyStarterCode={(starter) => setCode(starter)}
-            />
-          </section>
-        ) : mode === 'debug' ? (
-          /* Debug Mode Panel (Phase A13) */
-          <section className="task-panel" aria-label="Debug Challenge Panel">
-            <DebugChallengePanel
-              code={code}
-              challenges={debugChallenges}
-              activeChallenge={activeDebugChallenge}
-              onSelectChallenge={handleSelectDebugChallenge}
-              onResetToBuggy={handleResetToBuggy}
-              evaluationResult={debugEvaluationResult}
-              isEvaluating={isDebugEvaluating}
-              hintsData={debugHintsData}
-            />
-          </section>
-        ) : (
-          /* Free Play Mode Terminal Panel */
 
+          {/* Section 2: Integrated Execution Terminal & Diagnostic Console */}
           <section className="output-panel" aria-label="Terminal output and diagnostics">
             <div className="output-panel__header">
               <div className="output-panel__header-left">
-                <span className="output-panel__title">Terminal & Diagnostics</span>
+                <div className="output-panel__tabs" role="tablist">
+                  <button
+                    type="button"
+                    className={`output-panel__tab ${terminalTab === 'output' ? 'output-panel__tab--active' : ''}`}
+                    onClick={() => setTerminalTab('output')}
+                  >
+                    Terminal Output
+                  </button>
+                  {result?.diagnostic?.has_diagnostic && (
+                    <button
+                      type="button"
+                      className={`output-panel__tab output-panel__tab--has-diag ${terminalTab === 'diagnostics' ? 'output-panel__tab--active' : ''}`}
+                      onClick={() => setTerminalTab('diagnostics')}
+                    >
+                      <span className="output-panel__diag-dot" />
+                      Compiler Diagnostic
+                    </button>
+                  )}
+                </div>
                 {renderStatusBadge()}
               </div>
 
@@ -571,7 +601,7 @@ export default function EditorPage() {
               {isRunning && (
                 <div className="output-state output-state--running">
                   <div className="output-pulse-loader" aria-hidden="true" />
-                  <p className="output-state__text">Executing code and analyzing diagnostics…</p>
+                  <p className="output-state__text">Executing script in isolated Python sandbox…</p>
                 </div>
               )}
 
@@ -590,20 +620,26 @@ export default function EditorPage() {
               {/* 3. Idle state (no run yet) */}
               {!isRunning && !apiError && !result && (
                 <div className="output-state output-state--idle">
-                  <span className="output-state__icon" aria-hidden="true">💡</span>
+                  <div className="output-state__icon-box">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="4 17 10 11 4 5" />
+                      <line x1="12" y1="19" x2="20" y2="19" />
+                    </svg>
+                  </div>
                   <p className="output-state__text">
-                    Press <strong>Run Code</strong> or <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to execute your code.
+                    Press <strong>Run Code</strong> or <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to execute.
                   </p>
                   <p className="output-state__subtext">
-                    Standard output (<code>stdout</code>), plain-English error diagnostics, and hints will appear here.
+                    Standard output (<code>stdout</code>), raw tracebacks, and plain-English diagnostics render here.
                   </p>
                 </div>
               )}
 
-              {/* 4. Execution Result & Diagnostic Card */}
+              {/* 4. Execution Result & Diagnostics */}
               {!isRunning && !apiError && result && (
                 <div className="output-content">
-                  {showDiagnostic && result.diagnostic && result.diagnostic.has_diagnostic && (
+                  {/* Diagnostics Tab View */}
+                  {terminalTab === 'diagnostics' && showDiagnostic && result.diagnostic && result.diagnostic.has_diagnostic && (
                     <DiagnosticCard
                       diagnostic={result.diagnostic}
                       code={code}
@@ -612,45 +648,102 @@ export default function EditorPage() {
                     />
                   )}
 
+                  {/* Standard Output Stream */}
+                  {terminalTab === 'output' && (
+                    <>
+                      {/* Diagnostic Banner if there is an error but user is in output tab */}
+                      {showDiagnostic && result.diagnostic && result.diagnostic.has_diagnostic && (
+                        <div className="terminal-diag-quick-notice">
+                          <div className="terminal-diag-quick-notice__left">
+                            <span className="terminal-diag-quick-notice__tag">Diagnostic Detected</span>
+                            <span className="terminal-diag-quick-notice__type">{result.diagnostic.error_type}</span>
+                          </div>
+                          <button
+                            type="button"
+                            className="terminal-diag-quick-notice__btn"
+                            onClick={() => setTerminalTab('diagnostics')}
+                          >
+                            View Diagnostic Analysis →
+                          </button>
+                        </div>
+                      )}
 
-                  {result.stdout && (
-                    <div className="output-stream-container">
-                      <span className="output-stream-label">Standard Output</span>
-                      <pre className="output-stream output-stream--stdout">
-                        <code>{result.stdout}</code>
-                      </pre>
-                    </div>
-                  )}
+                      {result.stdout && (
+                        <div className="output-stream-container">
+                          <span className="output-stream-label">Standard Output</span>
+                          <pre className="output-stream output-stream--stdout">
+                            <code>{result.stdout}</code>
+                          </pre>
+                        </div>
+                      )}
 
-                  {result.stderr && (
-                    <div className="output-stream-container">
-                      <span className="output-stream-label output-stream-label--error">Raw Python Traceback</span>
-                      <pre className="output-stream output-stream--stderr">
-                        <code>{result.stderr}</code>
-                      </pre>
-                    </div>
-                  )}
+                      {result.stderr && (
+                        <div className="output-stream-container">
+                          <span className="output-stream-label output-stream-label--error">Raw Python Traceback</span>
+                          <pre className="output-stream output-stream--stderr">
+                            <code>{result.stderr}</code>
+                          </pre>
+                        </div>
+                      )}
 
-                  {!result.stdout && !result.stderr && (
-                    <p className="output-empty-note">
-                      [Process completed with exit code 0 — no output printed]
-                    </p>
+                      {!result.stdout && !result.stderr && (
+                        <p className="output-empty-note">
+                          [Process completed with exit code 0 — no standard output printed]
+                        </p>
+                      )}
+                    </>
                   )}
                 </div>
               )}
-
-              {/* Phase A7: AI Tutor Panel in Free Play Mode */}
-              {!isRunning && (
-                <AITutorPanel
-                  code={code}
-                  diagnostic={result?.diagnostic}
-                  executionDetails={result}
-                />
-              )}
             </div>
           </section>
-        )}
+        </div>
 
+        {/* Right Column: Contextual Learning & Mode Experience */}
+        <div className="workspace-right-column">
+          {mode === 'task' ? (
+            <section className="task-panel" aria-label="Task Evaluation Results">
+              <TaskEvaluationPanel
+                code={code}
+                tasks={tasks}
+                activeTask={activeTask}
+                onSelectTask={handleSelectTask}
+                evaluationResult={evaluationResult}
+                isEvaluating={isEvaluating}
+                hintsData={hintsData}
+              />
+            </section>
+          ) : mode === 'custom' ? (
+            <section className="task-panel" aria-label="Custom Question Panel">
+              <CustomQuestionPanel
+                code={code}
+                onApplyStarterCode={(starter) => setCode(starter)}
+              />
+            </section>
+          ) : mode === 'debug' ? (
+            <section className="task-panel" aria-label="Debug Challenge Panel">
+              <DebugChallengePanel
+                code={code}
+                challenges={debugChallenges}
+                activeChallenge={activeDebugChallenge}
+                onSelectChallenge={handleSelectDebugChallenge}
+                onResetToBuggy={handleResetToBuggy}
+                evaluationResult={debugEvaluationResult}
+                isEvaluating={isDebugEvaluating}
+                hintsData={debugHintsData}
+              />
+            </section>
+          ) : (
+            /* Free Play Mode: Dedicated AI Tutor Panel in Zone 3 */
+            <section className="tutor-freeplay-panel" aria-label="AI Socratic Tutor">
+              <AITutorPanel
+                code={code}
+                diagnostic={result?.diagnostic}
+                executionDetails={result}
+              />
+            </section>
+          )}
+        </div>
       </div>
     </main>
   );
