@@ -5,9 +5,9 @@
 .ai-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(4, 7, 13, 0.82);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: radial-gradient(circle 700px at 50% 50%, rgba(56, 239, 189, 0.16) 0%, rgba(4, 7, 16, 0.88) 100%);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -22,12 +22,14 @@
 }
 
 .ai-modal-card {
-  background: #0f131c;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(14, 19, 32, 0.94);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 18px;
   width: 100%;
   max-width: 620px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(56, 239, 189, 0.1);
+  box-shadow: 0 28px 72px rgba(0, 0, 0, 0.78), 0 0 48px rgba(56, 239, 189, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.12);
   overflow: hidden;
   animation: modalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }

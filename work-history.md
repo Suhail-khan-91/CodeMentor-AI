@@ -1981,3 +1981,56 @@ Using `CODEMENTOR_AI_REDESIGN.html` as foundational inspiration, the entire Reac
 3. **Browser Automation Verification:**
    - Evaluated live browser interaction across all 4 modes, modal dialogs, Python code execution, error diagnostics, progressive hints, AI tutor chat, custom question authoring, and debug challenges.
    - Browser console logs: **0 errors / 0 warnings**.
+
+---
+
+## PHASE A14-ATMOSPHERE — Colorful Ambient Background & Elevated Surface System
+
+**Status:** ✅ COMPLETE  
+**Date completed:** 2026-09-09  
+
+---
+
+### Overview & Visual Philosophy
+To completely break away from standard flat dark/black backgrounds (`#080a0f`), a dedicated visual pass was implemented to establish a **multi-color atmospheric background system** inspired by premier modern developer/AI platforms. The design combines **viewport-fixed radial glowing orbs (deep indigo, radiant violet, cobalt, and teal)** with a developer **micro-dot precision mesh**, providing a rich visual atmosphere across the entire frontend.
+
+Crucially, readability was preserved through a strict 3-tier visual hierarchy:
+$$\text{COLORFUL AMBIENT BACKDROP} \longrightarrow \text{ELEVATED FROSTED SURFACES} \longrightarrow \text{SOLID HIGH-CONTRAST CANVASES}$$
+
+---
+
+### Key Implementations
+
+1. **Global Ambient Canvas (`frontend/src/index.css`):**
+   - Injected multi-stop fixed radial gradients simulating aurora ambient orbs:
+     - Electric Indigo (`rgba(79, 70, 229, 0.22)`)
+     - Radiant Violet (`rgba(147, 51, 234, 0.18)`)
+     - Cyber Cyan / Cobalt (`rgba(14, 165, 233, 0.12)`)
+     - Cosmic Iris (`rgba(99, 102, 241, 0.16)`)
+     - Emerald Jade (`rgba(16, 185, 129, 0.12)`)
+   - Micro-dot developer grid pattern overlay (`28px 28px` tile size).
+   - Frosted elevation design tokens (`--bg-raised: rgba(15, 20, 34, 0.78)`, `--surface: rgba(18, 25, 42, 0.82)`).
+
+2. **Mode-Adaptive Workspace Lighting (`frontend/src/pages/EditorPage.jsx`, `EditorPage.css`):**
+   - Added `data-mode={mode}` to workspace wrapper to drive dynamic ambient background shifts:
+     - **Free Play**: Mint / Emerald & Cobalt atmospheric glow.
+     - **Task Evaluation**: Solar Amber & Royal Indigo atmospheric glow.
+     - **Custom Question**: Electric Blue & Cyber Cyan atmospheric glow.
+     - **Debug Mode**: Amethyst Violet & Crimson Rose atmospheric glow.
+   - Preserved 100% opaque, calibrated dark editor canvas (`#090d16`) and matte terminal stream backgrounds (`#080b12`) ensuring WCAG AAA code legibility.
+
+3. **Landing Page Aurora Background (`frontend/src/pages/Home.css`):**
+   - Multi-color radial hero backlight centering on title and demo card.
+   - Frosted glass terminal demo card and mode cards with colored ambient glow on hover.
+
+4. **Frosted Modal Auras (`ProgressModal.css`, `AISettingsModal.css`, `HelpUsageWidget.css`, `Toast.css`):**
+   - Centered radial ambient auras on modal backdrops.
+   - Glassmorphic modal containers with multi-layered glowing borders and specular highlights.
+
+---
+
+### Verification
+- **Frontend Build:** ✅ `npm run build` completed in **834ms** (`dist/` generated with 0 errors).
+- **Browser Automation:** Verified landing page aurora, workspace mode transitions, high-contrast code readability, and **0 console errors**.
+- **Functional Integrity:** 100% of Phase A1–A14 functional contracts and API integrations intact.
+

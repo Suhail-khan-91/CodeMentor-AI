@@ -2,10 +2,12 @@
 
 .diagnostic-card {
   border-radius: var(--r-md);
-  border: 1px solid var(--border-strong);
-  border-left: 3px solid var(--red);
-  background: var(--bg-raised);
-  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-left: 4px solid var(--red);
+  background: rgba(18, 23, 38, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45), 0 0 24px rgba(244, 63, 94, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   overflow: hidden;
   margin-bottom: 16px;
   animation: diag-fade-in 0.2s ease-out;
@@ -23,19 +25,23 @@
 }
 
 .diagnostic-card--syntax {
-  border-left-color: #60a5fa;
+  border-left-color: #38bdf8;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45), 0 0 24px rgba(56, 189, 248, 0.16);
 }
 
 .diagnostic-card--indentation {
   border-left-color: #34d399;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45), 0 0 24px rgba(52, 211, 153, 0.16);
 }
 
 .diagnostic-card--timeout {
-  border-left-color: var(--amber);
+  border-left-color: #fbbf24;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45), 0 0 24px rgba(251, 191, 36, 0.16);
 }
 
 .diagnostic-card--runtime {
-  border-left-color: var(--red);
+  border-left-color: #fb7185;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45), 0 0 24px rgba(251, 113, 133, 0.16);
 }
 
 /* ───── Header Bar ───── */

@@ -379,7 +379,7 @@ export default function EditorPage() {
   const modeInfo = getModeBadgeInfo();
 
   return (
-    <main className="editor-page" id="main-content">
+    <main className="editor-page" id="main-content" data-mode={mode}>
       {/* Sleek Workspace Top Bar */}
       <div className="workspace-header-bar container">
         <div className="workspace-header-bar__left">
