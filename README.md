@@ -91,3 +91,20 @@ AI responses can be generated using cloud LLM APIs or local models through Ollam
 
 ### AI Connection & Configuration
 ![AI Connection and Configuration Settings](IMAGES/5.png)
+
+## Redesigned with Claude Design
+
+### Home Page
+![CodeMentor AI Modern Home Page](<new-redesign/1 - HOME PAGE.png>)
+
+### Main Features
+![CodeMentor AI Main Features](<new-redesign/2 - MAIN FEATURES.png>)
+
+### Code Editor
+![CodeMentor AI Code Editor](<new-redesign/3 - Editor.png>)
+
+### AI Connection & Configuration
+![CodeMentor AI Connection and Configuration](<new-redesign/4 - NEW AI Connection & Configuration.png>)
+
+### New Look & Atmospheric Workspace
+![CodeMentor AI New Look and Atmospheric Workspace](<new-redesign/5 - new look.png>)
