@@ -171,13 +171,15 @@ export default function Home() {
             </p>
 
             <div className="hero-cta-group">
-              <a href="/editor" className="btn btn--accent hero-btn-main">
-                <span>Launch Workspace</span>
+              <a href="/courses" className="btn btn--accent hero-btn-main" style={{ background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)' }}>
+                <span>🐍 Start Python Course</span>
                 <span aria-hidden="true">→</span>
               </a>
-              <a href="#modes" className="btn btn--ghost hero-btn-sub">
-                <span>Explore Modes</span>
-                <span aria-hidden="true">↓</span>
+              <a href="/editor" className="btn btn--ghost hero-btn-sub">
+                <span>Open IDE Workspace</span>
+              </a>
+              <a href="#modes" className="btn btn--ghost hero-btn-sub" style={{ opacity: 0.85 }}>
+                <span>Explore Modes ↓</span>
               </a>
             </div>
 

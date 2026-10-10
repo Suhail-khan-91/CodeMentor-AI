@@ -25,8 +25,10 @@ import DiagnosticCard from '../components/DiagnosticCard';
 import TaskEvaluationPanel from '../components/TaskEvaluationPanel';
 import CustomQuestionPanel from '../components/CustomQuestionPanel';
 import DebugChallengePanel from '../components/DebugChallengePanel';
+import CourseChallengePanel from '../components/curriculum/CourseChallengePanel';
 import AITutorPanel from '../components/AITutorPanel';
 import HelpUsageWidget from '../components/HelpUsageWidget';
+import { findChallengeById, getModule } from '../services/curriculumService';
 import {
   runCode,
   evaluateTask,
@@ -42,14 +44,14 @@ export default function EditorPage() {
   const getInitialMode = () => {
     try {
       const urlMode = new URLSearchParams(window.location.search).get('mode');
-      if (urlMode === 'custom' || urlMode === 'task' || urlMode === 'editor' || urlMode === 'debug') {
+      if (urlMode === 'custom' || urlMode === 'task' || urlMode === 'editor' || urlMode === 'debug' || urlMode === 'course') {
         return urlMode;
       }
     } catch (e) {}
     return 'editor';
   };
 
-  const [mode, setMode] = useState(getInitialMode); // 'editor' | 'task' | 'custom' | 'debug'
+  const [mode, setMode] = useState(getInitialMode); // 'editor' | 'task' | 'custom' | 'debug' | 'course'
   const [code, setCode] = useState(DEFAULT_PYTHON_CODE);
 
   // Terminal active tab: 'output' | 'diagnostics'
@@ -74,6 +76,80 @@ export default function EditorPage() {
   const [isDebugEvaluating, setIsDebugEvaluating] = useState(false);
   const [debugEvaluationResult, setDebugEvaluationResult] = useState(null);
   const [debugHintsData, setDebugHintsData] = useState(null);
+
+  // Course & Curriculum Mode state (Phase B4)
+  const [activeCourseChallenge, setActiveCourseChallenge] = useState(null);
+  const [courseChallengeMeta, setCourseChallengeMeta] = useState({});
+  const [examQuestionsList, setExamQuestionsList] = useState([]);
+  const [currentExamIndex, setCurrentExamIndex] = useState(0);
+
+  // Load course challenge or transferred walkthrough code on mount
+  useEffect(() => {
+    // 1. Transferred snippet from walkthrough
+    const transferred = sessionStorage.getItem('codementor_transfer_code');
+    if (transferred) {
+      sessionStorage.removeItem('codementor_transfer_code');
+      setCode(transferred);
+      return;
+    }
+
+    // 2. Query param based challenge loading
+    const params = new URLSearchParams(window.location.search);
+    const challengeId = params.get('challengeId');
+    const examId = params.get('examId');
+
+    if (challengeId) {
+      const found = findChallengeById(challengeId);
+      if (found) {
+        setActiveCourseChallenge(found.challenge);
+        setCourseChallengeMeta(found);
+        if (found.challenge.starter_code) {
+          setCode(found.challenge.starter_code);
+        }
+        return;
+      }
+    }
+
+    if (examId) {
+      const mod = getModule('module_1');
+      if (mod && mod.chapter_exam && mod.chapter_exam.questions?.length > 0) {
+        const questions = mod.chapter_exam.questions;
+        setExamQuestionsList(questions);
+        setCurrentExamIndex(0);
+        setActiveCourseChallenge(questions[0]);
+        setCourseChallengeMeta({
+          type: 'chapter_exam',
+          moduleId: 'module_1',
+          examId: mod.chapter_exam.exam_id,
+          examTitle: mod.chapter_exam.title,
+          examQuestionIndex: 0,
+          totalExamQuestions: questions.length,
+        });
+        if (questions[0].starter_code) {
+          setCode(questions[0].starter_code);
+        }
+        return;
+      }
+    }
+
+    // Fallback: Default to first challenge in Module 1
+    const mod = getModule('module_1');
+    const firstChal = mod?.sessions?.[0]?.lessons?.[0]?.practice_challenges?.[0];
+    if (firstChal) {
+      setActiveCourseChallenge(firstChal);
+      setCourseChallengeMeta({
+        type: 'lesson_practice',
+        moduleId: 'module_1',
+        sessionId: 'session_01',
+        lessonId: 'lesson_01_01',
+        sessionTitle: 'Session 1 - Python Fundamentals',
+        lessonTitle: 'Python Output & Print Formatting',
+      });
+      if (getInitialMode() === 'course' && firstChal.starter_code) {
+        setCode(firstChal.starter_code);
+      }
+    }
+  }, []);
 
   // Load sample practice tasks on mount
   useEffect(() => {
@@ -153,14 +229,46 @@ export default function EditorPage() {
       setCode(activeTask.starter_code);
     } else if (newMode === 'debug' && activeDebugChallenge?.buggy_code) {
       setCode(activeDebugChallenge.buggy_code);
+    } else if (newMode === 'course' && activeCourseChallenge?.starter_code) {
+      setCode(activeCourseChallenge.starter_code);
     }
   };
+
+  const handleNextCourseQuestion = useCallback(() => {
+    if (examQuestionsList.length > 0 && currentExamIndex < examQuestionsList.length - 1) {
+      const nextIdx = currentExamIndex + 1;
+      setCurrentExamIndex(nextIdx);
+      const q = examQuestionsList[nextIdx];
+      setActiveCourseChallenge(q);
+      setCourseChallengeMeta((prev) => ({
+        ...prev,
+        examQuestionIndex: nextIdx,
+      }));
+      if (q.starter_code) setCode(q.starter_code);
+    }
+  }, [examQuestionsList, currentExamIndex]);
+
+  const handlePrevCourseQuestion = useCallback(() => {
+    if (examQuestionsList.length > 0 && currentExamIndex > 0) {
+      const prevIdx = currentExamIndex - 1;
+      setCurrentExamIndex(prevIdx);
+      const q = examQuestionsList[prevIdx];
+      setActiveCourseChallenge(q);
+      setCourseChallengeMeta((prev) => ({
+        ...prev,
+        examQuestionIndex: prevIdx,
+      }));
+      if (q.starter_code) setCode(q.starter_code);
+    }
+  }, [examQuestionsList, currentExamIndex]);
 
   const handleResetCode = useCallback(() => {
     if (mode === 'task' && activeTask?.starter_code) {
       setCode(activeTask.starter_code);
     } else if (mode === 'debug' && activeDebugChallenge?.buggy_code) {
       setCode(activeDebugChallenge.buggy_code);
+    } else if (mode === 'course' && activeCourseChallenge?.starter_code) {
+      setCode(activeCourseChallenge.starter_code);
     } else {
       setCode(DEFAULT_PYTHON_CODE);
     }
@@ -171,7 +279,7 @@ export default function EditorPage() {
     setDebugHintsData(null);
     setApiError(null);
     setShowDiagnostic(true);
-  }, [mode, activeTask, activeDebugChallenge]);
+  }, [mode, activeTask, activeDebugChallenge, activeCourseChallenge]);
 
   const handleClearOutput = useCallback(() => {
     setResult(null);
@@ -345,6 +453,13 @@ export default function EditorPage() {
 
   const getModeBadgeInfo = () => {
     switch (mode) {
+      case 'course':
+        return {
+          tag: 'CampusX Course Track',
+          accentClass: 'mode-accent--cyan',
+          title: 'Interactive Python Curriculum',
+          desc: 'Solve real-world CampusX Python challenges, read 3-tier hints, consult the AI tutor, and verify test cases.',
+        };
       case 'task':
         return {
           tag: 'Task Practice Track',
@@ -395,6 +510,17 @@ export default function EditorPage() {
         <div className="workspace-header-bar__right">
           {/* Mode Switcher Tabs */}
           <div className="mode-switcher" role="tablist" aria-label="Editor Modes">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mode === 'course'}
+              className={`mode-tab mode-tab--course ${mode === 'course' ? 'mode-tab--active' : ''}`}
+              onClick={() => handleSwitchMode('course')}
+              id="tab-course-mode"
+            >
+              <span className="mode-tab__dot" />
+              <span>Course</span>
+            </button>
             <button
               type="button"
               role="tab"
@@ -701,7 +827,21 @@ export default function EditorPage() {
 
         {/* Right Column: Contextual Learning & Mode Experience */}
         <div className="workspace-right-column">
-          {mode === 'task' ? (
+          {mode === 'course' ? (
+            <section className="task-panel" aria-label="Course Challenge Panel">
+              <CourseChallengePanel
+                challenge={activeCourseChallenge}
+                challengeMeta={courseChallengeMeta}
+                code={code}
+                onSetCode={setCode}
+                onNextQuestion={handleNextCourseQuestion}
+                onPrevQuestion={handlePrevCourseQuestion}
+                hasNext={examQuestionsList.length > 0 ? currentExamIndex < examQuestionsList.length - 1 : false}
+                hasPrev={examQuestionsList.length > 0 ? currentExamIndex > 0 : false}
+                onBackToCourse={() => (window.location.href = '/courses')}
+              />
+            </section>
+          ) : mode === 'task' ? (
             <section className="task-panel" aria-label="Task Evaluation Results">
               <TaskEvaluationPanel
                 code={code}

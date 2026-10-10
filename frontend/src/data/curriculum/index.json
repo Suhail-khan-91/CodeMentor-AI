@@ -1,0 +1,76 @@
+{
+  "course_id": "campusx_python_dsmp",
+  "title": "Complete Python for Data Science & Engineering",
+  "subtitle": "From Core Fundamentals to Advanced Numerical Analysis",
+  "description": "Comprehensive interactive Python course based on CampusX Data Science Mentorship Program. Built for CodeMentor-AI with real-time browser code execution, automated test evaluation, and Socratic AI guidance.",
+  "total_modules": 6,
+  "total_sessions": 32,
+  "modules": [
+    {
+      "id": "module_1",
+      "module_number": 1,
+      "title": "Python Fundamentals & Data Structures",
+      "slug": "fundamentals",
+      "file": "module1_fundamentals.json",
+      "icon": "🐍",
+      "session_count": 7,
+      "estimated_hours": 14,
+      "summary": "Core syntax, variables, operators, conditionals, loops, strings, lists, tuples, sets, dictionaries, and functions."
+    },
+    {
+      "id": "module_2",
+      "module_number": 2,
+      "title": "Object-Oriented Programming (OOP)",
+      "slug": "oop",
+      "file": "module2_oop.json",
+      "icon": "🧱",
+      "session_count": 5,
+      "estimated_hours": 10,
+      "summary": "Classes, objects, constructors, encapsulation, static keyword, inheritance, polymorphism, abstraction, and memory internals."
+    },
+    {
+      "id": "module_3",
+      "module_number": 3,
+      "title": "Advanced Python Programming",
+      "slug": "advanced",
+      "file": "module3_advanced.json",
+      "icon": "⚡",
+      "session_count": 3,
+      "estimated_hours": 8,
+      "summary": "File handling, serialization (pickle & json), exception handling, custom exceptions, decorators, namespaces, and the LEGB rule."
+    },
+    {
+      "id": "module_4",
+      "module_number": 4,
+      "title": "NumPy (Numerical Computing)",
+      "slug": "numpy",
+      "file": "module4_numpy.json",
+      "icon": "🔢",
+      "session_count": 3,
+      "estimated_hours": 8,
+      "summary": "Vectorized arrays, multi-dimensional array manipulation, fancy indexing, broadcasting rules, and numerical computing tricks."
+    },
+    {
+      "id": "module_5",
+      "module_number": 5,
+      "title": "Pandas (Data Analysis & Manipulation)",
+      "slug": "pandas",
+      "file": "module5_pandas.json",
+      "icon": "🐼",
+      "session_count": 8,
+      "estimated_hours": 18,
+      "summary": "Series, DataFrames, data cleaning, GroupBy aggregations, merging/joining, MultiIndex analysis, vectorized string operations, and DateTime."
+    },
+    {
+      "id": "module_6",
+      "module_number": 6,
+      "title": "Data Visualization (Matplotlib, Plotly & Seaborn)",
+      "slug": "visualization",
+      "file": "module6_visualization.json",
+      "icon": "📊",
+      "session_count": 6,
+      "estimated_hours": 12,
+      "summary": "2D and 3D Matplotlib plots, subplots, interactive visualizations with Plotly Express, and advanced statistical plotting with Seaborn."
+    }
+  ]
+}

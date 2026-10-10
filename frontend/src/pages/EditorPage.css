@@ -39,6 +39,13 @@
     radial-gradient(ellipse 750px 450px at 50% 90%, rgba(147, 51, 234, 0.14) 0%, transparent 70%);
 }
 
+.editor-page[data-mode="course"] {
+  background-image:
+    radial-gradient(ellipse 950px 520px at 10% 0%, rgba(56, 189, 248, 0.18) 0%, transparent 65%),
+    radial-gradient(ellipse 850px 550px at 90% 15%, rgba(99, 102, 241, 0.2) 0%, transparent 65%),
+    radial-gradient(ellipse 750px 450px at 50% 90%, rgba(16, 185, 129, 0.14) 0%, transparent 70%);
+}
+
 /* ── Workspace Header Bar ── */
 .workspace-header-bar {
   display: flex;
@@ -180,6 +187,11 @@
 .mode-tab--debug.mode-tab--active .mode-tab__dot {
   background: #c084fc;
   box-shadow: 0 0 8px #c084fc;
+}
+
+.mode-tab--course.mode-tab--active .mode-tab__dot {
+  background: #38bdf8;
+  box-shadow: 0 0 8px #38bdf8;
 }
 
 /* ── Workspace 3-Zone Grid Layout ── */

@@ -15,12 +15,14 @@ import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import EditorPage from './pages/EditorPage';
+import CourseExplorer from './pages/CourseExplorer';
 import Toast from './components/Toast';
 import './App.css';
 
 /** Derive which page to render from the current URL path. */
 function getPage(pathname) {
   if (pathname.startsWith('/editor')) return 'editor';
+  if (pathname.startsWith('/courses') || pathname.startsWith('/curriculum') || pathname.startsWith('/learn')) return 'courses';
   return 'home';
 }
 
@@ -52,7 +54,13 @@ export default function App() {
   return (
     <div className="app">
       <Navbar />
-      {page === 'editor' ? <EditorPage /> : <Home />}
+      {page === 'editor' ? (
+        <EditorPage />
+      ) : page === 'courses' ? (
+        <CourseExplorer />
+      ) : (
+        <Home />
+      )}
       <Toast />
     </div>
   );

@@ -72,10 +72,13 @@ export default function Navbar() {
           {isEditor ? (
             <div className="ws-crumb" aria-label="Breadcrumb">
               <span className="ws-crumb__slash">/</span>
+              <a href="/courses" className="ws-crumb__section" style={{ textDecoration: 'none', color: '#94a3b8' }}>Courses</a>
+              <span className="ws-crumb__slash">/</span>
               <span className="ws-crumb__section">Workspace</span>
             </div>
           ) : (
             <nav className="navbar__nav-links" aria-label="Main Navigation">
+              <a href="/courses" className="navbar__nav-link" style={{ color: '#38bdf8', fontWeight: '600' }}>Python Course</a>
               <a href="#features" className="navbar__nav-link">Features</a>
               <a href="#architecture" className="navbar__nav-link">How it Works</a>
               <a href="/editor" className="navbar__nav-link">IDE Workspace</a>

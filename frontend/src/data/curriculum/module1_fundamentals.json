@@ -1,0 +1,970 @@
+{
+  "module_id": "module_1",
+  "module_number": 1,
+  "title": "Python Fundamentals & Data Structures",
+  "description": "Master foundational Python syntax, memory semantics, and core data structures.",
+  "sessions": [
+    {
+      "session_id": "session_01",
+      "session_number": 1,
+      "title": "Session 1 - Python Fundamentals",
+      "video_url": "https://www.youtube.com/watch?v=1z5-O7-5AXk",
+      "notebook_file": "01_session1_python_fundamentals.ipynb",
+      "lessons": [
+        {
+          "lesson_id": "lesson_01_01",
+          "title": "Python Output & Print Formatting",
+          "concept_markdown": "In Python, the `print()` function is used to output data to standard output. By default, items passed to `print()` are separated by a single space and end with a newline character (`\\n`). You can customize this behavior using the `sep` and `end` keyword arguments.\n\nPython is also a case-sensitive programming language, meaning `print` is recognized as a built-in function, while `Print` or `PRINT` will raise a `NameError`.",
+          "code_walkthroughs": [
+            {
+              "title": "Custom Separator and Ending",
+              "code": "print('Hello', 'World', sep='-', end='!\\n')\nprint('Next Line')",
+              "expected_stdout": "Hello-World!\nNext Line\n",
+              "explanation": "The `sep='-'` joins multiple arguments with dashes, and `end='!\\n'` appends an exclamation mark before the newline."
+            },
+            {
+              "title": "Suppressing the Newline",
+              "code": "print('Loading', end='...')\nprint('Done!')",
+              "expected_stdout": "Loading...Done!\n",
+              "explanation": "Setting `end='...'` prevents advancing to the next line immediately."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_01_01_custom_print",
+              "title": "Formatted Date Output",
+              "difficulty": "beginner",
+              "description": "Read day, month, and year as three separate lines of input, and print them formatted as `DD/MM/YYYY` using a single `print()` call with `sep`.",
+              "starter_code": "# Read day, month, and year from standard input\nday = input()\nmonth = input()\nyear = input()\n\n# Your code here: print date formatted with '/'\n",
+              "solution_code": "day = input()\nmonth = input()\nyear = input()\nprint(day, month, year, sep='/')",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Standard date",
+                  "stdin": "25\n12\n2024",
+                  "expected_output": "25/12/2024",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "Single-digit day and month",
+                  "stdin": "5\n7\n2025",
+                  "expected_output": "5/7/2025",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Think about how print() joins multiple arguments by default.",
+                "level_2_strategy": "You can pass day, month, year into print() and specify the separator using sep='/'.",
+                "level_3_clue": "print(day, month, year, sep='/')"
+              }
+            }
+          ]
+        },
+        {
+          "lesson_id": "lesson_01_02",
+          "title": "Data Types & Type Conversion",
+          "concept_markdown": "Python has several fundamental data types:\n- **Integer (`int`)**: Whole numbers like `42`, `-5`.\n- **Float (`float`)**: Decimal numbers and scientific notation like `3.14`, `1e5`.\n- **Boolean (`bool`)**: Logical `True` or `False`.\n- **String (`str`)**: Text sequences in quotes.\n- **Complex (`complex`)**: Numbers with imaginary components like `3 + 4j`.\n\nBecause `input()` always returns a string, explicit type conversion (type casting) using `int()` or `float()` is necessary to perform arithmetic.",
+          "code_walkthroughs": [
+            {
+              "title": "Type Casting and Inspection",
+              "code": "val_str = '42'\nval_int = int(val_str)\nprint(val_int + 8, type(val_int).__name__)",
+              "expected_stdout": "50 int\n",
+              "explanation": "`int(val_str)` converts the string `'42'` to integer `42`, allowing numeric addition."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_01_02_type_cast_sum",
+              "title": "Numeric Addition from Input",
+              "difficulty": "beginner",
+              "description": "Read two numbers (each on a new line), convert them to integers, and print their sum.",
+              "starter_code": "# Read two inputs, convert to int, and print the sum\na = input()\nb = input()\n\n# Your code here\n",
+              "solution_code": "a = int(input())\nb = int(input())\nprint(a + b)",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Positive integers",
+                  "stdin": "15\n27",
+                  "expected_output": "42",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "Negative and zero",
+                  "stdin": "-10\n0",
+                  "expected_output": "-10",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "input() returns text. You need to convert the text to numbers before adding.",
+                "level_2_strategy": "Wrap each input() with int() and then calculate a + b.",
+                "level_3_clue": "a = int(input())\nb = int(input())\nprint(a + b)"
+              }
+            }
+          ]
+        },
+        {
+          "lesson_id": "lesson_01_03",
+          "title": "Variables, Dynamic Typing & Simple Interest",
+          "concept_markdown": "In Python, variables are dynamically typed references pointing to objects in memory. You do not declare variable types explicitly (unlike C++ or Java). A variable can reference an integer at one moment and a string the next (dynamic binding).\n\nPython also supports multiple assignment: `x, y = 10, 20`.",
+          "code_walkthroughs": [
+            {
+              "title": "Multiple Assignment & Dynamic Binding",
+              "code": "x, y = 5, 'Python'\nprint(x, y)\nx = 10.5\nprint(x, type(x).__name__)",
+              "expected_stdout": "5 Python\n10.5 float\n",
+              "explanation": "Variables `x` and `y` are assigned simultaneously, and `x` rebinds dynamically from `int` to `float`."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_01_03_simple_interest",
+              "title": "Calculate Simple Interest",
+              "difficulty": "beginner",
+              "description": "Given Principal (`P`), Rate (`R` in %), and Time (`T` in years) on separate input lines, calculate and print the Simple Interest (`SI = (P * R * T) / 100`). Output as float.",
+              "starter_code": "# Read P, R, T from input and calculate simple interest\np = float(input())\nr = float(input())\nt = float(input())\n\n# Your code here\n",
+              "solution_code": "p = float(input())\nr = float(input())\nt = float(input())\nsi = (p * r * t) / 100\nprint(si)",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Standard simple interest",
+                  "stdin": "1000\n5\n2",
+                  "expected_output": "100.0",
+                  "is_hidden": false,
+                  "match_mode": "numeric_float"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "Decimal rate and period",
+                  "stdin": "5000\n7.5\n3",
+                  "expected_output": "1125.0",
+                  "is_hidden": true,
+                  "match_mode": "numeric_float"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "The formula for simple interest is Principal multiplied by Rate multiplied by Time divided by 100.",
+                "level_2_strategy": "Convert each input to float, compute (p * r * t) / 100, and print the result.",
+                "level_3_clue": "si = (p * r * t) / 100\nprint(si)"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "session_id": "session_02",
+      "session_number": 2,
+      "title": "Session 2 - Operators, If-Else & Loops",
+      "video_url": "https://www.youtube.com/watch?v=JCkIrdrZEE8",
+      "notebook_file": "02_session2_operators_if_else_loops.ipynb",
+      "lessons": [
+        {
+          "lesson_id": "lesson_02_01",
+          "title": "Python Operators & Arithmetic",
+          "concept_markdown": "Python provides standard arithmetic operators:\n- Addition (`+`), Subtraction (`-`), Multiplication (`*`)\n- Floating-point division (`/`) and Integer/Floor division (`//`)\n- Modulus (`%`) for division remainder\n- Exponentiation (`**`)\n\nComparison operators (`==`, `!=`, `<`, `>`, `<=`, `>=`) evaluate to boolean values `True` or `False`.",
+          "code_walkthroughs": [
+            {
+              "title": "Floor Division and Modulus",
+              "code": "a, b = 17, 5\nprint(a // b, a % b)",
+              "expected_stdout": "3 2\n",
+              "explanation": "`17 // 5` evaluates to integer quotient `3`, and `17 % 5` gives the remainder `2`."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_02_01_quotient_remainder",
+              "title": "Quotient and Remainder",
+              "difficulty": "beginner",
+              "description": "Read two integers `dividend` and `divisor` from standard input (on separate lines). Print the quotient (using floor division) and the remainder on two separate lines.",
+              "starter_code": "dividend = int(input())\ndivisor = int(input())\n\n# Your code here: print quotient and remainder on separate lines\n",
+              "solution_code": "dividend = int(input())\ndivisor = int(input())\nprint(dividend // divisor)\nprint(dividend % divisor)",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Standard division",
+                  "stdin": "23\n4",
+                  "expected_output": "5\n3",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "Exact multiple",
+                  "stdin": "50\n5",
+                  "expected_output": "10\n0",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Use // for floor division and % for remainder.",
+                "level_2_strategy": "First print dividend // divisor, then print dividend % divisor on the next line.",
+                "level_3_clue": "print(dividend // divisor)\nprint(dividend % divisor)"
+              }
+            }
+          ]
+        },
+        {
+          "lesson_id": "lesson_02_02",
+          "title": "Conditional Statements (If-Elif-Else)",
+          "concept_markdown": "Conditional execution allows code blocks to run only when specific boolean criteria are met:\n```python\nif condition1:\n    # executed if condition1 is True\nelif condition2:\n    # executed if condition2 is True\nelse:\n    # executed if all conditions are False\n```\nIndentation (typically 4 spaces) defines the code block scope in Python.",
+          "code_walkthroughs": [
+            {
+              "title": "Even / Odd Classification",
+              "code": "num = 7\nif num % 2 == 0:\n    print('Even')\nelse:\n    print('Odd')",
+              "expected_stdout": "Odd\n",
+              "explanation": "Because `7 % 2` equals `1`, the `else` branch executes."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_02_02_ticket_pricing",
+              "title": "Age-Based Ticket Category",
+              "difficulty": "beginner",
+              "description": "Read an age (integer) from input and print:\n- `Child` if age is less than 13\n- `Teenager` if age is between 13 and 19 (inclusive)\n- `Adult` if age is between 20 and 59 (inclusive)\n- `Senior` if age is 60 or above.",
+              "starter_code": "age = int(input())\n\n# Your code here: classify age group\n",
+              "solution_code": "age = int(input())\nif age < 13:\n    print('Child')\nelif age <= 19:\n    print('Teenager')\nelif age <= 59:\n    print('Adult')\nelse:\n    print('Senior')",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Teenager age",
+                  "stdin": "16",
+                  "expected_output": "Teenager",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "Senior boundary",
+                  "stdin": "60",
+                  "expected_output": "Senior",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_03",
+                  "description": "Child boundary",
+                  "stdin": "10",
+                  "expected_output": "Child",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Chain if, elif, and else statements to test the boundaries in order.",
+                "level_2_strategy": "Test age < 13 first, then elif age <= 19, then elif age <= 59, and else for seniors.",
+                "level_3_clue": "if age < 13:\n    print('Child')\nelif age <= 19:\n    ..."
+              }
+            }
+          ]
+        },
+        {
+          "lesson_id": "lesson_02_03",
+          "title": "Loops: While, For & Loop Control",
+          "concept_markdown": "Loops repeat a block of code multiple times:\n- **`while` loop**: Repeats while a boolean condition remains `True`.\n- **`for` loop**: Iterates over a sequence (such as `range()`, lists, or strings).\n- **`break`**: Immediately terminates the loop.\n- **`continue`**: Skips the remaining body of the current iteration and advances to the next.\n- **`while ... else`**: The `else` block executes only if the loop terminates normally without hitting a `break`.",
+          "code_walkthroughs": [
+            {
+              "title": "Summing with a For Loop",
+              "code": "total = 0\nfor i in range(1, 6):\n    total += i\nprint('Sum:', total)",
+              "expected_stdout": "Sum: 15\n",
+              "explanation": "`range(1, 6)` generates integers `1, 2, 3, 4, 5`. The loop accumulates the total to `15`."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_02_03_factorial_calculator",
+              "title": "Calculate Factorial",
+              "difficulty": "intermediate",
+              "description": "Read an integer `n` (`n >= 0`) from input. Compute and print the factorial of `n` (`n!`). Note: `0! = 1`.",
+              "starter_code": "n = int(input())\n\n# Your code here: calculate n!\n",
+              "solution_code": "n = int(input())\nfact = 1\nfor i in range(1, n + 1):\n    fact *= i\nprint(fact)",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Factorial of 5",
+                  "stdin": "5",
+                  "expected_output": "120",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "Factorial of 0",
+                  "stdin": "0",
+                  "expected_output": "1",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_03",
+                  "description": "Factorial of 7",
+                  "stdin": "7",
+                  "expected_output": "5040",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Initialize a product variable to 1, then multiply by every integer up to n.",
+                "level_2_strategy": "Use for i in range(1, n + 1) to multiply each i into your running product.",
+                "level_3_clue": "fact = 1\nfor i in range(1, n + 1):\n    fact *= i\nprint(fact)"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "session_id": "session_03",
+      "session_number": 3,
+      "title": "Session 3 - Python Strings",
+      "video_url": "https://www.youtube.com/watch?v=6HAu0Y9BjA4",
+      "notebook_file": "03_session3_python_strings.ipynb",
+      "lessons": [
+        {
+          "lesson_id": "lesson_03_01",
+          "title": "String Indexing, Slicing & Immutability",
+          "concept_markdown": "Strings are immutable sequences of Unicode characters:\n- **Positive Indexing**: Starts from `0` at the beginning (`s[0]`).\n- **Negative Indexing**: Starts from `-1` at the end (`s[-1]`).\n- **Slicing**: `s[start:end:step]` extracts a substring from `start` up to (but not including) `end`.\n- **String Reversal**: `s[::-1]` reverses the entire string by taking step `-1`.\n\nBecause strings are immutable, attempting `s[0] = 'X'` raises a `TypeError`.",
+          "code_walkthroughs": [
+            {
+              "title": "Negative Slicing and Reversal",
+              "code": "text = 'CampusX'\nprint(text[1:5], text[::-1])",
+              "expected_stdout": "ampu XsupmaC\n",
+              "explanation": "`text[1:5]` extracts indices 1, 2, 3, 4 (`'ampu'`), and `text[::-1]` reverses the entire string."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_03_01_palindrome_check",
+              "title": "Palindrome Checker",
+              "difficulty": "beginner",
+              "description": "Read a string from input. Convert it to lowercase and print `True` if it is a palindrome (reads the same forward and backwards), or `False` otherwise.",
+              "starter_code": "s = input().strip()\n\n# Your code here: check if palindrome (case-insensitive)\n",
+              "solution_code": "s = input().strip().lower()\nprint(s == s[::-1])",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Classic palindrome",
+                  "stdin": "Racecar",
+                  "expected_output": "True",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "Not a palindrome",
+                  "stdin": "Python",
+                  "expected_output": "False",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Compare the lowercase version of the string to its reversed version.",
+                "level_2_strategy": "A string reversed in Python is s[::-1]. Compare s == s[::-1].",
+                "level_3_clue": "s = input().strip().lower()\nprint(s == s[::-1])"
+              }
+            }
+          ]
+        },
+        {
+          "lesson_id": "lesson_03_02",
+          "title": "Essential String Methods & Formatting",
+          "concept_markdown": "Python strings include powerful built-in methods:\n- **Transformations**: `s.upper()`, `s.lower()`, `s.capitalize()`, `s.title()`, `s.swapcase()`\n- **Whitespace removal**: `s.strip()`, `s.lstrip()`, `s.rstrip()`\n- **Splitting & Joining**: `s.split(delimiter)` splits text into a list; `'delimiter'.join(list)` combines list items into text.\n- **Search & Replace**: `s.replace(old, new)`, `s.find(sub)`, `s.count(sub)`",
+          "code_walkthroughs": [
+            {
+              "title": "Split and Join Mechanics",
+              "code": "words = 'python-data-science'.split('-')\nprint(words)\nprint(' '.join(words).title())",
+              "expected_stdout": "['python', 'data', 'science']\nPython Data Science\n",
+              "explanation": "Splitting on `'-'` returns a 3-element list, which is joined with spaces and capitalized with `.title()`."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_03_02_title_case_cleaner",
+              "title": "Title Case Word Cleaner",
+              "difficulty": "beginner",
+              "description": "Read a sentence containing messy arbitrary spacing. Normalize it so words are separated by exactly a single space and formatted in Title Case.",
+              "starter_code": "raw_text = input()\n\n# Your code here: clean extra spaces and format as Title Case\n",
+              "solution_code": "raw_text = input()\ncleaned = ' '.join(raw_text.split()).title()\nprint(cleaned)",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Irregular spaces",
+                  "stdin": "   data    science    mentorship   ",
+                  "expected_output": "Data Science Mentorship",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "Multiple mixed words",
+                  "stdin": "learn    python   the   right   way",
+                  "expected_output": "Learn Python The Right Way",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Calling .split() with no arguments splits on arbitrary whitespace and removes extra spaces.",
+                "level_2_strategy": "Join the split tokens with ' '.join(...) and then call .title().",
+                "level_3_clue": "print(' '.join(raw_text.split()).title())"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "session_id": "session_04",
+      "session_number": 4,
+      "title": "Session 4 - Programming Problems on Strings",
+      "video_url": "https://www.youtube.com/watch?v=7ltjqU5iytY",
+      "notebook_file": "04_session3_problems_on_strings.ipynb",
+      "lessons": [
+        {
+          "lesson_id": "lesson_04_01",
+          "title": "String Parsing & Character Counting Algorithms",
+          "concept_markdown": "Supplementary string algorithms test core logic without relying entirely on high-level helpers.\nCommon patterns include:\n- Counting occurrences of specific character classes (vowels, digits, consonants)\n- Parsing structured text strings such as URLs, email addresses, or CSV lines\n- In-place frequency tracking using loops and conditional accumulation",
+          "code_walkthroughs": [
+            {
+              "title": "Counting Vowels in a String",
+              "code": "s = 'Hello World'\nvowels = 'aeiouAEIOU'\ncount = sum(1 for ch in s if ch in vowels)\nprint('Vowels:', count)",
+              "expected_stdout": "Vowels: 3\n",
+              "explanation": "Iterates through each character, checking membership in the vowel reference string."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_04_01_vowel_counter",
+              "title": "Count Total Vowels",
+              "difficulty": "beginner",
+              "description": "Read a string from input. Count and print the total number of vowels (`a, e, i, o, u`, case-insensitive) in the string.",
+              "starter_code": "text = input()\n\n# Your code here: count and print vowels\n",
+              "solution_code": "text = input()\nvowels = set('aeiouAEIOU')\nprint(sum(1 for ch in text if ch in vowels))",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Sentence with vowels",
+                  "stdin": "Data Science",
+                  "expected_output": "5",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "All consonants",
+                  "stdin": "rhythm fly",
+                  "expected_output": "0",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Iterate through each character and check if it is in 'aeiouAEIOU'.",
+                "level_2_strategy": "Maintain a counter and increment it whenever character in 'aeiouAEIOU'.",
+                "level_3_clue": "count = 0\nfor c in text:\n    if c.lower() in 'aeiou':\n        count += 1\nprint(count)"
+              }
+            },
+            {
+              "id": "chal_04_02_email_extractor",
+              "title": "Extract Email Username",
+              "difficulty": "beginner",
+              "description": "Read an email address from input and print only the username portion (everything before the `@` symbol).",
+              "starter_code": "email = input().strip()\n\n# Your code here: print username before '@'\n",
+              "solution_code": "email = input().strip()\nprint(email.split('@')[0])",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Standard email",
+                  "stdin": "suhail@campusx.in",
+                  "expected_output": "suhail",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "Dot-separated username",
+                  "stdin": "nitish.singh@gmail.com",
+                  "expected_output": "nitish.singh",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Split the email string at the '@' character.",
+                "level_2_strategy": "email.split('@') gives a 2-item list. The first item at index 0 is the username.",
+                "level_3_clue": "print(email.split('@')[0])"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "session_id": "session_05",
+      "session_number": 5,
+      "title": "Session 5 - Lists in Python",
+      "video_url": "https://www.youtube.com/watch?v=WmbU3WBaoR0",
+      "notebook_file": "05_session4_lists_in_python.ipynb",
+      "lessons": [
+        {
+          "lesson_id": "lesson_05_01",
+          "title": "List Architecture, Methods & Mutability",
+          "concept_markdown": "A Python list is a dynamic, ordered, and mutable collection that stores references to objects in memory:\n- **Creation**: `nums = [1, 2, 3]`\n- **Modification**: `nums[0] = 99` (in-place mutation)\n- **Appending & Extending**: `nums.append(4)` adds an item; `nums.extend([5, 6])` concatenates multiple items.\n- **Insertion**: `nums.insert(index, value)`\n- **Deletion**: `nums.pop()` removes and returns the last element; `nums.remove(value)` removes the first matching value; `del nums[i]` deletes by index.",
+          "code_walkthroughs": [
+            {
+              "title": "List Mutation and Operations",
+              "code": "lst = [10, 20, 30]\nlst.append(40)\nlst.insert(1, 15)\nprint(lst)\npopped = lst.pop()\nprint('Popped:', popped, 'Remaining:', lst)",
+              "expected_stdout": "[10, 15, 20, 30, 40]\nPopped: 40 Remaining: [10, 15, 20, 30]\n",
+              "explanation": "`insert(1, 15)` shifts elements right, and `pop()` removes `40` from the end."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_05_01_cumulative_sum",
+              "title": "Cumulative Running Sum",
+              "difficulty": "intermediate",
+              "description": "Read a space-separated list of integers from input. Compute and print a list of running cumulative sums formatted as a Python list.",
+              "starter_code": "# Read space-separated numbers, e.g. '1 2 3 4'\nnums = [int(x) for x in input().split()]\n\n# Your code here: print cumulative sums list\n",
+              "solution_code": "nums = [int(x) for x in input().split()]\ncumulative = []\ntotal = 0\nfor n in nums:\n    total += n\n    cumulative.append(total)\nprint(cumulative)",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Consecutive numbers",
+                  "stdin": "1 2 3 4",
+                  "expected_output": "[1, 3, 6, 10]",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "Negative and positive numbers",
+                  "stdin": "10 -2 5 -8",
+                  "expected_output": "[10, 8, 13, 5]",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Keep a running total variable and append it to a new list on each step.",
+                "level_2_strategy": "Iterate through nums with a loop, add each number to total, and append total to your result list.",
+                "level_3_clue": "total = 0\nres = []\nfor x in nums:\n    total += x\n    res.append(total)\nprint(res)"
+              }
+            }
+          ]
+        },
+        {
+          "lesson_id": "lesson_05_02",
+          "title": "List Comprehensions & 2D Matrices",
+          "concept_markdown": "List comprehensions offer a concise syntax for constructing new lists from existing iterables:\n```python\n[expression for item in iterable if condition]\n```\nThey are more concise and run faster than equivalent `for` loops with `.append()`.",
+          "code_walkthroughs": [
+            {
+              "title": "List Comprehension Filtering",
+              "code": "evens_squared = [x**2 for x in range(10) if x % 2 == 0]\nprint(evens_squared)",
+              "expected_stdout": "[0, 4, 16, 36, 64]\n",
+              "explanation": "Generates squares of even integers from `0` to `8` in a single expressive line."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_05_02_even_squares",
+              "title": "Filter and Square Even Numbers",
+              "difficulty": "beginner",
+              "description": "Read a space-separated line of integers from input. Using a list comprehension, extract only the even numbers, square them, and print the resulting list.",
+              "starter_code": "nums = [int(x) for x in input().split()]\n\n# Your code here: list comprehension for even squares\n",
+              "solution_code": "nums = [int(x) for x in input().split()]\nprint([x**2 for x in nums if x % 2 == 0])",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Mixed numbers",
+                  "stdin": "1 2 3 4 5 6",
+                  "expected_output": "[4, 16, 36]",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "All odd numbers",
+                  "stdin": "1 3 5 7",
+                  "expected_output": "[]",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Combine the condition x % 2 == 0 with expression x**2 inside square brackets.",
+                "level_2_strategy": "Use syntax: [x**2 for x in nums if x % 2 == 0].",
+                "level_3_clue": "print([x**2 for x in nums if x % 2 == 0])"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "session_id": "session_06",
+      "session_number": 6,
+      "title": "Session 6 - Tuples, Sets & Dictionaries",
+      "video_url": "https://www.youtube.com/watch?v=jcQjp11mn1A",
+      "notebook_file": "06_session5_tuples_sets_dictionary.ipynb",
+      "lessons": [
+        {
+          "lesson_id": "lesson_06_01",
+          "title": "Tuples & Sets (Mathematical Set Theory)",
+          "concept_markdown": "- **Tuples (`tuple`)**: Immutable sequences defined by parentheses `(1, 2)`. Elements cannot be modified after creation, making tuples faster and safe for fixed datasets and dictionary keys.\n- **Sets (`set`)**: Unordered collections of unique elements defined by curly braces `{1, 2}`. Sets support fast O(1) membership lookups and set operations:\n  - Union (`|` or `set.union`)\n  - Intersection (`&` or `set.intersection`)\n  - Difference (`-` or `set.difference`)\n  - Symmetric Difference (`^`)",
+          "code_walkthroughs": [
+            {
+              "title": "Set Operations in Python",
+              "code": "a = {1, 2, 3, 4}\nb = {3, 4, 5, 6}\nprint('Intersection:', a & b)\nprint('Difference (a - b):', a - b)",
+              "expected_stdout": "Intersection: {3, 4}\nDifference (a - b): {1, 2}\n",
+              "explanation": "`a & b` finds shared elements, while `a - b` finds elements in `a` not in `b`."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_06_01_unique_words",
+              "title": "Count Unique Words",
+              "difficulty": "beginner",
+              "description": "Read a sentence from standard input. Count and print the total number of unique words, ignoring letter case.",
+              "starter_code": "sentence = input()\n\n# Your code here: print count of unique words (case-insensitive)\n",
+              "solution_code": "sentence = input()\nwords = set(sentence.lower().split())\nprint(len(words))",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Sentence with duplicates",
+                  "stdin": "Python is great and python is fun",
+                  "expected_output": "5",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "Unique words",
+                  "stdin": "data science machine learning",
+                  "expected_output": "4",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Convert all text to lowercase, split into words, and convert the words to a set to remove duplicates.",
+                "level_2_strategy": "Use sentence.lower().split() to get words, pass them to set(), and print len(set_of_words).",
+                "level_3_clue": "print(len(set(sentence.lower().split())))"
+              }
+            }
+          ]
+        },
+        {
+          "lesson_id": "lesson_06_02",
+          "title": "Dictionaries & Key-Value Mappings",
+          "concept_markdown": "A dictionary is a mutable mapping of unique keys to values:\n```python\nd = {'name': 'Alice', 'role': 'Engineer'}\n```\nKeys must be immutable and hashable (strings, numbers, tuples). Values can be any data type.\n- Access values safely: `d.get(key, default)`\n- Iterate over entries: `for k, v in d.items():`\n- Dictionary comprehension: `{k: v for k, v in ...}`",
+          "code_walkthroughs": [
+            {
+              "title": "Frequency Counting with Dictionary",
+              "code": "nums = [1, 2, 2, 3, 1, 2]\nfreq = {}\nfor n in nums:\n    freq[n] = freq.get(n, 0) + 1\nprint(freq)",
+              "expected_stdout": "{1: 2, 2: 3, 3: 1}\n",
+              "explanation": "`freq.get(n, 0)` returns the current count (or `0` if not yet present) and adds `1`."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_06_02_char_frequency_map",
+              "title": "Character Frequency Counter",
+              "difficulty": "intermediate",
+              "description": "Read a string from input. Build a dictionary counting the occurrences of each alphabetical character (ignoring case and ignoring spaces). Print the result as sorted key-value pairs in the format `'char: count'` on separate lines, ordered alphabetically by character.",
+              "starter_code": "text = input()\n\n# Your code here: print sorted character frequencies\n",
+              "solution_code": "text = input()\nfreq = {}\nfor ch in text.lower():\n    if ch.isalpha():\n        freq[ch] = freq.get(ch, 0) + 1\nfor ch in sorted(freq.keys()):\n    print(f\"{ch}: {freq[ch]}\")",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Standard word",
+                  "stdin": "CampusX",
+                  "expected_output": "a: 1\nc: 1\nm: 1\np: 1\ns: 1\nu: 1\nx: 1",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "Sentence with repeating characters",
+                  "stdin": "Hello World",
+                  "expected_output": "d: 1\ne: 1\nh: 1\nl: 3\no: 2\nr: 1\nw: 1",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Loop through text.lower(), check ch.isalpha(), and update your frequency dictionary.",
+                "level_2_strategy": "After building freq, iterate through sorted(freq.keys()) and print f'{ch}: {freq[ch]}'.",
+                "level_3_clue": "for ch in sorted(freq.keys()):\n    print(f'{ch}: {freq[ch]}')"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "session_id": "session_07",
+      "session_number": 7,
+      "title": "Session 7 - Functions in Python",
+      "video_url": "https://www.youtube.com/watch?v=OOInK25PoFo",
+      "notebook_file": "07_session6_functions_in_python.ipynb",
+      "lessons": [
+        {
+          "lesson_id": "lesson_07_01",
+          "title": "Function Definitions, Return Values & Scope",
+          "concept_markdown": "Functions encapsulate reusable logic:\n```python\ndef function_name(param1, param2=default_val):\n    \"\"\"Optional docstring.\"\"\"\n    return result\n```\n- If no `return` is provided, Python functions return `None` by default.\n- **Scope**: Variables defined inside a function are local to that function's execution frame.",
+          "code_walkthroughs": [
+            {
+              "title": "Function with Default Parameters",
+              "code": "def greet(name, greeting='Hello'):\n    return f'{greeting}, {name}!'\n\nprint(greet('Suhail'))\nprint(greet('Nitish', 'Welcome'))",
+              "expected_stdout": "Hello, Suhail!\nWelcome, Nitish!\n",
+              "explanation": "Calling `greet('Suhail')` uses the default greeting, while `'Welcome'` overrides it."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_07_01_fahrenheit_to_celsius",
+              "title": "Temperature Converter",
+              "difficulty": "beginner",
+              "description": "Read a temperature in Fahrenheit (float) from input. Write a function `f_to_c(f)` that converts Fahrenheit to Celsius using formula `(f - 32) * 5 / 9`. Print the Celsius temperature rounded to 2 decimal places using `round(val, 2)`.",
+              "starter_code": "f = float(input())\n\ndef f_to_c(f_temp):\n    # Your code here\n    pass\n\n# Call function and print rounded result\n",
+              "solution_code": "f = float(input())\n\ndef f_to_c(f_temp):\n    return (f_temp - 32) * 5 / 9\n\nprint(round(f_to_c(f), 2))",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Freezing point",
+                  "stdin": "32",
+                  "expected_output": "0.0",
+                  "is_hidden": false,
+                  "match_mode": "numeric_float"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "Boiling point",
+                  "stdin": "212",
+                  "expected_output": "100.0",
+                  "is_hidden": true,
+                  "match_mode": "numeric_float"
+                },
+                {
+                  "id": "tc_03",
+                  "description": "Body temperature",
+                  "stdin": "98.6",
+                  "expected_output": "37.0",
+                  "is_hidden": true,
+                  "match_mode": "numeric_float"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "The conversion formula is (f - 32) * 5 / 9.",
+                "level_2_strategy": "Return (f_temp - 32) * 5 / 9 from your function, then print round(f_to_c(f), 2).",
+                "level_3_clue": "def f_to_c(f_temp):\n    return (f_temp - 32) * 5 / 9\nprint(round(f_to_c(f), 2))"
+              }
+            }
+          ]
+        },
+        {
+          "lesson_id": "lesson_07_02",
+          "title": "Arbitrary Arguments (*args, **kwargs) & Lambdas",
+          "concept_markdown": "- **`*args`**: Captures variable positional arguments as a tuple.\n- **`**kwargs`**: Captures variable keyword arguments as a dictionary.\n- **Lambda Functions**: Anonymous inline functions: `lambda x: x * 2`\n- **Functional Helpers**: `map(func, iterable)`, `filter(predicate, iterable)`",
+          "code_walkthroughs": [
+            {
+              "title": "*args Variable Summation",
+              "code": "def sum_all(*args):\n    return sum(args)\n\nprint(sum_all(1, 2, 3, 4, 5))",
+              "expected_stdout": "15\n",
+              "explanation": "`*args` packs `(1, 2, 3, 4, 5)` into a tuple passed directly to `sum()`."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_07_02_product_of_evens",
+              "title": "Product of Even Numbers (*args)",
+              "difficulty": "intermediate",
+              "description": "Write a function `product_of_evens(*args)` that accepts any number of integer arguments and returns the product of only the even numbers. If there are no even numbers, return `1`.\nRead a space-separated line of numbers from input, pass them unpacked (`*numbers`) to your function, and print the return value.",
+              "starter_code": "def product_of_evens(*args):\n    # Return product of even numbers, or 1 if none\n    pass\n\nnums = [int(x) for x in input().split()]\n# Call and print\n",
+              "solution_code": "def product_of_evens(*args):\n    product = 1\n    found_even = False\n    for n in args:\n        if n % 2 == 0:\n            product *= n\n            found_even = True\n    return product if found_even else 1\n\nnums = [int(x) for x in input().split()]\nprint(product_of_evens(*nums))",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Mixed numbers",
+                  "stdin": "1 2 3 4 5",
+                  "expected_output": "8",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "All odd numbers",
+                  "stdin": "1 3 5 7",
+                  "expected_output": "1",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_03",
+                  "description": "Multiple even numbers",
+                  "stdin": "2 4 6",
+                  "expected_output": "48",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Iterate through args, check if each number is divisible by 2, and multiply.",
+                "level_2_strategy": "Track whether any even was found with a boolean flag. Return product if found else 1.",
+                "level_3_clue": "for n in args:\n    if n % 2 == 0:\n        product *= n"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "chapter_exam": {
+    "exam_id": "exam_module_1",
+    "title": "Module 1 Mastery Exam — Fundamentals & Data Structures",
+    "description": "Comprehensive evaluation covering loops, strings, collections, and functions. Passing requires scoring >= 80%.",
+    "passing_score_percentage": 80.0,
+    "questions": [
+      {
+        "id": "exam_01_prime_check",
+        "title": "Prime Number Verifier",
+        "difficulty": "intermediate",
+        "description": "Write a function `is_prime(n)` that returns `True` if integer `n` is prime and `False` otherwise. Read an integer from input and print the function output.",
+        "starter_code": "def is_prime(n):\n    # Return True if prime, False otherwise\n    pass\n\nnum = int(input())\nprint(is_prime(num))\n",
+        "solution_code": "def is_prime(n):\n    if n < 2:\n        return False\n    for i in range(2, int(n**0.5) + 1):\n        if n % i == 0:\n            return False\n    return True\n\nnum = int(input())\nprint(is_prime(num))",
+        "test_cases": [
+          {
+            "id": "tc_exam_01",
+            "description": "Prime number 29",
+            "stdin": "29",
+            "expected_output": "True",
+            "match_mode": "trimmed",
+            "is_hidden": false
+          },
+          {
+            "id": "tc_exam_02",
+            "description": "Composite number 1",
+            "stdin": "1",
+            "expected_output": "False",
+            "match_mode": "trimmed",
+            "is_hidden": true
+          },
+          {
+            "id": "tc_exam_03",
+            "description": "Composite number 100",
+            "stdin": "100",
+            "expected_output": "False",
+            "match_mode": "trimmed",
+            "is_hidden": true
+          }
+        ],
+        "hints": {
+          "level_1_nudge": "Numbers less than 2 are not prime. Test divisors up to the square root of n.",
+          "level_2_strategy": "Loop i from 2 to int(n**0.5) + 1. If n % i == 0, return False. Otherwise return True.",
+          "level_3_clue": "for i in range(2, int(n**0.5) + 1):\n    if n % i == 0: return False"
+        }
+      },
+      {
+        "id": "exam_02_anagram_detector",
+        "title": "Anagram Detector",
+        "difficulty": "intermediate",
+        "description": "Read two words on separate lines. Print `True` if the words are anagrams of each other (contain exact same characters with exact same frequencies, case-insensitive), or `False` otherwise.",
+        "starter_code": "word1 = input().strip()\nword2 = input().strip()\n\n# Your code here: check if anagrams\n",
+        "solution_code": "word1 = input().strip().lower()\nword2 = input().strip().lower()\nprint(sorted(word1) == sorted(word2))",
+        "test_cases": [
+          {
+            "id": "tc_exam_01",
+            "description": "Valid anagram pair",
+            "stdin": "Listen\nSilent",
+            "expected_output": "True",
+            "match_mode": "trimmed",
+            "is_hidden": false
+          },
+          {
+            "id": "tc_exam_02",
+            "description": "Different lengths / characters",
+            "stdin": "Python\nJava",
+            "expected_output": "False",
+            "match_mode": "trimmed",
+            "is_hidden": true
+          }
+        ],
+        "hints": {
+          "level_1_nudge": "Convert both strings to lowercase and sort their characters.",
+          "level_2_strategy": "If sorted(word1.lower()) == sorted(word2.lower()), they are anagrams.",
+          "level_3_clue": "print(sorted(word1.lower()) == sorted(word2.lower()))"
+        }
+      },
+      {
+        "id": "exam_03_flatten_2d_matrix",
+        "title": "Flatten and Sort 2D Matrix",
+        "difficulty": "intermediate",
+        "description": "Read an integer `R` (number of rows). Then read `R` lines, each containing space-separated integers. Flatten all rows into a single 1D list, sort it in ascending order, and print the resulting list.",
+        "starter_code": "r = int(input())\n# Read r rows and flatten into a sorted 1D list\n",
+        "solution_code": "r = int(input())\nflat = []\nfor _ in range(r):\n    flat.extend([int(x) for x in input().split()])\nprint(sorted(flat))",
+        "test_cases": [
+          {
+            "id": "tc_exam_01",
+            "description": "3x3 matrix",
+            "stdin": "3\n5 2 9\n1 7 4\n8 3 6",
+            "expected_output": "[1, 2, 3, 4, 5, 6, 7, 8, 9]",
+            "match_mode": "trimmed",
+            "is_hidden": false
+          },
+          {
+            "id": "tc_exam_02",
+            "description": "Single row matrix",
+            "stdin": "1\n42 10 15",
+            "expected_output": "[10, 15, 42]",
+            "match_mode": "trimmed",
+            "is_hidden": true
+          }
+        ],
+        "hints": {
+          "level_1_nudge": "Loop R times, convert each row line into integers, and extend a master list.",
+          "level_2_strategy": "Use flat.extend(...) inside the loop, then print sorted(flat).",
+          "level_3_clue": "for _ in range(r):\n    flat.extend([int(x) for x in input().split()])\nprint(sorted(flat))"
+        }
+      },
+      {
+        "id": "exam_04_word_frequency_analyzer",
+        "title": "Top Word Frequency Analyzer",
+        "difficulty": "advanced",
+        "description": "Read a sentence from input. Find the word that appears the most frequently (case-insensitive). If multiple words tie for highest frequency, select the one that appears first alphabetically. Print the result in format `'word: count'`.",
+        "starter_code": "text = input()\n\n# Your code here: find most frequent word\n",
+        "solution_code": "text = input().lower().split()\nfreq = {}\nfor w in text:\n    freq[w] = freq.get(w, 0) + 1\nmax_count = max(freq.values())\ntop_words = sorted([w for w, c in freq.items() if c == max_count])\nprint(f\"{top_words[0]}: {max_count}\")",
+        "test_cases": [
+          {
+            "id": "tc_exam_01",
+            "description": "Clear highest frequency",
+            "stdin": "apple orange banana apple orange apple",
+            "expected_output": "apple: 3",
+            "match_mode": "trimmed",
+            "is_hidden": false
+          },
+          {
+            "id": "tc_exam_02",
+            "description": "Tie resolved alphabetically",
+            "stdin": "blue red blue red green",
+            "expected_output": "blue: 2",
+            "match_mode": "trimmed",
+            "is_hidden": true
+          }
+        ],
+        "hints": {
+          "level_1_nudge": "Build a frequency dictionary for all lowercase words. Find the maximum count.",
+          "level_2_strategy": "Collect all words whose count equals max_count, sort them alphabetically, and take the first.",
+          "level_3_clue": "max_c = max(freq.values())\nbest = sorted([w for w, c in freq.items() if c == max_c])[0]\nprint(f'{best}: {max_c}')"
+        }
+      }
+    ]
+  }
+}
