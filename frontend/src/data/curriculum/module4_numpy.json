@@ -1,0 +1,212 @@
+{
+  "module_id": "module_4",
+  "module_number": 4,
+  "title": "NumPy (Numerical Computing)",
+  "description": "Vectorized arrays, multi-dimensional array manipulation, fancy indexing, broadcasting rules, and numerical computing tricks.",
+  "sessions": [
+    {
+      "session_id": "session_16",
+      "session_number": 16,
+      "title": "Session 16 - NumPy Fundamentals",
+      "video_url": "https://www.youtube.com/watch?v=XF6DCrNTzug",
+      "notebook_file": "16_session13_numpy_fundamentals.ipynb",
+      "lessons": [
+        {
+          "lesson_id": "lesson_16_01",
+          "title": "NumPy Array Creation & Multidimensional Shapes",
+          "concept_markdown": "NumPy (`numpy`) is the foundational package for scientific computing in Python. It provides the N-dimensional array object (`ndarray`), which stores homogeneous data in contiguous memory blocks, enabling vectorized calculations without slow Python `for` loops.\n- `np.array(list, dtype=...)`: Creates an ndarray\n- `np.arange(start, stop, step)`: Array of evenly spaced values\n- `np.zeros(shape)`, `np.ones(shape)`: Initialized constant arrays\n- `arr.reshape(rows, cols)`: Reshapes array without copying data",
+          "code_walkthroughs": [
+            {
+              "title": "Creating and Reshaping an Array",
+              "code": "import numpy as np\narr = np.arange(1, 10).reshape(3, 3)\nprint('Shape:', arr.shape)\nprint('Diagonal sum:', np.trace(arr))",
+              "expected_stdout": "Shape: (3, 3)\nDiagonal sum: 15\n",
+              "explanation": "Creates a 3x3 matrix containing numbers 1 to 9 and computes the sum of its main diagonal (1 + 5 + 9 = 15)."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_16_01_matrix_diagonal_sum",
+              "title": "Matrix Creation & Diagonal Trace",
+              "difficulty": "beginner",
+              "description": "Read an integer `N` from input. Create an `N x N` matrix filled with numbers from `1` to `N*N` (using `np.arange(1, N*N + 1).reshape(N, N)`). Print the sum of its diagonal elements (trace) as an integer.",
+              "starter_code": "import numpy as np\n\nn = int(input())\n# Create NxN array and print diagonal sum\n",
+              "solution_code": "import numpy as np\n\nn = int(input())\narr = np.arange(1, n * n + 1).reshape(n, n)\nprint(int(np.trace(arr)))",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "3x3 matrix trace",
+                  "stdin": "3",
+                  "expected_output": "15",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "4x4 matrix trace",
+                  "stdin": "4",
+                  "expected_output": "34",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Use np.arange(1, n*n + 1).reshape(n, n) to construct the matrix.",
+                "level_2_strategy": "np.trace(arr) computes the sum of diagonal elements.",
+                "level_3_clue": "print(int(np.trace(arr)))"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "session_id": "session_17",
+      "session_number": 17,
+      "title": "Session 17 - Advanced NumPy: Indexing & Broadcasting",
+      "video_url": "https://www.youtube.com/watch?v=40xGMygHMDU",
+      "notebook_file": "17_session14_advanced_numpy.ipynb",
+      "lessons": [
+        {
+          "lesson_id": "lesson_17_01",
+          "title": "Boolean Masking, Fancy Indexing & Broadcasting",
+          "concept_markdown": "- **Boolean Indexing**: Passing a condition `arr[arr > 5]` filters elements matching criteria instantly in compiled C code.\n- **Fancy Indexing**: Passing an integer array `arr[[0, 2, 4]]` selects non-contiguous rows or columns.\n- **Broadcasting**: NumPy automatically stretches compatible array dimensions during arithmetic without allocating redundant memory copies.",
+          "code_walkthroughs": [
+            {
+              "title": "Filtering Array with Boolean Masks",
+              "code": "import numpy as np\nnums = np.array([12, 45, 7, 88, 33, 91])\nfiltered = nums[nums > 40]\nprint(filtered)",
+              "expected_stdout": "[45 88 91]\n",
+              "explanation": "`nums > 40` produces a boolean array used directly as an index filter."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_17_01_filter_multiples",
+              "title": "Filter Multiples with Boolean Masking",
+              "difficulty": "intermediate",
+              "description": "Read a space-separated line of integers from input. Convert them to a NumPy array. Filter and print only the numbers that are divisible by both 3 and 5 (multiples of 15). Print the filtered numbers space-separated, or `'None'` if none match.",
+              "starter_code": "import numpy as np\n\n# Read numbers and filter multiples of 15\n",
+              "solution_code": "import numpy as np\n\nnums = np.array([int(x) for x in input().split()])\nmask = (nums % 3 == 0) & (nums % 5 == 0)\nres = nums[mask]\nif len(res) > 0:\n    print(' '.join(map(str, res)))\nelse:\n    print('None')",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Contains multiples of 15",
+                  "stdin": "10 15 20 30 45 50",
+                  "expected_output": "15 30 45",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "No multiples of 15",
+                  "stdin": "1 2 4 7 11",
+                  "expected_output": "None",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Combine conditions using the bitwise & operator: (nums % 3 == 0) & (nums % 5 == 0).",
+                "level_2_strategy": "Apply the mask nums[mask]. If len(res) > 0, join with spaces, else print 'None'.",
+                "level_3_clue": "mask = (nums % 15 == 0)\nres = nums[mask]"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "session_id": "session_18",
+      "session_number": 18,
+      "title": "Session 18 - NumPy Tricks: Conditional Selection & Stats",
+      "video_url": "https://www.youtube.com/watch?v=jFBpnd0G09o",
+      "notebook_file": "18_session15_numpy_tricks.ipynb",
+      "lessons": [
+        {
+          "lesson_id": "lesson_18_01",
+          "title": "Vectorized np.where, np.clip & Extrema Indices",
+          "concept_markdown": "- `np.where(condition, x, y)`: Vectorized ternary operator `(if cond then x else y)`.\n- `np.clip(arr, a_min, a_max)`: Caps values outside boundary intervals.\n- `np.argmax(arr)` / `np.argmin(arr)`: Returns index positions of maximum and minimum elements.\n- `np.unique(arr, return_counts=True)`: Finds unique items and their counts.",
+          "code_walkthroughs": [
+            {
+              "title": "Vectorized Value Replacement with np.where",
+              "code": "import numpy as np\nscores = np.array([45, 80, 20, 95])\nstatus = np.where(scores >= 50, 'Pass', 'Fail')\nprint(status)",
+              "expected_stdout": "['Pass' 'Pass' 'Fail' 'Pass']\n",
+              "explanation": "`np.where` evaluates element-wise, replacing scores >= 50 with `'Pass'` and others with `'Fail'`."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_18_01_clamp_values",
+              "title": "Clamp and Replace Values",
+              "difficulty": "intermediate",
+              "description": "Read a space-separated line of numbers from input. Convert to a NumPy array. Replace any negative values with `0`, and cap any values above `100` to `100`. Print the transformed array elements space-separated.",
+              "starter_code": "import numpy as np\n\n# Clamp numbers to range [0, 100]\n",
+              "solution_code": "import numpy as np\n\narr = np.array([int(x) for x in input().split()])\nclamped = np.clip(arr, 0, 100)\nprint(' '.join(map(str, clamped)))",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Values outside [0, 100]",
+                  "stdin": "-15 50 120 85 -2 100",
+                  "expected_output": "0 50 100 85 0 100",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "All negative values",
+                  "stdin": "-5 -10 -20",
+                  "expected_output": "0 0 0",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Use np.clip(arr, 0, 100) to constrain all array values.",
+                "level_2_strategy": "Call np.clip(arr, 0, 100) and print elements joined with spaces.",
+                "level_3_clue": "print(' '.join(map(str, np.clip(arr, 0, 100))))"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "chapter_exam": {
+    "exam_id": "exam_module_4",
+    "title": "Module 4 Mastery Exam — NumPy Numerical Computing",
+    "description": "Evaluation covering multi-dimensional matrix operations, boolean masking, normalization, and vectorized math. Passing requires scoring >= 80%.",
+    "passing_score_percentage": 80.0,
+    "questions": [
+      {
+        "id": "exam_04_minmax_normalization",
+        "title": "Min-Max Feature Normalization",
+        "difficulty": "intermediate",
+        "description": "Read a space-separated line of floats. Normalize the array using Min-Max scaling: `(x - min) / (max - min)`. If all numbers are identical (`max == min`), return all zeros. Print normalized values rounded to 2 decimal places, space-separated.",
+        "starter_code": "import numpy as np\n\n# Implement Min-Max scaling\n",
+        "solution_code": "import numpy as np\n\narr = np.array([float(x) for x in input().split()])\nmin_v = np.min(arr)\nmax_v = np.max(arr)\nif max_v == min_v:\n    scaled = np.zeros_like(arr)\nelse:\n    scaled = (arr - min_v) / (max_v - min_v)\nprint(' '.join(f'{x:.2f}' for x in scaled))",
+        "test_cases": [
+          {
+            "id": "tc_exam_01",
+            "description": "Standard distinct values",
+            "stdin": "10 20 30 40 50",
+            "expected_output": "0.00 0.25 0.50 0.75 1.00",
+            "match_mode": "trimmed",
+            "is_hidden": false
+          },
+          {
+            "id": "tc_exam_02",
+            "description": "Identical numbers edge case",
+            "stdin": "5 5 5",
+            "expected_output": "0.00 0.00 0.00",
+            "match_mode": "trimmed",
+            "is_hidden": true
+          }
+        ],
+        "hints": {
+          "level_1_nudge": "Find min and max using np.min() and np.max().",
+          "level_2_strategy": "Compute (arr - min_v) / (max_v - min_v), and format each element as f'{x:.2f}'.",
+          "level_3_clue": "scaled = (arr - min_v) / (max_v - min_v)\nprint(' '.join(f'{x:.2f}' for x in scaled))"
+        }
+      }
+    ]
+  }
+}

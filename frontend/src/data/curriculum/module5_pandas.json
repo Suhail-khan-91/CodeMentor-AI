@@ -1,0 +1,377 @@
+{
+  "module_id": "module_5",
+  "module_number": 5,
+  "title": "Pandas (Data Analysis & Manipulation)",
+  "description": "Series, DataFrames, data cleaning, GroupBy aggregations, merging/joining, MultiIndex analysis, vectorized string operations, and DateTime.",
+  "sessions": [
+    {
+      "session_id": "session_19",
+      "session_number": 19,
+      "title": "Session 19 - Pandas Series Fundamentals",
+      "video_url": "https://www.youtube.com/watch?v=zCDVUyq8lkw",
+      "notebook_file": "19_session16_pandas_series.ipynb",
+      "lessons": [
+        {
+          "lesson_id": "lesson_19_01",
+          "title": "1D Series Object & Statistical Aggregations",
+          "concept_markdown": "A Pandas `Series` is a one-dimensional labeled array capable of holding any data type. Unlike NumPy arrays, Series support axis labels (index):\n- `pd.Series(data, index=...)`: Creates a Series\n- Summary statistics: `.sum()`, `.mean()`, `.median()`, `.std()`, `.min()`, `.max()`\n- `.value_counts()`: Returns frequency of unique values in descending order",
+          "code_walkthroughs": [
+            {
+              "title": "Series Statistical Summaries",
+              "code": "import pandas as pd\ns = pd.Series([10, 20, 30, 40, 50])\nprint('Mean:', s.mean(), 'Max:', s.max())",
+              "expected_stdout": "Mean: 30.0 Max: 50\n",
+              "explanation": "Calculates arithmetic mean and maximum value directly across the Series."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_19_01_series_outlier_filter",
+              "title": "Filter Series Above Mean",
+              "difficulty": "beginner",
+              "description": "Read a space-separated line of numbers from input. Create a Pandas Series. Calculate its mean. Print how many values in the Series are strictly greater than the mean.",
+              "starter_code": "import pandas as pd\n\n# Read numbers, create Series, count elements > mean\n",
+              "solution_code": "import pandas as pd\n\ns = pd.Series([float(x) for x in input().split()])\nmean_val = s.mean()\ncount_above = (s > mean_val).sum()\nprint(int(count_above))",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Standard series",
+                  "stdin": "10 20 30 40 50",
+                  "expected_output": "2",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "Skewed values",
+                  "stdin": "1 2 3 100",
+                  "expected_output": "1",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Compute mean using s.mean(), then evaluate (s > mean_val).sum().",
+                "level_2_strategy": "The boolean mask (s > mean_val) converts True to 1 and False to 0 when summed.",
+                "level_3_clue": "print(int((s > s.mean()).sum()))"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "session_id": "session_20",
+      "session_number": 20,
+      "title": "Session 20 - Pandas DataFrame & Row/Column Selection",
+      "video_url": "https://www.youtube.com/watch?v=OG31yhRQxPI",
+      "notebook_file": "20_session17_pandas_dataframe.ipynb",
+      "lessons": [
+        {
+          "lesson_id": "lesson_20_01",
+          "title": "2D Tabular Data & loc vs iloc",
+          "concept_markdown": "A `DataFrame` is a two-dimensional labeled data structure with columns of potentially different types:\n- `df['col']`: Selects a column as a Series\n- `df[['col1', 'col2']]`: Selects multiple columns as a sub-DataFrame\n- `df.iloc[row_idx, col_idx]`: Integer position-based indexing\n- `df.loc[row_label, col_label]`: Label-based indexing",
+          "code_walkthroughs": [
+            {
+              "title": "Creating and Filtering DataFrame",
+              "code": "import pandas as pd\ndf = pd.DataFrame({'Name': ['Alice', 'Bob', 'Charlie'], 'Age': [25, 30, 22]})\nprint(df[df['Age'] >= 25]['Name'].tolist())",
+              "expected_stdout": "['Alice', 'Bob']\n",
+              "explanation": "Filters rows where `Age >= 25` and extracts the `'Name'` column as a list."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_20_01_filter_dataframe_rows",
+              "title": "Filter High Earners",
+              "difficulty": "intermediate",
+              "description": "Read an integer `N` (number of rows). Then read `N` lines formatted as `'Name Salary'` (e.g. `'Alice 75000'`). Create a DataFrame with columns `['Name', 'Salary']`. Filter rows where `Salary >= 50000`, sorted by `Salary` in descending order. Print the names space-separated.",
+              "starter_code": "import pandas as pd\n\nn = int(input())\n# Create DataFrame and filter salaries >= 50000\n",
+              "solution_code": "import pandas as pd\n\nn = int(input())\ndata = []\nfor _ in range(n):\n    parts = input().split()\n    data.append({'Name': parts[0], 'Salary': float(parts[1])})\ndf = pd.DataFrame(data)\nhigh_earners = df[df['Salary'] >= 50000].sort_values(by='Salary', ascending=False)\nprint(' '.join(high_earners['Name'].tolist()))",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "3 employees",
+                  "stdin": "3\nAlice 45000\nBob 75000\nCharlie 62000",
+                  "expected_output": "Bob Charlie",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "All below threshold",
+                  "stdin": "2\nDan 30000\nEve 42000",
+                  "expected_output": "",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Filter df using df['Salary'] >= 50000 and sort using .sort_values(by='Salary', ascending=False).",
+                "level_2_strategy": "Extract names with high_earners['Name'].tolist() and join with spaces.",
+                "level_3_clue": "high = df[df['Salary'] >= 50000].sort_values(by='Salary', ascending=False)\nprint(' '.join(high['Name'].tolist()))"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "session_id": "session_21",
+      "session_number": 21,
+      "title": "Session 21 - Important Series & DataFrame Methods",
+      "video_url": "https://www.youtube.com/watch?v=zTa4MIrGTIE",
+      "notebook_file": "22_session18_important_dataframe_methods.ipynb",
+      "lessons": [
+        {
+          "lesson_id": "lesson_21_01",
+          "title": "apply, drop_duplicates & Missing Value Handling",
+          "concept_markdown": "- `df.apply(func, axis=0/1)`: Applies custom functions across columns or rows\n- `df.drop_duplicates()`: Removes duplicate rows\n- `df.fillna(value)`: Replaces missing `NaN` entries with imputation constants or metrics",
+          "code_walkthroughs": [
+            {
+              "title": "Transforming Values with apply",
+              "code": "import pandas as pd\ns = pd.Series([10, 20, 30])\nprint(s.apply(lambda x: x * 2).tolist())",
+              "expected_stdout": "[20, 40, 60]\n",
+              "explanation": "`apply` runs the lambda on each element, doubling each value."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_21_01_impute_missing_mean",
+              "title": "Missing Value Mean Imputation",
+              "difficulty": "intermediate",
+              "description": "Read a space-separated line of tokens where missing numbers are written as `'nan'`. Convert into a Pandas Series of floats. Impute any missing (`NaN`) values with the mean of the available numbers. Print the imputed values rounded to 1 decimal place, space-separated.",
+              "starter_code": "import pandas as pd\nimport numpy as np\n\n# Impute missing values with mean\n",
+              "solution_code": "import pandas as pd\nimport numpy as np\n\ntokens = input().split()\nvals = [np.nan if x.lower() == 'nan' else float(x) for x in tokens]\ns = pd.Series(vals)\nimputed = s.fillna(s.mean())\nprint(' '.join(f'{x:.1f}' for x in imputed))",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Series with one NaN",
+                  "stdin": "10 20 nan 40",
+                  "expected_output": "10.0 20.0 23.3 40.0",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "Two NaNs",
+                  "stdin": "5 nan 15 nan",
+                  "expected_output": "5.0 10.0 15.0 10.0",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Replace 'nan' with np.nan, create Series s, and use s.fillna(s.mean()).",
+                "level_2_strategy": "Format numbers with f'{x:.1f}' and join with spaces.",
+                "level_3_clue": "s = s.fillna(s.mean())\nprint(' '.join(f'{x:.1f}' for x in s))"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "session_id": "session_22",
+      "session_number": 22,
+      "title": "Session 22 - GroupBy Object & Analytical Aggregations",
+      "video_url": "https://www.youtube.com/watch?v=LPBjF4_gZnI",
+      "notebook_file": "23_session19_groupby_object_in_pandas.ipynb",
+      "lessons": [
+        {
+          "lesson_id": "lesson_22_01",
+          "title": "Split-Apply-Combine & Group Aggregations",
+          "concept_markdown": "GroupBy follows the **Split-Apply-Combine** paradigm:\n```python\ndf.groupby('category')['metric'].mean()\n```\n- `.agg({'metric1': 'sum', 'metric2': 'mean'})`: Applies multi-metric aggregations\n- `len(grouped)`: Number of distinct groups\n- `grouped.size()`: Row count per group",
+          "code_walkthroughs": [
+            {
+              "title": "Department Average Salary",
+              "code": "import pandas as pd\ndf = pd.DataFrame({'Dept': ['IT', 'HR', 'IT'], 'Salary': [90000, 60000, 110000]})\nprint(df.groupby('Dept')['Salary'].mean().to_dict())",
+              "expected_stdout": "{'HR': 60000.0, 'IT': 100000.0}\n",
+              "explanation": "Splits by department and computes average salary per department."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_22_01_genre_revenue_groupby",
+              "title": "Top Genre by Revenue",
+              "difficulty": "intermediate",
+              "description": "Read an integer `N`. Then read `N` lines containing `'Genre Revenue'` (e.g. `'Action 150.5'`). Group movies by Genre, compute total revenue per genre, and print the genre with the highest revenue along with its total revenue rounded to 1 decimal place as `'Genre: Revenue'`.",
+              "starter_code": "import pandas as pd\n\nn = int(input())\n# Group by Genre and find highest revenue\n",
+              "solution_code": "import pandas as pd\n\nn = int(input())\nrows = []\nfor _ in range(n):\n    p = input().split()\n    rows.append({'Genre': p[0], 'Revenue': float(p[1])})\ndf = pd.DataFrame(rows)\ngrp = df.groupby('Genre')['Revenue'].sum()\ntop_genre = grp.idxmax()\nprint(f'{top_genre}: {grp[top_genre]:.1f}')",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Multiple movies per genre",
+                  "stdin": "4\nAction 100.0\nComedy 50.0\nAction 80.5\nComedy 120.0",
+                  "expected_output": "Action: 180.5",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "Drama wins",
+                  "stdin": "3\nDrama 300.0\nSciFi 150.0\nDrama 50.0",
+                  "expected_output": "Drama: 350.0",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Use df.groupby('Genre')['Revenue'].sum() to compute group totals.",
+                "level_2_strategy": "Find top genre using grp.idxmax(), and print f'{top_genre}: {grp[top_genre]:.1f}'.",
+                "level_3_clue": "grp = df.groupby('Genre')['Revenue'].sum()\ntop = grp.idxmax()\nprint(f'{top}: {grp[top]:.1f}')"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "session_id": "session_23",
+      "session_number": 23,
+      "title": "Session 23 - Merging, Joining & Concatenating",
+      "video_url": "https://www.youtube.com/watch?v=Ssy1EfK5S-o",
+      "notebook_file": "24_session20_merging_joining_concatenating.ipynb",
+      "lessons": [
+        {
+          "lesson_id": "lesson_23_01",
+          "title": "pd.concat & Relational pd.merge Joins",
+          "concept_markdown": "- `pd.concat([df1, df2], axis=0)`: Stacks DataFrames vertically (row-wise)\n- `pd.concat([df1, df2], axis=1)`: Combines DataFrames horizontally (column-wise)\n- `pd.merge(df1, df2, on='key', how='inner'|'left'|'right'|'outer')`: SQL-style joins on primary/foreign keys",
+          "code_walkthroughs": [
+            {
+              "title": "Merging Users and Purchases",
+              "code": "import pandas as pd\nusers = pd.DataFrame({'id': [1, 2], 'name': ['Alice', 'Bob']})\norders = pd.DataFrame({'id': [1, 2], 'item': ['Book', 'Pen']})\nmerged = pd.merge(users, orders, on='id')\nprint(merged[['name', 'item']].to_dict('records'))",
+              "expected_stdout": "[{'name': 'Alice', 'item': 'Book'}, {'name': 'Bob', 'item': 'Pen'}]\n",
+              "explanation": "Performs an inner join matching on `'id'` key across both tables."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_23_01_inner_join_lookup",
+              "title": "Inner Join Price Lookup",
+              "difficulty": "intermediate",
+              "description": "Read an integer `N` for products table (`Product Price`). Read `M` for sales table (`Order Product`). Perform an inner join on `Product`. Compute total revenue (`sum of prices of all orders`) and print it as float rounded to 1 decimal place.",
+              "starter_code": "import pandas as pd\n\n# Read products and sales, merge on Product, compute total revenue\n",
+              "solution_code": "import pandas as pd\n\nn = int(input())\nprods = []\nfor _ in range(n):\n    p = input().split()\n    prods.append({'Product': p[0], 'Price': float(p[1])})\ndf_p = pd.DataFrame(prods)\n\nm = int(input())\nsales = []\nfor _ in range(m):\n    p = input().split()\n    sales.append({'Order': p[0], 'Product': p[1]})\ndf_s = pd.DataFrame(sales)\n\nmerged = pd.merge(df_s, df_p, on='Product', how='inner')\nprint(round(float(merged['Price'].sum()), 1))",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Standard products and orders",
+                  "stdin": "2\nApple 1.5\nBanana 0.5\n3\n101 Apple\n102 Banana\n103 Apple",
+                  "expected_output": "3.5",
+                  "is_hidden": false,
+                  "match_mode": "numeric_float"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "Product not found omitted by inner join",
+                  "stdin": "1\nCoffee 4.0\n2\n201 Coffee\n202 Tea",
+                  "expected_output": "4.0",
+                  "is_hidden": true,
+                  "match_mode": "numeric_float"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Merge sales and products on 'Product' using how='inner'.",
+                "level_2_strategy": "Sum the Price column of the merged DataFrame and print round(total, 1).",
+                "level_3_clue": "merged = pd.merge(df_s, df_p, on='Product', how='inner')\nprint(round(float(merged['Price'].sum()), 1))"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "session_id": "session_24",
+      "session_number": 24,
+      "title": "Session 24 - Vectorized Strings, DateTime & Pivot Tables",
+      "video_url": "https://www.youtube.com/watch?v=UE6DmRQJ2w8",
+      "notebook_file": "26a_session22_pivot_table.ipynb",
+      "lessons": [
+        {
+          "lesson_id": "lesson_24_01",
+          "title": "Vectorized .str, .dt Accessors & Pivot Tables",
+          "concept_markdown": "- `.str`: Vectorized string methods on Series (`s.str.upper()`, `s.str.contains()`, `s.str.strip()`)\n- `.dt`: Vectorized DateTime operations (`s.dt.year`, `s.dt.month_name()`, `s.dt.day_name()`)\n- `df.pivot_table(index=..., columns=..., values=..., aggfunc='mean')`: Multidimensional aggregation tables",
+          "code_walkthroughs": [
+            {
+              "title": "Vectorized DateTime Day Name",
+              "code": "import pandas as pd\ndates = pd.to_datetime(['2024-01-01', '2024-01-02'])\nprint(dates.day_name().tolist())",
+              "expected_stdout": "['Monday', 'Tuesday']\n",
+              "explanation": "Converts strings to timestamps and extracts weekday names using `.day_name()`."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_24_01_pivot_summary",
+              "title": "Pivot Table Regional Sales Sum",
+              "difficulty": "intermediate",
+              "description": "Read an integer `N`. Then read `N` lines formatted as `'Region Product Sales'`. Construct a pivot table summarizing total sales with `index='Region'`, `columns='Product'`, and `aggfunc='sum'`. Fill missing cells with `0`.\nPrint the total sum of sales in `'North'` region across all products as an integer.",
+              "starter_code": "import pandas as pd\n\n# Compute total sales for North region from pivot table\n",
+              "solution_code": "import pandas as pd\n\nn = int(input())\nrows = []\nfor _ in range(n):\n    p = input().split()\n    rows.append({'Region': p[0], 'Product': p[1], 'Sales': float(p[2])})\ndf = pd.DataFrame(rows)\npvt = df.pivot_table(index='Region', columns='Product', values='Sales', aggfunc='sum', fill_value=0)\nif 'North' in pvt.index:\n    print(int(pvt.loc['North'].sum()))\nelse:\n    print(0)",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "North region sales",
+                  "stdin": "4\nNorth Widget 100\nSouth Widget 200\nNorth Gadget 150\nNorth Widget 50",
+                  "expected_output": "300",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "No North region records",
+                  "stdin": "2\nEast Widget 100\nWest Gadget 200",
+                  "expected_output": "0",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Use df.pivot_table(index='Region', columns='Product', values='Sales', aggfunc='sum', fill_value=0).",
+                "level_2_strategy": "If 'North' in pvt.index, sum row pvt.loc['North'].sum() and cast to int.",
+                "level_3_clue": "print(int(pvt.loc['North'].sum()) if 'North' in pvt.index else 0)"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "chapter_exam": {
+    "exam_id": "exam_module_5",
+    "title": "Module 5 Mastery Exam — Pandas Data Analysis",
+    "description": "Comprehensive evaluation covering Series filtering, DataFrame manipulation, multi-column GroupBy, and pivot tables. Passing requires scoring >= 80%.",
+    "passing_score_percentage": 80.0,
+    "questions": [
+      {
+        "id": "exam_05_customer_churn_summary",
+        "title": "Customer Segmentation & Churn Analysis",
+        "difficulty": "advanced",
+        "description": "Read an integer `N`. Then read `N` lines formatted as `'Plan Churned'` where `Plan` is string ('Basic' or 'Pro') and `Churned` is integer `1` (churned) or `0` (retained).\nCompute the churn rate percentage for each plan: `(churned_count / total_customers) * 100`. Print the plan with the higher churn rate as `'Plan: Rate%'` rounded to 1 decimal place (e.g. `'Basic: 40.0%'`). If equal, print `'Tied'`.",
+        "starter_code": "import pandas as pd\n\n# Compute churn rate per plan and print higher churn plan\n",
+        "solution_code": "import pandas as pd\n\nn = int(input())\nrows = []\nfor _ in range(n):\n    p = input().split()\n    rows.append({'Plan': p[0], 'Churned': int(p[1])})\ndf = pd.DataFrame(rows)\ngrp = df.groupby('Plan')['Churned'].mean() * 100\nplans = grp.index.tolist()\nif len(plans) == 2 and abs(grp[plans[0]] - grp[plans[1]]) < 1e-5:\n    print('Tied')\nelse:\n    top = grp.idxmax()\n    print(f'{top}: {grp[top]:.1f}%')",
+        "test_cases": [
+          {
+            "id": "tc_exam_01",
+            "description": "Basic has higher churn",
+            "stdin": "5\nBasic 1\nBasic 1\nBasic 0\nPro 0\nPro 1",
+            "expected_output": "Basic: 66.7%",
+            "match_mode": "trimmed",
+            "is_hidden": false
+          },
+          {
+            "id": "tc_exam_02",
+            "description": "Both 50% churn",
+            "stdin": "4\nBasic 1\nBasic 0\nPro 1\nPro 0",
+            "expected_output": "Tied",
+            "match_mode": "trimmed",
+            "is_hidden": true
+          }
+        ],
+        "hints": {
+          "level_1_nudge": "The mean of a 0/1 column multiplied by 100 directly gives the percentage rate.",
+          "level_2_strategy": "df.groupby('Plan')['Churned'].mean() * 100 gives rates per plan. Compare values.",
+          "level_3_clue": "grp = df.groupby('Plan')['Churned'].mean() * 100\ntop = grp.idxmax()\nprint(f'{top}: {grp[top]:.1f}%')"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,157 @@
+{
+  "module_id": "module_6",
+  "module_number": 6,
+  "title": "Data Visualization (Matplotlib, Plotly & Seaborn)",
+  "description": "2D and 3D Matplotlib plots, subplots, interactive visualizations with Plotly Express, and advanced statistical plotting with Seaborn.",
+  "sessions": [
+    {
+      "session_id": "session_27",
+      "session_number": 27,
+      "title": "Session 27 - Matplotlib Fundamentals",
+      "video_url": "https://www.youtube.com/watch?v=XaKn_cKFlSY",
+      "notebook_file": "27_session23_plotting_using_matplotlib.ipynb",
+      "lessons": [
+        {
+          "lesson_id": "lesson_27_01",
+          "title": "Anatomy of a Figure, Line Plots & Subplots",
+          "concept_markdown": "- **Anatomy**: A Matplotlib `Figure` contains one or more `Axes` (the plotting canvas). Each axis has labels, title, ticks, and legends.\n- `plt.subplots(nrows, ncols)`: Creates figure and grid of subplots.\n- Plot types: Line (`plot`), Scatter (`scatter`), Bar (`bar`), Histogram (`hist`).",
+          "code_walkthroughs": [
+            {
+              "title": "Creating Figure and Line Plot Attributes",
+              "code": "import matplotlib.pyplot as plt\nfig, ax = plt.subplots()\nax.plot([1, 2, 3], [10, 20, 30], label='Trend')\nax.set_title('Growth')\nprint('Title:', ax.get_title(), 'Lines:', len(ax.lines))",
+              "expected_stdout": "Title: Growth Lines: 1\n",
+              "explanation": "Initializes an axis, plots a data series, sets title, and inspects figure properties programmatically."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_27_01_plot_data_pipeline",
+              "title": "Chart Data Aggregator & Boundary Analysis",
+              "difficulty": "intermediate",
+              "description": "Read a space-separated line of numbers representing monthly sensor readings. Calculate the 3-point moving average: `avg(i-1, i, i+1)` for `1 <= i <= len-2`. Print the moving averages rounded to 1 decimal place, space-separated.",
+              "starter_code": "# Compute 3-point moving average for chart series\n",
+              "solution_code": "nums = [float(x) for x in input().split()]\nma = []\nfor i in range(1, len(nums) - 1):\n    ma.append((nums[i-1] + nums[i] + nums[i+1]) / 3)\nprint(' '.join(f'{x:.1f}' for x in ma))",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "5 data points",
+                  "stdin": "10 20 30 40 50",
+                  "expected_output": "20.0 30.0 40.0",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "4 data points",
+                  "stdin": "5 15 25 35",
+                  "expected_output": "15.0 25.0",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Loop from index 1 to len(nums) - 2. Average the current, previous, and next numbers.",
+                "level_2_strategy": "Append (nums[i-1] + nums[i] + nums[i+1]) / 3, then format with f'{x:.1f}'.",
+                "level_3_clue": "for i in range(1, len(nums) - 1):\n    ma.append((nums[i-1] + nums[i] + nums[i+1]) / 3)"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "session_id": "session_28",
+      "session_number": 28,
+      "title": "Session 28 - Seaborn Statistical Graphics & Categorical Plots",
+      "video_url": "https://www.youtube.com/watch?v=kLWeKeqc9Ms",
+      "notebook_file": "32_session26_plotting_using_seaborn_part2.ipynb",
+      "lessons": [
+        {
+          "lesson_id": "lesson_28_01",
+          "title": "Statistical Distribution Analysis & Five-Number Summaries",
+          "concept_markdown": "Seaborn provides high-level APIs for statistical exploration:\n- **Boxplots**: Visualizes the five-number summary: Minimum, Q1 (25th percentile), Median (50th percentile), Q3 (75th percentile), and Maximum, with dots representing outliers beyond `1.5 * IQR`.\n- **IQR Formula**: `IQR = Q3 - Q1`.\n- **Outliers**: Any value `< Q1 - 1.5 * IQR` or `> Q3 + 1.5 * IQR`.",
+          "code_walkthroughs": [
+            {
+              "title": "Computing Quartiles and IQR",
+              "code": "import numpy as np\ndata = np.array([1, 2, 5, 6, 7, 9, 12, 15, 18, 100])\nq1, q3 = np.percentile(data, [25, 75])\niqr = q3 - q1\nprint('Q1:', q1, 'Q3:', q3, 'IQR:', iqr)",
+              "expected_stdout": "Q1: 5.25 Q3: 14.25 IQR: 9.0\n",
+              "explanation": "Calculates 25th and 75th percentiles and the interquartile range used in Seaborn boxplots."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_28_01_boxplot_outlier_count",
+              "title": "Boxplot Outlier Detector",
+              "difficulty": "intermediate",
+              "description": "Read a space-separated line of numbers from input. Calculate the 25th percentile (`Q1`) and 75th percentile (`Q3`) using `np.percentile(arr, [25, 75])`. Compute `IQR = Q3 - Q1`. Count how many elements in the array are outliers (`value < Q1 - 1.5*IQR` or `value > Q3 + 1.5*IQR`). Print the count as integer.",
+              "starter_code": "import numpy as np\n\n# Count outliers outside 1.5 * IQR\n",
+              "solution_code": "import numpy as np\n\narr = np.array([float(x) for x in input().split()])\nq1, q3 = np.percentile(arr, [25, 75])\niqr = q3 - q1\nlower = q1 - 1.5 * iqr\nupper = q3 + 1.5 * iqr\noutliers = ((arr < lower) | (arr > upper)).sum()\nprint(int(outliers))",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Data with one high outlier",
+                  "stdin": "10 12 11 14 13 12 11 100",
+                  "expected_output": "1",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "Uniform data without outliers",
+                  "stdin": "1 2 3 4 5 6 7 8 9",
+                  "expected_output": "0",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Compute q1, q3 = np.percentile(arr, [25, 75]) and iqr = q3 - q1.",
+                "level_2_strategy": "Thresholds are q1 - 1.5 * iqr and q3 + 1.5 * iqr. Count matches using boolean mask.",
+                "level_3_clue": "outliers = ((arr < q1 - 1.5*iqr) | (arr > q3 + 1.5*iqr)).sum()\nprint(int(outliers))"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "chapter_exam": {
+    "exam_id": "exam_module_6",
+    "title": "Module 6 Mastery Exam — Data Visualization & Analysis",
+    "description": "Comprehensive evaluation covering data binning, statistical dispersion metrics, and automated chart formatting. Passing requires scoring >= 80%.",
+    "passing_score_percentage": 80.0,
+    "questions": [
+      {
+        "id": "exam_06_histogram_bin_frequency",
+        "title": "Histogram Frequency Binning",
+        "difficulty": "intermediate",
+        "description": "Read an integer `B` (number of bins). Then read a space-separated line of numbers. Using `np.histogram(arr, bins=B)`, compute the count of elements in each bin. Print the bin frequency counts space-separated.",
+        "starter_code": "import numpy as np\n\nb = int(input())\n# Compute and print histogram bin frequencies\n",
+        "solution_code": "import numpy as np\n\nb = int(input())\narr = np.array([float(x) for x in input().split()])\ncounts, _ = np.histogram(arr, bins=b)\nprint(' '.join(map(str, counts)))",
+        "test_cases": [
+          {
+            "id": "tc_exam_01",
+            "description": "3 bins over values 1 to 9",
+            "stdin": "3\n1 2 3 4 5 6 7 8 9",
+            "expected_output": "3 3 3",
+            "match_mode": "trimmed",
+            "is_hidden": false
+          },
+          {
+            "id": "tc_exam_02",
+            "description": "2 bins with skewed clustering",
+            "stdin": "2\n1 1 1 10 10",
+            "expected_output": "3 2",
+            "match_mode": "trimmed",
+            "is_hidden": true
+          }
+        ],
+        "hints": {
+          "level_1_nudge": "Use counts, _ = np.histogram(arr, bins=b).",
+          "level_2_strategy": "np.histogram returns (counts, bin_edges). Join counts with spaces.",
+          "level_3_clue": "counts, _ = np.histogram(arr, bins=b)\nprint(' '.join(map(str, counts)))"
+        }
+      }
+    ]
+  }
+}

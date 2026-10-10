@@ -1,0 +1,220 @@
+{
+  "module_id": "module_3",
+  "module_number": 3,
+  "title": "Advanced Python Programming",
+  "description": "File handling, JSON/pickle serialization, robust exception handling, custom exceptions, decorators, namespaces, and the LEGB scope rule.",
+  "sessions": [
+    {
+      "session_id": "session_13",
+      "session_number": 13,
+      "title": "Session 13 - File Handling & Serialization",
+      "video_url": "https://www.youtube.com/watch?v=o-TAYRMQzIQ",
+      "notebook_file": "13_session10_file_handling_serialization.ipynb",
+      "lessons": [
+        {
+          "lesson_id": "lesson_13_01",
+          "title": "File I/O Streams, Context Managers & JSON Serialization",
+          "concept_markdown": "- **Context Managers (`with open(...)`)**: Automatically guarantees file closure upon exiting the block, even if an exception occurs.\n- **Modes**: `'r'` (read), `'w'` (write/truncate), `'a'` (append).\n- **Serialization**: Converting Python in-memory objects (dicts, lists) into portable formats using the `json` module (`json.dumps`, `json.loads`).",
+          "code_walkthroughs": [
+            {
+              "title": "JSON Serialization and Parsing",
+              "code": "import json\n\ndata = {'user': 'suhail', 'roles': ['admin', 'developer']}\njson_str = json.dumps(data)\nprint('JSON:', json_str)\nparsed = json.loads(json_str)\nprint('Role 0:', parsed['roles'][0])",
+              "expected_stdout": "JSON: {\"user\": \"suhail\", \"roles\": [\"admin\", \"developer\"]}\nRole 0: admin\n",
+              "explanation": "`json.dumps()` turns dictionary into a JSON string, and `json.loads()` restores it back into a native Python dict."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_13_01_json_stats_extractor",
+              "title": "JSON Score Stats Extractor",
+              "difficulty": "intermediate",
+              "description": "Read a single line containing a valid JSON object string representing students and their scores: `{\"Alice\": 85, \"Bob\": 92, \"Charlie\": 78}`. Parse the JSON and print the top scorer name and score as `'name: score'`, followed by the average score rounded to 1 decimal place on the second line.",
+              "starter_code": "import json\n\nraw_json = input().strip()\n# Parse JSON, find top scorer and average\n",
+              "solution_code": "import json\n\nraw_json = input().strip()\ndata = json.loads(raw_json)\ntop_student = max(data.keys(), key=lambda k: data[k])\navg = sum(data.values()) / len(data.values())\nprint(f'{top_student}: {data[top_student]}')\nprint(round(avg, 1))",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Standard students JSON",
+                  "stdin": "{\"Alice\": 85, \"Bob\": 92, \"Charlie\": 78}",
+                  "expected_output": "Bob: 92\n85.0",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "Two students score",
+                  "stdin": "{\"Suhail\": 98, \"Nitish\": 94}",
+                  "expected_output": "Suhail: 98\n96.0",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Use json.loads() to convert the string into a dictionary.",
+                "level_2_strategy": "Find the key with highest value using max(data.keys(), key=lambda k: data[k]), and sum(data.values()) / len(data).",
+                "level_3_clue": "data = json.loads(raw_json)\ntop = max(data, key=data.get)\nprint(f'{top}: {data[top]}')\nprint(round(sum(data.values()) / len(data), 1))"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "session_id": "session_14",
+      "session_number": 14,
+      "title": "Session 14 - Exception Handling & Custom Exceptions",
+      "video_url": "https://www.youtube.com/watch?v=rvKR6tciJ2Q",
+      "notebook_file": "14_session11_exception_handling_modules.ipynb",
+      "lessons": [
+        {
+          "lesson_id": "lesson_14_01",
+          "title": "Try-Except-Else-Finally & Custom Exceptions",
+          "concept_markdown": "- **`try` block**: Code that might raise an exception.\n- **`except SpecificError`**: Graceful error handling without application crash.\n- **`else`**: Runs ONLY when NO exception occurred.\n- **`finally`**: ALWAYS runs regardless of exceptions (ideal for resource cleanup).\n- **`raise`**: Manually triggers exceptions.\n- **Custom Exceptions**: Inheriting from `Exception` creates domain-specific error classes.",
+          "code_walkthroughs": [
+            {
+              "title": "Safe Division with Error Handling",
+              "code": "def safe_divide(a, b):\n    try:\n        return a / b\n    except ZeroDivisionError:\n        return 'Error: Division by zero'\n\nprint(safe_divide(10, 2))\nprint(safe_divide(10, 0))",
+              "expected_stdout": "5.0\nError: Division by zero\n",
+              "explanation": "Catches `ZeroDivisionError` gracefully, returning a descriptive error string instead of crashing."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_14_01_custom_validator",
+              "title": "Custom Age Validator",
+              "difficulty": "intermediate",
+              "description": "Define a custom exception `InvalidAgeError(Exception)`.\nRead an input line for `age_str`.\n- If `age_str` is not an integer, catch `ValueError` and print `'Error: Invalid input'`.\n- If integer `age < 0` or `age > 120`, raise `InvalidAgeError('Age out of range')`, catch it, and print `'Error: Age out of range'`.\n- Otherwise in the `else` block, print `'Valid age: {age}'`.",
+              "starter_code": "class InvalidAgeError(Exception):\n    pass\n\nraw_age = input().strip()\n# Implement try-except-else\n",
+              "solution_code": "class InvalidAgeError(Exception):\n    pass\n\nraw_age = input().strip()\ntry:\n    age = int(raw_age)\n    if age < 0 or age > 120:\n        raise InvalidAgeError('Age out of range')\nexcept ValueError:\n    print('Error: Invalid input')\nexcept InvalidAgeError:\n    print('Error: Age out of range')\nelse:\n    print(f'Valid age: {age}')",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Valid age",
+                  "stdin": "25",
+                  "expected_output": "Valid age: 25",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "Invalid negative age",
+                  "stdin": "-5",
+                  "expected_output": "Error: Age out of range",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_03",
+                  "description": "Non-numeric input",
+                  "stdin": "twenty",
+                  "expected_output": "Error: Invalid input",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Wrap int(raw_age) inside a try block. Check if age < 0 or age > 120 and raise InvalidAgeError.",
+                "level_2_strategy": "Catch ValueError for conversion errors, and InvalidAgeError for range errors. Use else for valid age printing.",
+                "level_3_clue": "except ValueError:\n    print('Error: Invalid input')\nexcept InvalidAgeError:\n    print('Error: Age out of range')"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "session_id": "session_15",
+      "session_number": 15,
+      "title": "Session 15 - Decorators, Namespaces & LEGB Scope",
+      "video_url": "https://www.youtube.com/watch?v=aMARZGTbULc",
+      "notebook_file": "15_session12_decorators_namespaces.ipynb",
+      "lessons": [
+        {
+          "lesson_id": "lesson_15_01",
+          "title": "Python Decorators & Scope Resolution",
+          "concept_markdown": "- **LEGB Scope**: Python resolves variables in order: **L**ocal → **E**nclosing → **G**lobal → **B**uilt-in.\n- **Closures**: An inner function that retains access to variables in its outer enclosing scope even after the outer function has finished executing.\n- **Decorators (`@`)**: Higher-order functions that take a function as an argument, wrap additional behavior around it, and return the modified function.",
+          "code_walkthroughs": [
+            {
+              "title": "Function Wrapper Decorator",
+              "code": "def uppercase_decorator(func):\n    def wrapper():\n        result = func()\n        return result.upper()\n    return wrapper\n\n@uppercase_decorator\ndef greet():\n    return 'hello world'\n\nprint(greet())",
+              "expected_stdout": "HELLO WORLD\n",
+              "explanation": "The `@uppercase_decorator` intercepts `greet()`, transforming its return value to uppercase."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_15_01_timing_decorator",
+              "title": "Call-Counting Function Decorator",
+              "difficulty": "intermediate",
+              "description": "Write a decorator `count_calls(func)` that tracks how many times the decorated function has been invoked using an attribute `wrapper.calls = 0`.\nDecorate a function `say_hello()`. Read an integer `N` from input, call `say_hello()` `N` times, and print the total call count recorded by the decorator (`say_hello.calls`).",
+              "starter_code": "def count_calls(func):\n    # Implement decorator\n    pass\n\n@count_calls\ndef say_hello():\n    return 'hello'\n\nn = int(input())\nfor _ in range(n):\n    say_hello()\nprint(say_hello.calls)\n",
+              "solution_code": "def count_calls(func):\n    def wrapper(*args, **kwargs):\n        wrapper.calls += 1\n        return func(*args, **kwargs)\n    wrapper.calls = 0\n    return wrapper\n\n@count_calls\ndef say_hello():\n    return 'hello'\n\nn = int(input())\nfor _ in range(n):\n    say_hello()\nprint(say_hello.calls)",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Called 5 times",
+                  "stdin": "5",
+                  "expected_output": "5",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "Zero calls",
+                  "stdin": "0",
+                  "expected_output": "0",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Attach an attribute calls = 0 to the wrapper function object.",
+                "level_2_strategy": "Inside wrapper, increment wrapper.calls += 1 before returning func(*args, **kwargs).",
+                "level_3_clue": "def count_calls(func):\n    def wrapper(*args, **kwargs):\n        wrapper.calls += 1\n        return func(*args, **kwargs)\n    wrapper.calls = 0\n    return wrapper"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "chapter_exam": {
+    "exam_id": "exam_module_3",
+    "title": "Module 3 Mastery Exam — Advanced Python Programming",
+    "description": "Comprehensive evaluation covering file parsing, serialization, custom exception design, and decorator architecture. Passing requires scoring >= 80%.",
+    "passing_score_percentage": 80.0,
+    "questions": [
+      {
+        "id": "exam_03_retry_decorator",
+        "title": "Retry Decorator with Exception Fallback",
+        "difficulty": "advanced",
+        "description": "Write a decorator `retry_on_failure(func)` that attempts to execute `func()` up to 3 times if an exception is raised. If it fails on all 3 attempts, it catches the exception and returns `'Execution Failed'`.\nRead an integer `fail_count` from input. A helper function fails `fail_count` times before succeeding and returning `'Success'`.\nPrint the result.",
+        "starter_code": "def retry_on_failure(func):\n    # Implement retry decorator\n    pass\n",
+        "solution_code": "def retry_on_failure(func):\n    def wrapper(*args, **kwargs):\n        for attempt in range(3):\n            try:\n                return func(*args, **kwargs)\n            except Exception:\n                pass\n        return 'Execution Failed'\n    return wrapper\n\nfail_count = int(input())\nattempts = 0\n\n@retry_on_failure\ndef test_fn():\n    global attempts\n    attempts += 1\n    if attempts <= fail_count:\n        raise RuntimeError('Fail')\n    return 'Success'\n\nprint(test_fn())",
+        "test_cases": [
+          {
+            "id": "tc_exam_01",
+            "description": "Succeeds on 3rd try",
+            "stdin": "2",
+            "expected_output": "Success",
+            "match_mode": "trimmed",
+            "is_hidden": false
+          },
+          {
+            "id": "tc_exam_02",
+            "description": "Fails all 3 tries",
+            "stdin": "5",
+            "expected_output": "Execution Failed",
+            "match_mode": "trimmed",
+            "is_hidden": true
+          }
+        ],
+        "hints": {
+          "level_1_nudge": "Loop 3 times inside the wrapper, wrapping func() in a try-except block.",
+          "level_2_strategy": "Return func(*args, **kwargs) immediately upon success. If all 3 attempts raise an exception, return 'Execution Failed'.",
+          "level_3_clue": "for attempt in range(3):\n    try: return func(*args, **kwargs)\n    except Exception: pass\nreturn 'Execution Failed'"
+        }
+      }
+    ]
+  }
+}

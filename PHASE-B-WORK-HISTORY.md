@@ -77,22 +77,38 @@ Curriculum content is curated and adapted from CampusX's Data Science Mentorship
   - Chapter Exam Stepper: Question 1 of N navigation with live scoring and attempt persistence.
   - Automatic progress recording via `curriculumService.markChallengeSolved` and `/api/progress/record-attempt`.
 
+### Phase B5: Full Curriculum Ingestion (Modules 2–6)
+- **Files Created**:
+  - `frontend/src/data/curriculum/module2_oop.json` (5 sessions, 6 challenges, 12 test cases)
+  - `frontend/src/data/curriculum/module3_advanced.json` (3 sessions, 4 challenges, 9 test cases)
+  - `frontend/src/data/curriculum/module4_numpy.json` (3 sessions, 4 challenges, 9 test cases)
+  - `frontend/src/data/curriculum/module5_pandas.json` (6 sessions, 7 challenges, 14 test cases)
+  - `frontend/src/data/curriculum/module6_visualization.json` (2 sessions, 3 challenges, 5 test cases)
+- **Files Updated**:
+  - `frontend/src/services/curriculumService.js` (registered all 6 modules in `MODULE_REGISTRY`)
+- **Key Characteristics**:
+  - 100% compliant with Part A evaluation schema (`stdin`, `expected_output`, `match_mode`, `is_hidden`).
+  - Every challenge & exam question includes 3-tier progressive hints (`level_1_nudge`, `level_2_strategy`, `level_3_clue`).
+  - All solution codes verified against their test cases with automated subprocess execution.
+
 ---
 
 ## 🧪 Verification & Test Results
 
 1. **Automated Backend Test Suite**:
    - `python -m pytest tests/`
-   - ✅ **233 / 233 tests passed** in 18.16s (zero regressions across Part A engine).
+   - ✅ **233 / 233 tests passed** in 18.78s (zero regressions across Part A engine).
 2. **Frontend Production Build**:
    - `npm run build`
-   - ✅ **Built in 120ms** with zero errors or TypeScript/JSX warnings.
-3. **End-to-End Browser Subagent Verification**:
-   - Home Page → "Start Python Course" CTA clicked.
-   - Course Explorer (`/courses`) rendered 6 modules and session list.
-   - Lesson Viewer modal opened for Session 1, Lesson 1 with walkthroughs and challenges.
-   - "Solve in IDE" navigated to `/editor?mode=course&challengeId=chal_01_01_custom_print`.
-   - Monaco loaded starter code cleanly.
-   - "Run & Evaluate Tests" evaluated code against backend test cases.
-   - Hints tab revealed Level 2 Strategic Approach hint successfully.
+   - ✅ **Built in 121ms** with zero errors.
+3. **Comprehensive Curriculum Test Evaluation**:
+   - Total Challenges & Exam Questions Tested: **44**
+   - Total Test Cases Tested: **94** (both visible and hidden)
+   - ✅ **94 / 94 test cases passed (100% pass rate)**.
+4. **End-to-End Browser Subagent Verification**:
+   - Course Explorer (`/courses`) displays all 6 modules as unlocked, available, and interactive.
+   - Module 2 (OOP) explored: Sessions 8–12 rendered cleanly.
+   - Session 8 lesson opened in Lesson Viewer modal; "Solve in IDE" successfully deep-linked to `/editor?mode=course&challengeId=chal_08_01_bank_account_class`.
+   - Monaco Editor, CourseChallengePanel, test runner, and hint system loaded and responded accurately.
+
 

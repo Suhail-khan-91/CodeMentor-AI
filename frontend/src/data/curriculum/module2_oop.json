@@ -1,0 +1,322 @@
+{
+  "module_id": "module_2",
+  "module_number": 2,
+  "title": "Object-Oriented Programming (OOP)",
+  "description": "Master classes, objects, encapsulation, static members, inheritance, polymorphism, abstraction, and memory internals.",
+  "sessions": [
+    {
+      "session_id": "session_08",
+      "session_number": 8,
+      "title": "Session 8 - OOP Part 1: Class & Object",
+      "video_url": "https://www.youtube.com/watch?v=Trvqq5w7-0Q",
+      "notebook_file": "08_oop_part1_class_and_object.ipynb",
+      "lessons": [
+        {
+          "lesson_id": "lesson_08_01",
+          "title": "Class Blueprints, Objects & The Constructor (__init__)",
+          "concept_markdown": "Object-Oriented Programming (OOP) organizes code into reusable structures representing real-world entities:\n- **Class**: The blueprint defining properties (attributes) and behaviors (methods).\n- **Object**: A concrete instance created from the class blueprint.\n- **`__init__` Constructor**: Special method automatically called when a new object is instantiated.\n- **`self`**: The reference pointing to the specific instance currently invoking the method.",
+          "code_walkthroughs": [
+            {
+              "title": "Creating a Simple Person Class",
+              "code": "class Person:\n    def __init__(self, name, age):\n        self.name = name\n        self.age = age\n\n    def greet(self):\n        return f'Hello, my name is {self.name} and I am {self.age} years old.'\n\np = Person('Suhail', 24)\nprint(p.greet())",
+              "expected_stdout": "Hello, my name is Suhail and I am 24 years old.\n",
+              "explanation": "`p = Person('Suhail', 24)` triggers `__init__`, binding `name` and `age` to the instance `p` via `self`."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_08_01_bank_account_class",
+              "title": "Bank Account Class",
+              "difficulty": "beginner",
+              "description": "Create a class `BankAccount` with:\n- `__init__(self, owner, balance)`\n- `deposit(self, amount)` that adds `amount` to `balance` and returns the new balance\n- `withdraw(self, amount)` that deducts `amount` if funds are sufficient, or returns `'Insufficient funds'` if `amount > balance`.\n\nInput format: 4 lines containing `owner`, `initial_balance`, `deposit_amount`, `withdraw_amount`.",
+              "starter_code": "class BankAccount:\n    # Your implementation here\n    pass\n\nowner = input().strip()\nbalance = float(input())\ndep = float(input())\nwdraw = float(input())\n\nacc = BankAccount(owner, balance)\nprint(acc.deposit(dep))\nprint(acc.withdraw(wdraw))\n",
+              "solution_code": "class BankAccount:\n    def __init__(self, owner, balance):\n        self.owner = owner\n        self.balance = balance\n\n    def deposit(self, amount):\n        self.balance += amount\n        return self.balance\n\n    def withdraw(self, amount):\n        if amount > self.balance:\n            return 'Insufficient funds'\n        self.balance -= amount\n        return self.balance\n\nowner = input().strip()\nbalance = float(input())\ndep = float(input())\nwdraw = float(input())\n\nacc = BankAccount(owner, balance)\nprint(acc.deposit(dep))\nprint(acc.withdraw(wdraw))",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Normal deposit and valid withdrawal",
+                  "stdin": "Suhail\n1000\n500\n300",
+                  "expected_output": "1500.0\n1200.0",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "Overdraft attempt",
+                  "stdin": "Nitish\n500\n100\n800",
+                  "expected_output": "600.0\nInsufficient funds",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Store balance on self.balance in __init__.",
+                "level_2_strategy": "In withdraw, check if amount > self.balance first. If so, return 'Insufficient funds'; otherwise subtract and return self.balance.",
+                "level_3_clue": "def withdraw(self, amount):\n    if amount > self.balance:\n        return 'Insufficient funds'\n    self.balance -= amount\n    return self.balance"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "session_id": "session_09",
+      "session_number": 9,
+      "title": "Session 9 - OOP Part 2: Encapsulation & Static Members",
+      "video_url": "https://www.youtube.com/watch?v=P4xizq3CiJg",
+      "notebook_file": "09_oop_part2_encapsulation_static.ipynb",
+      "lessons": [
+        {
+          "lesson_id": "lesson_09_01",
+          "title": "Encapsulation, Private Attributes & Static Methods",
+          "concept_markdown": "- **Encapsulation**: Restricting direct external access to internal object state. Prefixing attribute names with double underscores (e.g. `__pin`, `__balance`) invokes Python's name mangling (`_ClassName__var`), preventing direct modification.\n- **Getters & Setters**: Controlled public methods for reading and validating modifications.\n- **Static / Class Variables**: Variables shared across all class instances (e.g. `counter`), accessed via `ClassName.var`.\n- **`@staticmethod`**: Utility functions that don't depend on instance (`self`) or class (`cls`) state.",
+          "code_walkthroughs": [
+            {
+              "title": "Private Attributes with Getter/Setter",
+              "code": "class User:\n    def __init__(self, username, pin):\n        self.username = username\n        self.__pin = pin\n\n    def check_pin(self, attempt):\n        return self.__pin == attempt\n\nu = User('alice', 1234)\nprint(u.username, u.check_pin(1234), u.check_pin(9999))",
+              "expected_stdout": "alice True False\n",
+              "explanation": "`__pin` cannot be accessed directly as `u.__pin`. It is verified securely via `check_pin`."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_09_01_secure_atm",
+              "title": "Encapsulated ATM Pin Validator",
+              "difficulty": "intermediate",
+              "description": "Create a class `Atm` with:\n- Private PIN initialized from input (`self.__pin`).\n- `change_pin(old_pin, new_pin)`: If `old_pin` matches `self.__pin` and `new_pin` is 4 digits (integer between `1000` and `9999`), update `__pin` and return `'PIN changed'`. Otherwise return `'Invalid request'`.\n- `verify(attempt_pin)`: Returns `True` if `attempt_pin == self.__pin`, else `False`.\n\nInput lines: `initial_pin`, `change_old`, `change_new`, `verify_pin`.",
+              "starter_code": "class Atm:\n    # Implement encapsulated ATM\n    pass\n\ninit_p = int(input())\nold_p = int(input())\nnew_p = int(input())\nver_p = int(input())\n\natm = Atm(init_p)\nprint(atm.change_pin(old_p, new_p))\nprint(atm.verify(ver_p))\n",
+              "solution_code": "class Atm:\n    def __init__(self, pin):\n        self.__pin = pin\n\n    def change_pin(self, old_pin, new_pin):\n        if old_pin == self.__pin and 1000 <= new_pin <= 9999:\n            self.__pin = new_pin\n            return 'PIN changed'\n        return 'Invalid request'\n\n    def verify(self, attempt_pin):\n        return self.__pin == attempt_pin\n\ninit_p = int(input())\nold_p = int(input())\nnew_p = int(input())\nver_p = int(input())\n\natm = Atm(init_p)\nprint(atm.change_pin(old_p, new_p))\nprint(atm.verify(ver_p))",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Valid PIN change and verification",
+                  "stdin": "1234\n1234\n5678\n5678",
+                  "expected_output": "PIN changed\nTrue",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "Incorrect old PIN",
+                  "stdin": "1234\n0000\n5678\n1234",
+                  "expected_output": "Invalid request\nTrue",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Store pin as self.__pin to prevent external mutation.",
+                "level_2_strategy": "In change_pin, verify both old_pin == self.__pin and 1000 <= new_pin <= 9999.",
+                "level_3_clue": "if old_pin == self.__pin and 1000 <= new_pin <= 9999:\n    self.__pin = new_pin\n    return 'PIN changed'"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "session_id": "session_10",
+      "session_number": 10,
+      "title": "Session 10 - OOP Part 3: Inheritance & Polymorphism",
+      "video_url": "https://www.youtube.com/watch?v=bEWwM4hXZg8",
+      "notebook_file": "10_oop_part3_inheritance_polymorphism.ipynb",
+      "lessons": [
+        {
+          "lesson_id": "lesson_10_01",
+          "title": "Inheritance, super() & Method Overriding",
+          "concept_markdown": "- **Inheritance ('Is-A' relationship)**: A child class inherits attributes and methods from a parent class (`class Child(Parent):`).\n- **`super()`**: Calls parent methods and constructors (`super().__init__(...)`).\n- **Method Overriding**: Child class provides a specific implementation of a method defined in the parent class.\n- **Polymorphism**: The ability of different classes to respond to the same method call with class-specific behaviors.",
+          "code_walkthroughs": [
+            {
+              "title": "Inheritance with super()",
+              "code": "class Animal:\n    def speak(self):\n        return 'Some sound'\n\nclass Dog(Animal):\n    def speak(self):\n        return 'Woof!'\n\nprint(Animal().speak())\nprint(Dog().speak())",
+              "expected_stdout": "Some sound\nWoof!\n",
+              "explanation": "`Dog` overrides the `speak()` method of `Animal` while inheriting all other animal traits."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_10_01_shape_polymorphism",
+              "title": "Shape Hierarchy & Polymorphic Area",
+              "difficulty": "intermediate",
+              "description": "Create a base class `Shape` with method `area()` returning `0`.\nCreate child classes:\n- `Rectangle(Shape)`: takes `width, height`, `area()` returns `width * height`.\n- `Circle(Shape)`: takes `radius`, `area()` returns `3.14 * radius * radius`.\n\nInput lines: `width`, `height`, `radius`. Instantiate both and print their areas (round float output to 2 decimals).",
+              "starter_code": "class Shape:\n    def area(self):\n        return 0\n\n# Implement Rectangle and Circle\n\nw = float(input())\nh = float(input())\nr = float(input())\n\nrect = Rectangle(w, h)\ncirc = Circle(r)\nprint(round(rect.area(), 2))\nprint(round(circ.area(), 2))\n",
+              "solution_code": "class Shape:\n    def area(self):\n        return 0\n\nclass Rectangle(Shape):\n    def __init__(self, width, height):\n        self.width = width\n        self.height = height\n\n    def area(self):\n        return self.width * self.height\n\nclass Circle(Shape):\n    def __init__(self, radius):\n        self.radius = radius\n\n    def area(self):\n        return 3.14 * self.radius * self.radius\n\nw = float(input())\nh = float(input())\nr = float(input())\n\nrect = Rectangle(w, h)\ncirc = Circle(r)\nprint(round(rect.area(), 2))\nprint(round(circ.area(), 2))",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Standard dimensions",
+                  "stdin": "5\n10\n4",
+                  "expected_output": "50.0\n50.24",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "Decimals dimensions",
+                  "stdin": "2.5\n4\n7",
+                  "expected_output": "10.0\n153.86",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Inherit Rectangle and Circle from Shape, and override area() in both.",
+                "level_2_strategy": "Rectangle.area() returns self.width * self.height. Circle.area() returns 3.14 * self.radius ** 2.",
+                "level_3_clue": "class Rectangle(Shape):\n    def area(self):\n        return self.width * self.height"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "session_id": "session_11",
+      "session_number": 11,
+      "title": "Session 11 - Week 3: Interview Questions & Object Internals",
+      "video_url": "https://www.youtube.com/watch?v=HQH5FxvJXzI",
+      "notebook_file": "11_week3_interview_questions.ipynb",
+      "lessons": [
+        {
+          "lesson_id": "lesson_11_01",
+          "title": "Class Methods, Dunder Methods & Operator Overloading",
+          "concept_markdown": "- **`@classmethod`**: Receives class reference `cls` instead of `self`. Useful as alternative constructors.\n- **Dunder (Magic) Methods**: Special double-underscore methods that hook into Python language syntax:\n  - `__str__`: User-friendly string representation (`print(obj)`)\n  - `__repr__`: Official unambiguous representation for debugging\n  - `__add__`: Overloads the `+` operator\n  - `__len__`: Implements `len(obj)`",
+          "code_walkthroughs": [
+            {
+              "title": "Vector Addition with __add__",
+              "code": "class Vector:\n    def __init__(self, x, y):\n        self.x, self.y = x, y\n\n    def __add__(self, other):\n        return Vector(self.x + other.x, self.y + other.y)\n\n    def __str__(self):\n        return f'Vector({self.x}, {self.y})'\n\nv1 = Vector(2, 4)\nv2 = Vector(3, 1)\nprint(v1 + v2)",
+              "expected_stdout": "Vector(5, 5)\n",
+              "explanation": "Overloading `__add__` enables using `+` directly between custom `Vector` instances."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_11_01_fraction_overload",
+              "title": "Fraction Class Operator Overloading",
+              "difficulty": "intermediate",
+              "description": "Create a `Fraction` class with `num` and `den`.\n- Implement `__add__(self, other)`: returns a new `Fraction` representing sum `(num1*den2 + num2*den1) / (den1*den2)`.\n- Implement `__str__(self)`: returns `'{num}/{den}'`.\n\nInput lines: `num1`, `den1`, `num2`, `den2`.",
+              "starter_code": "class Fraction:\n    # Implement __init__, __add__, __str__\n    pass\n\nn1 = int(input())\nd1 = int(input())\nn2 = int(input())\nd2 = int(input())\n\nf1 = Fraction(n1, d1)\nf2 = Fraction(n2, d2)\nprint(f1 + f2)\n",
+              "solution_code": "class Fraction:\n    def __init__(self, num, den):\n        self.num = num\n        self.den = den\n\n    def __add__(self, other):\n        new_num = self.num * other.den + other.num * self.den\n        new_den = self.den * other.den\n        return Fraction(new_num, new_den)\n\n    def __str__(self):\n        return f'{self.num}/{self.den}'\n\nn1 = int(input())\nd1 = int(input())\nn2 = int(input())\nd2 = int(input())\n\nf1 = Fraction(n1, d1)\nf2 = Fraction(n2, d2)\nprint(f1 + f2)",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "1/2 + 1/3 = 5/6",
+                  "stdin": "1\n2\n1\n3",
+                  "expected_output": "5/6",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "3/4 + 2/5 = 23/20",
+                  "stdin": "3\n4\n2\n5",
+                  "expected_output": "23/20",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "The formula for adding fractions is (n1*d2 + n2*d1) / (d1*d2).",
+                "level_2_strategy": "Return a new Fraction instance from __add__ and format string in __str__.",
+                "level_3_clue": "def __add__(self, other):\n    return Fraction(self.num * other.den + other.num * self.den, self.den * other.den)"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "session_id": "session_12",
+      "session_number": 12,
+      "title": "Session 12 - Abstraction & Abstract Base Classes",
+      "video_url": "https://www.youtube.com/watch?v=O-NrQvtorp0",
+      "notebook_file": "12_oop_abstraction.ipynb",
+      "lessons": [
+        {
+          "lesson_id": "lesson_12_01",
+          "title": "Abstract Base Classes (ABC) & Enforcement",
+          "concept_markdown": "- **Abstraction**: Hiding low-level implementation details and enforcing consistent interfaces across subclasses.\n- **`abc` Module**: Python's `abc` module provides `ABC` and `@abstractmethod`.\n- **Interface Contract**: Any class inheriting from an abstract base class **must** implement all abstract methods. Attempting to instantiate a subclass that misses an abstract method raises a `TypeError` at runtime.",
+          "code_walkthroughs": [
+            {
+              "title": "Abstract Vehicle Class",
+              "code": "from abc import ABC, abstractmethod\n\nclass Vehicle(ABC):\n    @abstractmethod\n    def drive(self):\n        pass\n\nclass Car(Vehicle):\n    def drive(self):\n        return 'Car is driving on roads.'\n\nprint(Car().drive())",
+              "expected_stdout": "Car is driving on roads.\n",
+              "explanation": "`Car` implements `drive()`, fulfilling the contract defined in `Vehicle`."
+            }
+          ],
+          "practice_challenges": [
+            {
+              "id": "chal_12_01_payment_gateway",
+              "title": "Abstract Payment Gateway",
+              "difficulty": "intermediate",
+              "description": "Define an abstract class `PaymentGateway(ABC)` with `@abstractmethod` `pay(self, amount)`.\nImplement concrete subclasses:\n- `CreditCard`: `pay(amount)` returns `'Paid ${amount} via Credit Card'`\n- `UPI`: `pay(amount)` returns `'Paid ${amount} via UPI'`\n\nInput lines: `gateway_type` ('card' or 'upi') and `amount` (int). Print result of `pay(amount)`.",
+              "starter_code": "from abc import ABC, abstractmethod\n\n# Define PaymentGateway, CreditCard, UPI\n\ngateway_type = input().strip().lower()\namount = int(input())\n\n# Your code here\n",
+              "solution_code": "from abc import ABC, abstractmethod\n\nclass PaymentGateway(ABC):\n    @abstractmethod\n    def pay(self, amount):\n        pass\n\nclass CreditCard(PaymentGateway):\n    def pay(self, amount):\n        return f'Paid ${amount} via Credit Card'\n\nclass UPI(PaymentGateway):\n    def pay(self, amount):\n        return f'Paid ${amount} via UPI'\n\ngateway_type = input().strip().lower()\namount = int(input())\n\ngw = CreditCard() if gateway_type == 'card' else UPI()\nprint(gw.pay(amount))",
+              "test_cases": [
+                {
+                  "id": "tc_01",
+                  "description": "Card payment",
+                  "stdin": "card\n150",
+                  "expected_output": "Paid $150 via Credit Card",
+                  "is_hidden": false,
+                  "match_mode": "trimmed"
+                },
+                {
+                  "id": "tc_02",
+                  "description": "UPI payment",
+                  "stdin": "upi\n499",
+                  "expected_output": "Paid $499 via UPI",
+                  "is_hidden": true,
+                  "match_mode": "trimmed"
+                }
+              ],
+              "hints": {
+                "level_1_nudge": "Inherit both CreditCard and UPI from PaymentGateway and implement pay(self, amount).",
+                "level_2_strategy": "Check gateway_type == 'card' to instantiate CreditCard, otherwise UPI, then call .pay(amount).",
+                "level_3_clue": "gw = CreditCard() if gateway_type == 'card' else UPI()\nprint(gw.pay(amount))"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "chapter_exam": {
+    "exam_id": "exam_module_2",
+    "title": "Module 2 Mastery Exam — Object-Oriented Programming",
+    "description": "Comprehensive evaluation covering class design, encapsulation, inheritance, polymorphism, and abstract contracts. Passing requires scoring >= 80%.",
+    "passing_score_percentage": 80.0,
+    "questions": [
+      {
+        "id": "exam_02_employee_hierarchy",
+        "title": "Employee Payroll Hierarchy",
+        "difficulty": "intermediate",
+        "description": "Build an inheritance hierarchy:\n- Base class `Employee(name, base_salary)` with method `get_salary()` returning `base_salary`.\n- Child class `Manager(name, base_salary, bonus)` with method `get_salary()` returning `base_salary + bonus`.\n- Child class `Developer(name, base_salary, overtime_hours, hourly_rate)` with `get_salary()` returning `base_salary + (overtime_hours * hourly_rate)`.\n\nInput lines: `emp_type` ('manager' or 'developer'), `name`, `base_salary`, and secondary params (bonus OR overtime_hours + hourly_rate). Print salary rounded to integer.",
+        "starter_code": "class Employee:\n    def __init__(self, name, base_salary):\n        self.name = name\n        self.base_salary = base_salary\n\n    def get_salary(self):\n        return self.base_salary\n\n# Implement Manager and Developer\n",
+        "solution_code": "class Employee:\n    def __init__(self, name, base_salary):\n        self.name = name\n        self.base_salary = base_salary\n\n    def get_salary(self):\n        return self.base_salary\n\nclass Manager(Employee):\n    def __init__(self, name, base_salary, bonus):\n        super().__init__(name, base_salary)\n        self.bonus = bonus\n\n    def get_salary(self):\n        return self.base_salary + self.bonus\n\nclass Developer(Employee):\n    def __init__(self, name, base_salary, overtime_hours, hourly_rate):\n        super().__init__(name, base_salary)\n        self.overtime_hours = overtime_hours\n        self.hourly_rate = hourly_rate\n\n    def get_salary(self):\n        return self.base_salary + (self.overtime_hours * self.hourly_rate)\n\nemp_type = input().strip().lower()\nname = input().strip()\nbase = float(input())\nif emp_type == 'manager':\n    bonus = float(input())\n    emp = Manager(name, base, bonus)\nelse:\n    hours = float(input())\n    rate = float(input())\n    emp = Developer(name, base, hours, rate)\nprint(int(emp.get_salary()))",
+        "test_cases": [
+          {
+            "id": "tc_exam_01",
+            "description": "Manager salary calculation",
+            "stdin": "manager\nAlice\n80000\n15000",
+            "expected_output": "95000",
+            "match_mode": "trimmed",
+            "is_hidden": false
+          },
+          {
+            "id": "tc_exam_02",
+            "description": "Developer salary with overtime",
+            "stdin": "developer\nBob\n70000\n20\n50",
+            "expected_output": "71000",
+            "match_mode": "trimmed",
+            "is_hidden": true
+          }
+        ],
+        "hints": {
+          "level_1_nudge": "Call super().__init__(name, base_salary) in both child classes.",
+          "level_2_strategy": "Override get_salary() to add bonus for Manager, and (hours * rate) for Developer.",
+          "level_3_clue": "class Manager(Employee):\n    def get_salary(self):\n        return self.base_salary + self.bonus"
+        }
+      }
+    ]
+  }
+}

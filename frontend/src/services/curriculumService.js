@@ -10,10 +10,20 @@
 
 import catalogData from '../data/curriculum/index.json';
 import module1Data from '../data/curriculum/module1_fundamentals.json';
+import module2Data from '../data/curriculum/module2_oop.json';
+import module3Data from '../data/curriculum/module3_advanced.json';
+import module4Data from '../data/curriculum/module4_numpy.json';
+import module5Data from '../data/curriculum/module5_pandas.json';
+import module6Data from '../data/curriculum/module6_visualization.json';
 
 // Registry of statically loaded and future modules
 const MODULE_REGISTRY = {
   module_1: module1Data,
+  module_2: module2Data,
+  module_3: module3Data,
+  module_4: module4Data,
+  module_5: module5Data,
+  module_6: module6Data,
 };
 
 const STORAGE_KEY = 'codementor_curriculum_progress_v1';
