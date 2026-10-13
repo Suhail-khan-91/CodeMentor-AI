@@ -1,75 +1,131 @@
 /**
- * AITutorPanel.jsx — Phase A7: Socratic AI Tutor Component (Upgraded)
+ * AITutorPanel.jsx — Unified Socratic AI Tutor Component
  *
- * Conversational Socratic AI mentor that guides reasoning without ever
- * providing full copy-paste answers.
+ * Clean, professional, conversational AI mentorship interface used in both:
+ * 1. Course Mode (CourseChallengePanel)
+ * 2. Custom Practice Mode (CustomQuestionPanel)
  *
  * Features:
- * - Conversational student / AI speech bubbles
- * - Interactive quick-prompt chips (e.g. 'Trace variables', 'Check loop condition')
- * - Sub-tier conceptual and strategy breakdowns
- * - Structural code skeletons
- * - Settings configuration trigger
- * - Help counter event tracking
+ * - Direct conversational chat stream with student and tutor bubbles
+ * - Active AI provider badge (Offline Mock, OpenRouter, Ollama, OpenAI)
+ * - Settings configuration button (⚙️) opening AISettingsModal
+ * - One-click Socratic quick prompt chips
+ * - Progressive conceptual hints & strategy guidance without answer leakage
  */
 
-import { useState } from 'react';
-import { askAITutor, recordHelpEvent } from '../services/api';
+import { useState, useEffect, useRef } from 'react';
+import { askAITutor, getAIConfig, recordHelpEvent } from '../services/api';
 import AISettingsModal from './AISettingsModal';
 import './AITutorPanel.css';
 
 export default function AITutorPanel({
-  code,
+  code = '',
   activeTask = null,
   evaluationResult = null,
   diagnostic = null,
   executionDetails = null,
 }) {
-  const [isOpen, setIsOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [activeProvider, setActiveProvider] = useState('mock');
   const [question, setQuestion] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [tutorData, setTutorData] = useState(null);
-  const [lastUserQuestion, setLastUserQuestion] = useState('');
   const [apiError, setApiError] = useState(null);
+
+  // Chat conversation history
+  const [messages, setMessages] = useState([
+    {
+      id: 'welcome',
+      role: 'assistant',
+      text: "Hello! I'm your Socratic AI Tutor. I help you build understanding step-by-step without giving away full solutions. Ask me about the problem requirements, your logic, or edge cases!",
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    },
+  ]);
+
+  const chatEndRef = useRef(null);
+
+  // Scroll to bottom on new message
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isLoading]);
+
+  // Load current provider config
+  const fetchProviderConfig = () => {
+    getAIConfig()
+      .then((res) => {
+        if (res?.config?.provider) {
+          const p = res.config.provider;
+          if (p === 'cloud') {
+            const cp = res.config?.cloud?.provider_name;
+            setActiveProvider(cp === 'openrouter' ? 'OpenRouter' : 'Cloud AI');
+          } else if (p === 'ollama') {
+            setActiveProvider('Ollama');
+          } else {
+            setActiveProvider('Offline Mock');
+          }
+        }
+      })
+      .catch(() => {});
+  };
+
+  useEffect(() => {
+    fetchProviderConfig();
+  }, []);
 
   const handleAsk = async (e, forcedQuestion = null) => {
     if (e) e.preventDefault();
     if (isLoading) return;
 
     const queryText = (forcedQuestion !== null ? forcedQuestion : question).trim();
+    if (!queryText) return;
+
+    const userMsg = {
+      id: `user_${Date.now()}`,
+      role: 'user',
+      text: queryText,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+
+    setMessages((prev) => [...prev, userMsg]);
+    setQuestion('');
     setIsLoading(true);
     setApiError(null);
-    setIsOpen(true);
-    if (queryText) setLastUserQuestion(queryText);
 
     try {
       const response = await askAITutor({
         code,
         taskId: activeTask?.id || null,
         task: activeTask || null,
-        question: queryText || undefined,
+        question: queryText,
         diagnostic,
         evaluationResult,
         executionDetails,
       });
 
-      setTutorData(response);
-      setQuestion('');
+      const aiMsg = {
+        id: `ai_${Date.now()}`,
+        role: 'assistant',
+        text: response.socratic_guidance || 'Consider breaking down the problem into smaller, verifiable steps.',
+        nudge: response.conceptual_nudge,
+        strategy: response.strategy,
+        clue: response.structural_clue,
+        suggestedActions: response.suggested_actions,
+        provider: response.provider || activeProvider,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
 
-      // Phase A11: Track AI Tutor inquiry assistance event
+      setMessages((prev) => [...prev, aiMsg]);
+
+      // Record help event
       if (response && response.success !== false) {
         recordHelpEvent('ai_tutor_ask', {
           task_id: activeTask?.id || null,
-          task_title: activeTask?.title || 'Custom/Free Code',
-          question: queryText || undefined,
+          task_title: activeTask?.title || 'Coding Practice',
+          question: queryText,
         })
           .then(() => {
             window.dispatchEvent(new CustomEvent('help-counter-updated'));
           })
-          .catch((err) => {
-            console.warn('Failed to record tutor assistance event:', err);
-          });
+          .catch(() => {});
       }
     } catch (err) {
       setApiError(err.message || 'Failed to reach AI Tutor.');
@@ -78,172 +134,178 @@ export default function AITutorPanel({
     }
   };
 
-  const handleToggle = () => {
-    const nextState = !isOpen;
-    setIsOpen(nextState);
-    if (nextState && !tutorData && !isLoading) {
-      handleAsk(null, 'Help me think through this step');
-    }
-  };
-
   return (
-    <section className="ai-tutor-shell" aria-label="AI Tutor Guidance">
-      {/* Header bar */}
-      <div className="tutor-header">
-        <div className="tutor-header__title-group">
-          <div className="tutor-avatar" aria-hidden="true">✦</div>
+    <div className="unified-tutor-container">
+      {/* ── Tutor Header ── */}
+      <div className="unified-tutor-header">
+        <div className="unified-tutor-header__left">
+          <span className="unified-tutor-avatar" aria-hidden="true">🤖</span>
           <div>
-            <h4 className="tutor-name">AI Tutor</h4>
-            <div className="tutor-status-pill">
-              <span className="tutor-dot" aria-hidden="true" />
-              <span>{tutorData ? `${tutorData.provider} Socratic` : 'Active'}</span>
+            <h4 className="unified-tutor-title">Socratic AI Tutor</h4>
+            <div className="unified-tutor-provider-pill">
+              <span className="unified-tutor-dot" />
+              <span>{activeProvider}</span>
             </div>
           </div>
         </div>
 
-        <div className="tutor-header__actions">
+        <div className="unified-tutor-header__right">
           <button
             type="button"
-            className="btn btn--ghost btn-icon btn-sm"
+            className="unified-tutor-settings-btn"
             onClick={() => setIsSettingsOpen(true)}
-            title="Configure AI Provider"
-            id="btn-tutor-config"
+            title="Configure AI Provider & Settings"
+            id="btn-open-tutor-settings"
           >
-            ⚙️
-          </button>
-          <button
-            type="button"
-            className="btn btn--ghost btn-sm tutor-toggle-btn"
-            onClick={handleToggle}
-            aria-expanded={isOpen}
-          >
-            {isOpen ? 'Close ▴' : 'Ask Tutor ▾'}
+            <span aria-hidden="true">⚙️</span>
+            <span>Settings</span>
           </button>
         </div>
       </div>
 
-      {/* Expanded Workspace */}
-      {isOpen && (
-        <div className="tutor-workspace">
-          {/* Conversational Stream */}
-          <div className="tutor-chat-stream">
-            {/* User message if one was asked */}
-            {lastUserQuestion && (
-              <div className="chat-bubble chat-bubble--student">
-                <span className="bubble-author">You</span>
-                <p className="bubble-text">{lastUserQuestion}</p>
+      {/* ── Chat Messages Stream ── */}
+      <div className="unified-tutor-stream">
+        {messages.map((msg) => (
+          <div
+            key={msg.id}
+            className={`unified-msg unified-msg--${msg.role}`}
+          >
+            <div className="unified-msg__bubble">
+              <div className="unified-msg__header">
+                <span className="unified-msg__author">
+                  {msg.role === 'user' ? 'You' : 'AI Tutor'}
+                </span>
+                <span className="unified-msg__time">{msg.timestamp}</span>
               </div>
-            )}
 
-            {/* AI Response Card */}
-            {tutorData && !isLoading && (
-              <div className="chat-bubble chat-bubble--ai">
-                <span className="bubble-author bubble-author--ai">AI Tutor</span>
-                <p className="bubble-text bubble-text--socratic">
-                  {tutorData.socratic_guidance}
-                </p>
+              <div className="unified-msg__text">{msg.text}</div>
 
-                {/* Sub-tier hints */}
-                {(tutorData.conceptual_nudge || tutorData.strategy) && (
-                  <div className="tutor-sub-grid">
-                    {tutorData.conceptual_nudge && (
-                      <div className="tutor-mini-card tutor-mini-card--nudge">
-                        <span className="tutor-mini-badge">🌱 Conceptual Nudge</span>
-                        <p className="tutor-mini-text">{tutorData.conceptual_nudge}</p>
-                      </div>
-                    )}
-                    {tutorData.strategy && (
-                      <div className="tutor-mini-card tutor-mini-card--strategy">
-                        <span className="tutor-mini-badge">🧭 Strategy Direction</span>
-                        <p className="tutor-mini-text">{tutorData.strategy}</p>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Structural Clue Skeleton */}
-                {tutorData.structural_clue && (
-                  <div className="tutor-clue-box">
-                    <span className="tutor-mini-badge">🧩 Structural Pattern</span>
-                    <pre className="tutor-clue-code"><code>{tutorData.structural_clue}</code></pre>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Suggested quick chips */}
-            {tutorData?.suggested_actions?.length > 0 && (
-              <div className="tutor-chips-row">
-                <span className="tutor-chips-label">Next Ideas:</span>
-                {tutorData.suggested_actions.map((chip, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    className="tutor-chip"
-                    onClick={() => handleAsk(null, chip)}
-                  >
-                    {chip}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Loading animation */}
-            {isLoading && (
-              <div className="tutor-loading-state" role="status">
-                <div className="tutor-typing-dots" aria-hidden="true">
-                  <span /><span /><span />
+              {/* Sub-tier hints from tutor response */}
+              {(msg.nudge || msg.strategy) && (
+                <div className="unified-tutor-hints-grid">
+                  {msg.nudge && (
+                    <div className="unified-hint-card unified-hint-card--nudge">
+                      <span className="unified-hint-badge">🌱 Conceptual Nudge</span>
+                      <p className="unified-hint-text">{msg.nudge}</p>
+                    </div>
+                  )}
+                  {msg.strategy && (
+                    <div className="unified-hint-card unified-hint-card--strategy">
+                      <span className="unified-hint-badge">🧭 Strategy Direction</span>
+                      <p className="unified-hint-text">{msg.strategy}</p>
+                    </div>
+                  )}
                 </div>
-                <span>Reasoning through your code…</span>
-              </div>
-            )}
+              )}
 
-            {/* Error banner */}
-            {!isLoading && apiError && (
-              <div className="tutor-error-banner" role="alert">
-                <span aria-hidden="true">⚠️</span>
-                <span>{apiError}</span>
-              </div>
-            )}
+              {msg.clue && (
+                <div className="unified-hint-card unified-hint-card--clue">
+                  <span className="unified-hint-badge">🧩 Structural Pattern</span>
+                  <pre className="unified-hint-code"><code>{msg.clue}</code></pre>
+                </div>
+              )}
+
+              {/* Quick suggestion chips */}
+              {msg.suggestedActions?.length > 0 && (
+                <div className="unified-chips-row">
+                  {msg.suggestedActions.map((chip, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      className="unified-chip-btn"
+                      onClick={() => handleAsk(null, chip)}
+                    >
+                      {chip}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
+        ))}
 
-          {/* Question Input Form */}
-          <form className="tutor-input-form" onSubmit={(e) => handleAsk(e)}>
-            <input
-              type="text"
-              className="input tutor-input-field"
-              placeholder="Ask a question or explain what feels stuck…"
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              disabled={isLoading}
-            />
-            <button
-              type="submit"
-              className="btn btn--accent btn-sm tutor-send-btn"
-              disabled={isLoading || !question.trim()}
-              id="btn-ask-ai-tutor"
-            >
-              {isLoading ? 'Thinking…' : 'Send'}
-            </button>
-          </form>
-
-          {/* Anti-spoiler guarantee footer */}
-          <div className="tutor-guarantee-footer">
-            <span>🛡️ Anti-Spoiler Guarantee: Reasoning guidance without solution leakage.</span>
+        {isLoading && (
+          <div className="unified-msg unified-msg--assistant">
+            <div className="unified-msg__bubble unified-msg__bubble--loading">
+              <div className="unified-typing-indicator" aria-hidden="true">
+                <span /><span /><span />
+              </div>
+              <span className="unified-loading-text">Analyzing your code & reasoning...</span>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* AI Settings Modal */}
+        {apiError && (
+          <div className="unified-alert-error" role="alert">
+            <span>⚠️ {apiError}</span>
+          </div>
+        )}
+
+        <div ref={chatEndRef} />
+      </div>
+
+      {/* ── Quick Starter Chips ── */}
+      <div className="unified-tutor-quick-chips">
+        <button
+          type="button"
+          className="unified-quick-pill"
+          onClick={() => handleAsk(null, 'Help me understand what this challenge requires.')}
+          disabled={isLoading}
+        >
+          📋 Explain Requirements
+        </button>
+        <button
+          type="button"
+          className="unified-quick-pill"
+          onClick={() => handleAsk(null, 'How should I structure the logic for this problem?')}
+          disabled={isLoading}
+        >
+          💡 Logic Structure
+        </button>
+        <button
+          type="button"
+          className="unified-quick-pill"
+          onClick={() => handleAsk(null, 'What edge cases should I test for in this code?')}
+          disabled={isLoading}
+        >
+          🔍 Edge Cases
+        </button>
+      </div>
+
+      {/* ── Bottom Input Bar ── */}
+      <form className="unified-tutor-input-bar" onSubmit={(e) => handleAsk(e)}>
+        <input
+          type="text"
+          className="unified-tutor-input"
+          placeholder="Ask AI Tutor for guidance..."
+          value={question}
+          onChange={(e) => setQuestion(e.target.value)}
+          disabled={isLoading}
+        />
+        <button
+          type="submit"
+          className="unified-tutor-send-btn"
+          disabled={isLoading || !question.trim()}
+          title="Send message"
+        >
+          <span>Ask</span>
+          <span aria-hidden="true">→</span>
+        </button>
+      </form>
+
+      {/* Anti-spoiler policy note */}
+      <div className="unified-tutor-footer-note">
+        <span>🛡️ Socratic Mentorship: Guiding reasoning without solution leakage.</span>
+      </div>
+
+      {/* AI Provider Settings Modal */}
       <AISettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
-        onConfigSaved={(cfg) => {
-          if (tutorData) {
-            setTutorData((prev) => ({ ...prev, provider: cfg.provider }));
-          }
+        onConfigSaved={() => {
+          fetchProviderConfig();
         }}
       />
-    </section>
+    </div>
   );
 }

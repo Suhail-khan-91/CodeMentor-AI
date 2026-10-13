@@ -125,13 +125,6 @@ export default function Navbar() {
             <span className="nav-icon" aria-hidden="true">⚙️</span>
             <span>AI Settings</span>
           </button>
-
-          {!isEditor && (
-            <a href="/editor" className="btn btn--accent navbar__cta-btn">
-              <span>Open Workspace</span>
-              <span aria-hidden="true">→</span>
-            </a>
-          )}
         </div>
       </div>
 

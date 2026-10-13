@@ -504,7 +504,7 @@ export default function CustomQuestionPanel({
 
             {/* SUB-TAB 3: AI TUTOR */}
             {activeSubTab === 'tutor' && (
-              <div className="task-tab-pane">
+              <div className="task-tab-pane" style={{ padding: 0, height: '100%' }}>
                 <AITutorPanel
                   code={code}
                   activeTask={question}

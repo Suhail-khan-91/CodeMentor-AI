@@ -130,4 +130,26 @@ Curriculum content is curated and adapted from CampusX's Data Science Mentorship
    - Session 8 lesson opened in Lesson Viewer modal; "Solve in IDE" successfully deep-linked to `/editor?mode=course&challengeId=chal_08_01_bank_account_class`.
    - Monaco Editor, CourseChallengePanel, test runner, and hint system loaded and responded accurately.
 
+### Phase B7: Modal Viewport Centering, OpenRouter Cloud Integration & Unified AI Tutor
+- **Objectives**:
+  - Remove redundant "Open Workspace" CTA button from navbar.
+  - Fix modal positioning: Replace navbar containment clipping by mounting `ProgressModal` and `AISettingsModal` onto `document.body` via `createPortal`, providing true horizontal and vertical viewport centering.
+  - Connect `ProgressModal` to the full 6-Module, 32-Session, 44-Challenge Python Curriculum, showing mastery gauge, completed lessons tally, challenges solved, exams passed, and module breakdown progress bars.
+  - Add OpenRouter as a first-class Cloud Provider preset in `AISettingsModal` with custom OpenAI-compatible base URL (`https://openrouter.ai/api/v1`), API key field, OpenRouter headers (`HTTP-Referer`, `X-Title`), and 5 quick model chips (`Llama 3.3 Free`, `Gemini 2.0 Free`, `DeepSeek Chat`, `Claude 3.5 Sonnet`, `GPT-4o Mini`).
+  - Unify the Socratic AI Tutor into a single, clean, professional chat component (`AITutorPanel.jsx`) shared identically between Course Mode (`CourseChallengePanel.jsx`) and Custom Practice Mode (`CustomQuestionPanel.jsx`), equipped with message stream, quick prompt pills, active provider indicator, and direct `⚙️ Settings` button.
+- **Files Modified**:
+  - `frontend/src/components/Navbar.jsx`
+  - `frontend/src/components/ProgressModal.jsx` & `ProgressModal.css`
+  - `frontend/src/components/AISettingsModal.jsx` & `AISettingsModal.css`
+  - `frontend/src/components/AITutorPanel.jsx` & `AITutorPanel.css`
+  - `frontend/src/components/curriculum/CourseChallengePanel.jsx`
+  - `frontend/src/components/CustomQuestionPanel.jsx`
+  - `backend/app/services/ai/providers/cloud_provider.py`
+  - `backend/app/services/ai/config_service.py`
+- **Verification**:
+  - `pytest`: 233 / 233 tests passed (including 14/14 AI config tests).
+  - `npm run build`: built cleanly in 136ms (0 errors).
+  - Browser Subagent: Visual verification confirmed centered Progress modal with live curriculum metrics, centered AI Settings modal with OpenRouter preset, and identical clean AI Tutor chat UI across Course and Custom Practice modes.
+
+
 

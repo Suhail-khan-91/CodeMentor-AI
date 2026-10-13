@@ -16,6 +16,7 @@ import {
   markChallengeSolved,
   recordExamAttempt,
 } from '../../services/curriculumService';
+import AITutorPanel from '../AITutorPanel';
 import StatusBadge from '../StatusBadge';
 import './CourseChallengePanel.css';
 
@@ -436,68 +437,12 @@ export default function CourseChallengePanel({
 
         {/* Tab 3: Socratic AI Tutor */}
         {activeTab === 'tutor' && (
-          <section className="ai-tutor-course-tab">
-            <button
-              type="button"
-              className="btn-ask-tutor-prompt"
-              onClick={() => handleAskTutor('Help me understand what this problem requires.')}
-              disabled={isTutorLoading}
-            >
-              <span>🤖</span> "Help me understand the requirement"
-            </button>
-            <button
-              type="button"
-              className="btn-ask-tutor-prompt"
-              onClick={() => handleAskTutor('What edge cases should I test for in this code?')}
-              disabled={isTutorLoading}
-            >
-              <span>🔍</span> "What edge cases should I check?"
-            </button>
-
-            <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
-              <input
-                type="text"
-                placeholder="Ask Socratic AI Tutor..."
-                value={tutorQuestion}
-                onChange={(e) => setTutorQuestion(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleAskTutor();
-                }}
-                style={{
-                  flex: 1,
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '8px',
-                  padding: '8px 12px',
-                  color: '#fff',
-                  fontSize: '0.85rem',
-                }}
-              />
-              <button
-                type="button"
-                className="btn-exam-step"
-                style={{ background: '#6366f1', color: '#fff' }}
-                onClick={() => handleAskTutor()}
-                disabled={isTutorLoading}
-              >
-                Ask
-              </button>
-            </div>
-
-            {isTutorLoading && (
-              <div style={{ fontSize: '0.85rem', color: '#a5b4fc', textAlign: 'center', padding: '12px' }}>
-                Consulting Socratic AI Tutor...
-              </div>
-            )}
-
-            {tutorAnswer && (
-              <div className="tutor-answer-box">
-                <div style={{ fontSize: '0.78rem', color: '#a5b4fc', fontWeight: '700', marginBottom: '4px' }}>
-                  Socratic AI Tutor:
-                </div>
-                {tutorAnswer}
-              </div>
-            )}
+          <section className="ai-tutor-course-tab" style={{ padding: 0, height: '100%' }}>
+            <AITutorPanel
+              code={code}
+              activeTask={challenge}
+              evaluationResult={evaluationResult}
+            />
           </section>
         )}
       </div>

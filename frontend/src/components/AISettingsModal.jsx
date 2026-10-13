@@ -7,6 +7,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { getAIConfig, saveAIConfig, testAIConnection } from '../services/api';
 import './AISettingsModal.css';
 
@@ -131,7 +132,7 @@ export default function AISettingsModal({ isOpen, onClose, onConfigSaved }) {
     }
   };
 
-  return (
+  return createPortal(
     <div className="ai-modal-backdrop" onClick={onClose} role="dialog" aria-modal="true">
       <div className="ai-modal-card" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
@@ -289,24 +290,47 @@ export default function AISettingsModal({ isOpen, onClose, onConfigSaved }) {
             <div className="ai-form-stack">
               <div className="ai-form-group">
                 <label className="ai-form-label" htmlFor="cloud-provider">
-                  <span>Provider Preset</span>
+                  <span>Cloud Provider Preset</span>
                 </label>
                 <select
                   id="cloud-provider"
                   className="ai-form-input ai-form-select"
                   value={cloudProvider}
                   onChange={(e) => {
-                    setCloudProvider(e.target.value);
-                    if (e.target.value === 'openai') {
+                    const prov = e.target.value;
+                    setCloudProvider(prov);
+                    if (prov === 'openrouter') {
+                      setCloudUrl('https://openrouter.ai/api/v1');
+                      setCloudModel('meta-llama/llama-3.3-70b-instruct:free');
+                    } else if (prov === 'openai') {
                       setCloudUrl('https://api.openai.com/v1');
                       setCloudModel('gpt-4o-mini');
                     }
                   }}
                 >
+                  <option value="openrouter">OpenRouter (100+ Models, DeepSeek, Claude, Llama)</option>
                   <option value="openai">OpenAI (Official API)</option>
                   <option value="custom">Custom / OpenAI-Compatible Endpoint</option>
                 </select>
               </div>
+
+              {cloudProvider === 'openrouter' && (
+                <div className="ai-info-box" style={{ padding: '12px 14px', background: 'rgba(99, 102, 241, 0.08)', borderColor: 'rgba(99, 102, 241, 0.25)' }}>
+                  <div style={{ fontSize: '0.78rem', color: '#c7d2fe', lineHeight: 1.5 }}>
+                    💡 <strong>OpenRouter</strong> connects to Claude 3.5, Gemini 2.0, DeepSeek, and Llama 3.3 with a single API key.
+                    Free-tier models (suffixed with <code>:free</code>) can be used with zero billing.
+                    {' '}
+                    <a
+                      href="https://openrouter.ai/keys"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: '#38bdf8', textDecoration: 'underline' }}
+                    >
+                      Get OpenRouter Key ↗
+                    </a>
+                  </div>
+                </div>
+              )}
 
               <div className="ai-form-group">
                 <label className="ai-form-label" htmlFor="cloud-url">
@@ -319,7 +343,7 @@ export default function AISettingsModal({ isOpen, onClose, onConfigSaved }) {
                     className="ai-form-input"
                     value={cloudUrl}
                     onChange={(e) => setCloudUrl(e.target.value)}
-                    placeholder="https://api.openai.com/v1"
+                    placeholder={cloudProvider === 'openrouter' ? 'https://openrouter.ai/api/v1' : 'https://api.openai.com/v1'}
                   />
                 </div>
               </div>
@@ -327,7 +351,7 @@ export default function AISettingsModal({ isOpen, onClose, onConfigSaved }) {
               <div className="ai-form-group">
                 <label className="ai-form-label" htmlFor="cloud-key">
                   <span>API Key</span>
-                  <span className="ai-form-help">Never exposed in plain text</span>
+                  <span className="ai-form-help">Securely masked</span>
                 </label>
                 <div className="ai-input-password-wrapper">
                   <input
@@ -336,7 +360,7 @@ export default function AISettingsModal({ isOpen, onClose, onConfigSaved }) {
                     className="ai-form-input ai-form-input--key"
                     value={cloudApiKey}
                     onChange={(e) => setCloudApiKey(e.target.value)}
-                    placeholder="sk-..."
+                    placeholder={cloudProvider === 'openrouter' ? 'sk-or-v1-...' : 'sk-...'}
                   />
                   <button
                     type="button"
@@ -362,6 +386,7 @@ export default function AISettingsModal({ isOpen, onClose, onConfigSaved }) {
               <div className="ai-form-group">
                 <label className="ai-form-label" htmlFor="cloud-model">
                   <span>Model Identifier</span>
+                  <span className="ai-form-help">Enter or click a suggestion below</span>
                 </label>
                 <div className="ai-input-wrapper">
                   <input
@@ -370,9 +395,38 @@ export default function AISettingsModal({ isOpen, onClose, onConfigSaved }) {
                     className="ai-form-input"
                     value={cloudModel}
                     onChange={(e) => setCloudModel(e.target.value)}
-                    placeholder="gpt-4o-mini"
+                    placeholder={cloudProvider === 'openrouter' ? 'meta-llama/llama-3.3-70b-instruct:free' : 'gpt-4o-mini'}
                   />
                 </div>
+
+                {cloudProvider === 'openrouter' && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
+                    {[
+                      { id: 'meta-llama/llama-3.3-70b-instruct:free', label: '🦙 Llama 3.3 (Free)' },
+                      { id: 'google/gemini-2.0-flash-exp:free', label: '⚡ Gemini 2.0 (Free)' },
+                      { id: 'deepseek/deepseek-chat', label: '🐋 DeepSeek Chat' },
+                      { id: 'anthropic/claude-3.5-sonnet', label: '🎭 Claude 3.5 Sonnet' },
+                      { id: 'openai/gpt-4o-mini', label: '🤖 GPT-4o Mini' },
+                    ].map((m) => (
+                      <button
+                        key={m.id}
+                        type="button"
+                        onClick={() => setCloudModel(m.id)}
+                        style={{
+                          background: cloudModel === m.id ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                          border: `1px solid ${cloudModel === m.id ? '#38bdf8' : 'rgba(255, 255, 255, 0.1)'}`,
+                          color: cloudModel === m.id ? '#38bdf8' : '#cbd5e1',
+                          padding: '3px 8px',
+                          borderRadius: '6px',
+                          fontSize: '0.72rem',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {m.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -452,6 +506,7 @@ export default function AISettingsModal({ isOpen, onClose, onConfigSaved }) {
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

@@ -232,7 +232,9 @@ class AIConfigService:
                     url,
                     headers={
                         "Authorization": f"Bearer {api_key}",
-                        "User-Agent": "CodeMentorAI/1.0"
+                        "User-Agent": "CodeMentorAI/1.0",
+                        "HTTP-Referer": "http://localhost:5173",
+                        "X-Title": "CodeMentor AI",
                     },
                     method="GET"
                 )

@@ -68,7 +68,9 @@ class CloudLLMClient(BaseLLMClient):
                 data=data_bytes,
                 headers={
                     "Content-Type": "application/json",
-                    "Authorization": f"Bearer {self.api_key}"
+                    "Authorization": f"Bearer {self.api_key}",
+                    "HTTP-Referer": "http://localhost:5173",
+                    "X-Title": "CodeMentor AI",
                 },
                 method="POST"
             )
