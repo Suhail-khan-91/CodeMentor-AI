@@ -13,7 +13,8 @@
 
 import { useState, useEffect } from 'react';
 import AITutorPanel from './AITutorPanel';
-import { evaluateCustomWithAI, recordProgressAttempt } from '../services/api';
+import AISettingsModal from './AISettingsModal';
+import { evaluateCustomWithAI, recordProgressAttempt, getAIConfig } from '../services/api';
 import './TaskEvaluationPanel.css';
 import './CustomQuestionPanel.css';
 
@@ -60,7 +61,6 @@ export default function CustomQuestionPanel({
   executionResult = null,
   onApplyStarterCode,
 }) {
-  const [questionTitle, setQuestionTitle] = useState(QUICK_PROMPTS[0].title);
   const [questionPrompt, setQuestionPrompt] = useState(QUICK_PROMPTS[0].prompt);
   const [selectedPromptId, setSelectedPromptId] = useState('star_triangle');
 
@@ -68,6 +68,34 @@ export default function CustomQuestionPanel({
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [evaluationResult, setEvaluationResult] = useState(null);
   const [evalError, setEvalError] = useState(null);
+
+  const [activeProvider, setActiveProvider] = useState('AI Ready');
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  const fetchProviderConfig = () => {
+    getAIConfig()
+      .then((res) => {
+        if (res?.config?.provider) {
+          const p = res.config.provider;
+          if (p === 'cloud') {
+            const cp = res.config?.cloud?.provider_name;
+            setActiveProvider(cp === 'openrouter' ? 'OpenRouter' : 'Cloud AI');
+          } else if (p === 'ollama') {
+            setActiveProvider('Ollama');
+          } else {
+            setActiveProvider('Mock AI');
+          }
+        }
+      })
+      .catch(() => setActiveProvider('Mock AI'));
+  };
+
+  useEffect(() => {
+    fetchProviderConfig();
+    const handleConfigUpdate = () => fetchProviderConfig();
+    window.addEventListener('ai-config-updated', handleConfigUpdate);
+    return () => window.removeEventListener('ai-config-updated', handleConfigUpdate);
+  }, []);
 
   // Sync initial starter code on first mount if starter code matches default
   useEffect(() => {
@@ -77,7 +105,6 @@ export default function CustomQuestionPanel({
   }, []);
 
   const handleSelectQuickPrompt = (item) => {
-    setQuestionTitle(item.title);
     setQuestionPrompt(item.prompt);
     setSelectedPromptId(item.id);
     setEvaluationResult(null);
@@ -97,7 +124,6 @@ export default function CustomQuestionPanel({
       const res = await evaluateCustomWithAI({
         code,
         question_prompt: questionPrompt,
-        question_title: questionTitle,
         execution_result: executionResult
       });
 
@@ -106,7 +132,7 @@ export default function CustomQuestionPanel({
       // Record telemetry in background
       recordProgressAttempt({
         taskId: selectedPromptId ? `custom_${selectedPromptId}` : 'custom_user_prompt',
-        taskTitle: questionTitle || 'Custom Practice',
+        taskTitle: questionPrompt ? questionPrompt.slice(0, 35) + '…' : 'Custom Practice',
         category: 'custom',
         scorePercentage: res.score || 0,
         passedAll: res.verdict === 'correct' || res.verdict === 'clean_code',
@@ -134,16 +160,20 @@ export default function CustomQuestionPanel({
           <span className="badge badge--blue">
             <span>✏️</span> Custom Practice
           </span>
-          <span className="custom-mode-subtag">
-            {hasPrompt ? 'Guided Challenge' : 'Free Sandbox'}
-          </span>
         </div>
 
         <div className="custom-q-header__right">
-          <span className="custom-status-indicator">
+          <button
+            type="button"
+            className="custom-status-indicator custom-status-btn"
+            onClick={() => setIsSettingsOpen(true)}
+            title="Configure AI Provider & Settings"
+            id="btn-custom-ai-settings"
+          >
             <span className="custom-status-dot" />
-            AI Ready
-          </span>
+            <span>{activeProvider}</span>
+            <span style={{ fontSize: '0.70rem', opacity: 0.85, marginLeft: '2px' }}>⚙️</span>
+          </button>
         </div>
       </div>
 
@@ -196,35 +226,18 @@ export default function CustomQuestionPanel({
             {/* Direct In-Place Editable Question Card */}
             <div className="custom-editable-card">
               <div className="custom-field-row">
-                <label htmlFor="custom-q-title" className="custom-field-label">
-                  Problem Title (Optional)
-                </label>
-                <input
-                  id="custom-q-title"
-                  type="text"
-                  className="input custom-title-input"
-                  value={questionTitle}
-                  onChange={(e) => {
-                    setQuestionTitle(e.target.value);
-                    setSelectedPromptId(null);
-                  }}
-                  placeholder="e.g. Reverse a String or Find Maximum Number"
-                />
-              </div>
-
-              <div className="custom-field-row" style={{ marginTop: '10px' }}>
                 <div className="custom-prompt-label-group">
                   <label htmlFor="custom-q-prompt" className="custom-field-label">
-                    Problem Requirements / Prompt
+                    Question Requirements / Problem Prompt
                   </label>
                   <span className="custom-prompt-hint">
-                    {hasPrompt ? 'AI will evaluate against this prompt' : 'Empty = Free Sandbox Mode'}
+                    {hasPrompt ? 'AI evaluates code against this prompt' : 'Empty = Free Sandbox Mode'}
                   </span>
                 </div>
                 <textarea
                   id="custom-q-prompt"
                   className="textarea custom-prompt-textarea"
-                  rows={4}
+                  rows={5}
                   value={questionPrompt}
                   onChange={(e) => {
                     setQuestionPrompt(e.target.value);
@@ -255,12 +268,6 @@ export default function CustomQuestionPanel({
                     : 'Review Code with AI'}
                 </span>
               </button>
-
-              <span className="custom-eval-note">
-                {hasPrompt
-                  ? 'Tests code logic against question requirements'
-                  : 'Checks syntax, execution, and code quality'}
-              </span>
             </div>
 
             {/* Error Message if API fails */}
@@ -349,7 +356,7 @@ export default function CustomQuestionPanel({
               code={code}
               activeTask={{
                 id: selectedPromptId || 'custom_task',
-                title: questionTitle || 'Custom Practice Problem',
+                title: questionPrompt ? 'Custom Challenge' : 'Freeform Sandbox',
                 description: questionPrompt || 'Freeform Python Sandbox'
               }}
               evaluationResult={evaluationResult}
@@ -358,6 +365,12 @@ export default function CustomQuestionPanel({
           </div>
         )}
       </div>
+
+      <AISettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        onConfigSaved={fetchProviderConfig}
+      />
     </div>
   );
 }

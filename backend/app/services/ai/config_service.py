@@ -12,6 +12,8 @@ import urllib.request
 import urllib.error
 from typing import Dict, Any, Optional
 
+import re
+
 DEFAULT_CONFIG: Dict[str, Any] = {
     "provider": os.getenv("AI_PROVIDER", "mock").lower().strip(),
     "ollama": {
@@ -25,6 +27,38 @@ DEFAULT_CONFIG: Dict[str, Any] = {
         "model": os.getenv("CLOUD_AI_MODEL", "gpt-4o-mini")
     }
 }
+
+
+def _resolve_initial_config() -> Dict[str, Any]:
+    """Resolve initial runtime configuration, inspecting api-key.txt if present."""
+    cfg = json.loads(json.dumps(DEFAULT_CONFIG))
+
+    for candidate in [
+        os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "api-key.txt"),
+        os.path.join(os.getcwd(), "api-key.txt"),
+        os.path.join(os.getcwd(), "..", "api-key.txt"),
+    ]:
+        norm = os.path.abspath(candidate)
+        if os.path.isfile(norm):
+            try:
+                with open(norm, "r", encoding="utf-8") as f:
+                    content = f.read()
+                key_match = re.search(r'api-key:\s*["\']?([^"\'\s]+)["\']?', content)
+                if key_match:
+                    raw_key = key_match.group(1).strip()
+                    cfg["cloud"]["api_key"] = raw_key
+                    if raw_key.startswith("sk-or-"):
+                        cfg["cloud"]["provider_name"] = "openrouter"
+                        cfg["cloud"]["base_url"] = "https://openrouter.ai/api/v1"
+                    if "gpt-4o-mini" in content:
+                        cfg["cloud"]["model"] = "openai/gpt-4o-mini"
+                    elif "apodex" in content:
+                        cfg["cloud"]["model"] = "apodex/apodex-1.1-mini:free"
+                    cfg["provider"] = "cloud"
+                    break
+            except Exception:
+                pass
+    return cfg
 
 
 def mask_api_key(key: str) -> str:
@@ -41,7 +75,7 @@ class AIConfigService:
     """Service managing runtime AI provider settings and connection testing."""
 
     def __init__(self, initial_config: Optional[Dict[str, Any]] = None):
-        self._config = initial_config.copy() if initial_config else json.loads(json.dumps(DEFAULT_CONFIG))
+        self._config = initial_config.copy() if initial_config else _resolve_initial_config()
 
     def get_config(self, mask_secrets: bool = True) -> Dict[str, Any]:
         """Retrieve current AI configuration, with sensitive keys masked by default."""
@@ -92,25 +126,35 @@ class AIConfigService:
 
         return self.get_config(mask_secrets=True)
 
+    def get_active_client(self):
+        """Instantiate and return the current active BaseLLMClient based on stored config."""
+        from app.services.ai.providers import get_llm_provider
+
+        provider = self._config.get("provider", "mock")
+        override_cfg = {}
+
+        if provider == "ollama":
+            override_cfg["OLLAMA_BASE_URL"] = self._config["ollama"].get("base_url")
+            override_cfg["OLLAMA_MODEL"] = self._config["ollama"].get("model")
+        elif provider == "cloud":
+            override_cfg["CLOUD_AI_BASE_URL"] = self._config["cloud"].get("base_url")
+            override_cfg["CLOUD_AI_API_KEY"] = self._config["cloud"].get("api_key")
+            override_cfg["CLOUD_AI_MODEL"] = self._config["cloud"].get("model")
+
+        return get_llm_provider(provider_type=provider, config=override_cfg)
+
     def _sync_tutor_engine(self):
-        """Update the A7 tutor engine's client to match new configuration."""
+        """Update both the tutor engine and custom evaluator clients to match new configuration."""
         try:
-            from app.services.ai import get_ai_tutor_engine
-            from app.services.ai.providers import get_llm_provider
+            from app.services.ai import get_ai_tutor_engine, get_ai_custom_evaluator
+
+            active_client = self.get_active_client()
 
             engine = get_ai_tutor_engine()
-            provider = self._config.get("provider", "mock")
-            override_cfg = {}
+            engine._client = active_client
 
-            if provider == "ollama":
-                override_cfg["OLLAMA_BASE_URL"] = self._config["ollama"].get("base_url")
-                override_cfg["OLLAMA_MODEL"] = self._config["ollama"].get("model")
-            elif provider == "cloud":
-                override_cfg["CLOUD_AI_BASE_URL"] = self._config["cloud"].get("base_url")
-                override_cfg["CLOUD_AI_API_KEY"] = self._config["cloud"].get("api_key")
-                override_cfg["CLOUD_AI_MODEL"] = self._config["cloud"].get("model")
-
-            engine._client = get_llm_provider(provider_type=provider, config=override_cfg)
+            evaluator = get_ai_custom_evaluator()
+            evaluator._client = active_client
         except Exception:
             pass
 
@@ -210,9 +254,12 @@ class AIConfigService:
         # 3. Cloud Provider Test
         elif target_provider == "cloud":
             cloud_cfg = custom_params.get("cloud", {}) if custom_params and "cloud" in custom_params else self._config.get("cloud", {})
-            api_key = cloud_cfg.get("api_key") or self._config.get("cloud", {}).get("api_key", "")
-            base_url = (cloud_cfg.get("base_url") or "https://api.openai.com/v1").rstrip("/")
-            model = cloud_cfg.get("model") or "gpt-4o-mini"
+            if "api_key" in cloud_cfg:
+                api_key = str(cloud_cfg["api_key"]).strip()
+            else:
+                api_key = self._config.get("cloud", {}).get("api_key", "")
+            base_url = (cloud_cfg.get("base_url") or self._config.get("cloud", {}).get("base_url", "https://api.openai.com/v1")).rstrip("/")
+            model = cloud_cfg.get("model") or self._config.get("cloud", {}).get("model", "gpt-4o-mini")
 
             # Check if key is provided
             if not api_key or not api_key.strip():

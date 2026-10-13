@@ -20,12 +20,13 @@ class CloudLLMClient(BaseLLMClient):
         api_key: str = "",
         base_url: str = "https://api.openai.com/v1",
         model_name: str = "gpt-4o-mini",
-        timeout_seconds: float = 12.0
+        timeout_seconds: float = 25.0
     ):
         self.api_key = api_key
         self.base_url = base_url.rstrip("/")
         self.model_name = model_name
         self.timeout = timeout_seconds
+        self.provider_label = "OpenRouter" if "openrouter" in self.base_url.lower() else "Cloud AI"
 
     def is_available(self) -> bool:
         """Check if an API key has been provided."""
@@ -84,18 +85,18 @@ class CloudLLMClient(BaseLLMClient):
                             success=True,
                             status="success",
                             socratic_guidance=raw_text,
-                            conceptual_nudge="Reflect on the guidance above to guide your solution.",
-                            strategy="Break down the logic into smaller testable steps.",
-                            structural_clue="# Structural clue:\n...",
+                            conceptual_nudge="",
+                            strategy="",
+                            structural_clue="",
                             source="ai_tutor",
-                            provider="cloud",
+                            provider=self.provider_label,
                             model=self.model_name
                         )
                 return AITutorResponse(
                     success=False,
                     status="error",
                     socratic_guidance="Cloud AI provider returned an unexpected response.",
-                    provider="cloud",
+                    provider=self.provider_label,
                     model=self.model_name,
                     error_message=f"HTTP {response.status}"
                 )
@@ -104,7 +105,7 @@ class CloudLLMClient(BaseLLMClient):
                 success=False,
                 status="unavailable",
                 socratic_guidance="Could not reach the Cloud AI endpoint. Check your internet connection.",
-                provider="cloud",
+                provider=self.provider_label,
                 model=self.model_name,
                 error_message=str(e)
             )
@@ -113,7 +114,7 @@ class CloudLLMClient(BaseLLMClient):
                 success=False,
                 status="error",
                 socratic_guidance="An unexpected error occurred while communicating with the Cloud AI provider.",
-                provider="cloud",
+                provider=self.provider_label,
                 model=self.model_name,
                 error_message=str(e)
             )

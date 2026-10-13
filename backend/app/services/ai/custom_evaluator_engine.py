@@ -58,8 +58,9 @@ def build_custom_evaluation_prompt(
 
     prompt_parts = []
     if question_prompt.strip():
-        prompt_parts.append(f"### PROBLEM TITLE: {question_title or 'Custom Problem'}")
-        prompt_parts.append(f"### PROBLEM REQUIREMENTS / PROMPT:\n{question_prompt.strip()}\n")
+        if question_title and question_title.strip():
+            prompt_parts.append(f"### PROBLEM TITLE: {question_title.strip()}")
+        prompt_parts.append(f"### QUESTION REQUIREMENTS / PROMPT:\n{question_prompt.strip()}\n")
     else:
         prompt_parts.append("### MODE: Freeform Python Sandbox (Code Alone Review)\n")
 
@@ -279,6 +280,54 @@ def get_deterministic_mock_evaluation(
                 "concepts_applied": ["Loops", "Membership Checks"]
             }
 
+    # Pattern E: Hello World
+    if "hello" in clean_prompt and "world" in clean_prompt:
+        has_hello_world = "hello" in code_lower and "world" in code_lower and "print(" in code_lower
+        if has_hello_world:
+            return {
+                "verdict": "correct",
+                "score": 100,
+                "summary": "Excellent! Your code correctly prints 'hello world'.",
+                "feedback_points": [
+                    "String literal is properly passed to the print() function.",
+                    "Syntax is clean and straightforward."
+                ],
+                "edge_case_note": "Make sure spelling and punctuation match requirements.",
+                "concepts_applied": ["Basic Output", "Strings"]
+            }
+        else:
+            return {
+                "verdict": "needs_work",
+                "score": 30,
+                "summary": "Your code does not print 'hello world'. It currently contains different logic.",
+                "feedback_points": [
+                    "The problem prompt specifically asks to print 'hello world'.",
+                    "Update your script to use print('hello world') instead of the current code."
+                ],
+                "edge_case_note": "Remember Python string syntax requires matching quotes.",
+                "concepts_applied": ["Basic Output"]
+            }
+
+    # General Relevance Mismatch Check
+    prompt_words = [
+        w for w in re.findall(r'[a-zA-Z]{4,}', clean_prompt)
+        if w not in {"write", "program", "python", "input", "output", "print", "that", "takes", "from", "standard", "user"}
+    ]
+    code_words = set(re.findall(r'[a-zA-Z]{3,}', code_lower))
+
+    if prompt_words and not any(pw in code_words for pw in prompt_words):
+        return {
+            "verdict": "needs_work",
+            "score": 35,
+            "summary": "Your code does not appear to address the specific requirements described in your prompt.",
+            "feedback_points": [
+                "The logic in the editor does not reflect the key operations mentioned in the prompt.",
+                "Review your problem description and ensure your code performs the requested task."
+            ],
+            "edge_case_note": "Make sure your variable names and logic align with the challenge description.",
+            "concepts_applied": ["Problem Analysis"]
+        }
+
     # General Fallback for Custom Prompts
     has_statements = len(clean_code.splitlines()) >= 2 or "print(" in clean_code
     if has_statements:
@@ -314,9 +363,13 @@ class AICustomEvaluator:
         self._client = client
 
     def get_client(self) -> BaseLLMClient:
-        if self._client is None:
-            self._client = get_llm_provider()
-        return self._client
+        if self._client is not None:
+            return self._client
+        try:
+            from app.services.ai.config_service import get_ai_config_service
+            return get_ai_config_service().get_active_client()
+        except Exception:
+            return get_llm_provider()
 
     def evaluate(
         self,

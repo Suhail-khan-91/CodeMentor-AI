@@ -199,8 +199,40 @@ We systematically addressed all visual clutter, dead links, duplicate call-to-ac
 | `backend/app/services/ai/__init__.py` | Exported custom evaluator engine symbols. |
 | `backend/app/routes/custom_question.py` | Added `POST /api/custom-questions/ai-evaluate` endpoint. |
 | `backend/tests/test_custom_question.py` | Added comprehensive unit tests for AI custom evaluation (star triangle, sandbox, syntax error, missing fields). |
-| `backend/app/services/ai/providers/cloud_provider.py` | Added OpenRouter headers (`HTTP-Referer`, `X-Title`) to cloud OpenAI client. |
-| `backend/app/services/ai/config_service.py` | Updated configuration schema and defaults for OpenRouter cloud provider. |
+| `backend/app/services/ai/providers/cloud_provider.py` | Added OpenRouter headers (`HTTP-Referer`, `X-Title`), `self.provider_label`, and eliminated static filler hint cards. |
+| `backend/app/services/ai/config_service.py` | Added `_resolve_initial_config()` parsing `api-key.txt`, dynamic `get_active_client()`, and live key propagation. |
+| `backend/app/services/ai/custom_evaluator_engine.py` | Wired live client to `get_ai_config_service().get_active_client()`, fixed mock heuristics with token overlap & Pattern E, removed forced title injection. |
+| `backend/app/services/ai/prompt_builder.py` | Overhauled Socratic prompt rules to mandate short, simple, concise answers (under 80–120 words) with no repetitive section headers. |
+| `backend/app/services/ai/tutor_engine.py` | Wired `get_client()` to dynamically resolve active client from `AIConfigService`. |
+| `frontend/src/components/CustomQuestionPanel.jsx` | Removed `Problem Title (Optional)` input field, removed `Guided Challenge` and evaluate note texts, made AI status badge interactive with `AISettingsModal`. |
+| `frontend/src/components/CustomQuestionPanel.css` | Added interactive hover & click styles for `.custom-status-btn`. |
+
+---
+
+## 🔬 Section 8: Custom Mode Live Evaluation, Title Removal & Prompt Streamlining (October 14, 2026)
+
+### 1. Root Cause Analysis: Why Was Custom Evaluation "Vibe Coded"?
+- **Mock Client Fallback:** `AICustomEvaluator.get_client()` previously called `get_llm_provider()` with no parameters, always defaulting to `MockLLMClient` even when OpenRouter was configured.
+- **Over-Permissive Mock Fallback:** In `get_deterministic_mock_evaluation()`, if code had $\ge 2$ lines or contained `print(`, it automatically returned `verdict: "correct"` with a 90% score based on the title, completely ignoring whether the code actually solved the prompt.
+- **Title Mismatch Confusion:** The UI had separate "Problem Title" and "Problem Requirements / Prompt" fields. When users changed the prompt to *"Write a program to print hello world"* but left the title as *"Right-Angled Star Triangle"*, both were sent to the AI, creating semantic confusion.
+
+### 2. Solutions Implemented & Verified
+1. **Dynamic OpenRouter Integration (`api-key.txt`):**
+   - Automatically loads API key `sk-or-v1-65f847...` and sets default provider to OpenRouter with model `openai/gpt-4o-mini`.
+   - Wired `AICustomEvaluator` and `AITutorEngine` to dynamically fetch the active client via `get_ai_config_service().get_active_client()`.
+2. **Removal of Redundant Title Field:**
+   - Removed the separate `Problem Title (Optional)` input field from `CustomQuestionPanel.jsx`.
+   - The card now contains a single, spacious `Question Requirements / Problem Prompt` textarea.
+   - Backend only injects title into prompts when explicitly non-empty.
+3. **Removed Clutter Texts (Image 2 Green Circles):**
+   - Removed `<span className="custom-mode-subtag">` (`Guided Challenge` / `Free Sandbox`).
+   - Removed `<span className="custom-eval-note">` (`Tests code logic against question requirements`).
+4. **Verified & Upgraded Image 2 Red Boxes:**
+   - **`• Assists: 0`:** Verified 100% functional. Connected to Flask `/api/help-counter/` routes and opens interactive usage telemetry modal. Automatically increments when student asks AI tutor or views hints.
+   - **`• AI Ready`:** Upgraded from static text to a live interactive button (`● OpenRouter ⚙️`). Clicking it opens `AISettingsModal` to configure providers, keys, and models.
+5. **Short, Simple AI Tutor Responses (No Wall of Text):**
+   - Refactored `SYSTEM_PROMPT` in `prompt_builder.py` to enforce strict concise rules (under 80–120 words, 1–2 short paragraphs, simple plain English, single skeleton hint with `...`, and one reflective question).
+   - Removed redundant static filler hint cards from `cloud_provider.py`.
 
 ---
 
@@ -210,21 +242,24 @@ We systematically addressed all visual clutter, dead links, duplicate call-to-ac
    ```bash
    python -m pytest tests/
    ```
-   - **Result:** `237 / 237 passed (100%)` in 18.36s.
-   - Includes all 26 custom question tests and 14 AI connection probe tests.
+   - **Result:** `237 / 237 passed (100%)` in 18.20s.
+   - All custom question tests, AI config tests, tutor tests, runner tests, and diagnostics tests pass cleanly.
 
 2. **Frontend Production Build:**
    ```bash
    npm run build
    ```
-   - **Result:** Built cleanly in 459ms with zero errors.
+   - **Result:** `✓ built in 478ms` with zero errors.
 
-3. **Browser Visual & Interaction Verifications:**
-   - **Custom Practice (`/editor?mode=custom`):**
-     - Verified quick starter chips (`⭐ Star Triangle`, `🔢 Even or Odd`, etc.) properly switch prompts and Monaco starter code in sync.
-     - Verified in-place editable title and prompt textareas.
-     - Verified clicking **"Evaluate Solution with AI"** renders the AI Review Card with verdict (`✓ Solved / Correct Logic`), score (`100% Score`), summary, bulleted feedback points, and edge case tip.
-     - Verified switching to **AI Socratic Tutor** tab renders the unified chat interface with Settings gear button.
+3. **End-to-End Live Browser Testing (`http://localhost:5173/editor?mode=custom`):**
+   - Verified single prompt field layout with star triangle code in editor.
+   - Evaluated prompt *"Write a program to print hello world"* against star triangle code:
+     - **Result:** `⚠️ Needs Refinement` (Score: 50%, Evaluated by OpenRouter). Correctly explained that code prints stars instead of hello world.
+   - Evaluated matching prompt with matching code (`print("hello world")`):
+     - **Result:** `✓ Solved / Correct Logic` (Score: 100%, Evaluated by OpenRouter).
+   - Tested AI Socratic Tutor chat:
+     - **Result:** Returned brief 48-word explanation without repetitive 4-part headers.
+     - **Assists Counter:** Incremented from `• Assists: 0` to `• Assists: 1` live.
 
 ---
 
@@ -243,3 +278,4 @@ cd c:\Users\Suhail\Desktop\Soheab\code-mentor\frontend
 npm run dev
 ```
 *(Runs on `http://127.0.0.1:5173`)*
+

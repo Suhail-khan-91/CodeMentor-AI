@@ -20,9 +20,13 @@ class AITutorEngine:
         self._client = client
 
     def get_client(self) -> BaseLLMClient:
-        if self._client is None:
-            self._client = get_llm_provider()
-        return self._client
+        if self._client is not None:
+            return self._client
+        try:
+            from app.services.ai.config_service import get_ai_config_service
+            return get_ai_config_service().get_active_client()
+        except Exception:
+            return get_llm_provider()
 
     def ask_tutor(
         self,
