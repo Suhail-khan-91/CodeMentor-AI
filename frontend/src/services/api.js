@@ -340,6 +340,41 @@ export async function evaluateCustomQuestion(code, question) {
 }
 
 /**
+ * Evaluate Python code against custom question prompt or freeform review using AI.
+ *
+ * @param {object} params
+ * @param {string} params.code - Student's Python source code
+ * @param {string} [params.question_prompt] - Problem prompt or requirements
+ * @param {string} [params.question_title] - Optional question title
+ * @param {object} [params.execution_result] - Optional terminal execution details
+ * @returns {Promise<{
+ *   success: boolean,
+ *   status: string,
+ *   verdict: string,
+ *   score: number,
+ *   summary: string,
+ *   feedback_points: Array<string>,
+ *   edge_case_note: string,
+ *   concepts_applied: Array<string>,
+ *   provider: string,
+ *   model: string
+ * }>}
+ */
+export async function evaluateCustomWithAI({
+  code,
+  question_prompt = '',
+  question_title = '',
+  execution_result = null
+}) {
+  return apiPost('/api/custom-questions/ai-evaluate', {
+    code,
+    question_prompt,
+    question_title,
+    execution_result
+  });
+}
+
+/**
  * Retrieve session assistance metrics summary (Phase A11).
  *
  * @returns {Promise<{

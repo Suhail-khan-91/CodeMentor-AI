@@ -361,3 +361,58 @@ def test_api_evaluate_custom_missing_question(client):
     assert resp.status_code == 400
     data = resp.get_json()
     assert "question" in data["error"].lower()
+
+
+def test_api_ai_evaluate_custom_success(client):
+    """Verify POST /api/custom-questions/ai-evaluate evaluates solution with AI."""
+    payload = {
+        "code": "n = 3\nfor i in range(1, n + 1):\n    print('*' * i)",
+        "question_title": "Right-Angled Star Triangle",
+        "question_prompt": "Print a right-angled triangle of asterisks with N rows."
+    }
+    resp = client.post("/api/custom-questions/ai-evaluate", json=payload)
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["success"] is True
+    assert data["verdict"] == "correct"
+    assert data["score"] == 100
+    assert len(data["feedback_points"]) > 0
+
+
+def test_api_ai_evaluate_custom_missing_code(client):
+    """Verify POST /api/custom-questions/ai-evaluate returns 400 when code is missing."""
+    payload = {
+        "question_prompt": "Print something."
+    }
+    resp = client.post("/api/custom-questions/ai-evaluate", json=payload)
+    assert resp.status_code == 400
+    data = resp.get_json()
+    assert "code" in data["error"].lower()
+
+
+def test_api_ai_evaluate_sandbox_clean_code(client):
+    """Verify POST /api/custom-questions/ai-evaluate handles freeform sandbox mode."""
+    payload = {
+        "code": "x = 10\ny = 20\nprint(x + y)",
+        "question_prompt": ""
+    }
+    resp = client.post("/api/custom-questions/ai-evaluate", json=payload)
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["success"] is True
+    assert data["verdict"] == "clean_code"
+    assert data["score"] == 100
+
+
+def test_api_ai_evaluate_syntax_error(client):
+    """Verify POST /api/custom-questions/ai-evaluate detects syntax errors."""
+    payload = {
+        "code": "for i in range(5\n    print(i)",
+        "question_prompt": "Count to 5."
+    }
+    resp = client.post("/api/custom-questions/ai-evaluate", json=payload)
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["success"] is True
+    assert data["verdict"] == "syntax_error"
+    assert data["score"] == 10

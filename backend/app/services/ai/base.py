@@ -76,6 +76,39 @@ class AIErrorExplanationResponse:
         }
 
 
+@dataclass
+class AICustomEvaluationResponse:
+    """Structured response for AI-based evaluation of custom student questions."""
+    success: bool
+    status: str                         # "success" | "unavailable" | "fallback" | "error"
+    verdict: str                        # "correct" | "needs_work" | "runtime_error" | "syntax_error" | "clean_code"
+    score: int                          # 0 - 100
+    summary: str                        # Encouraging high-level explanation
+    feedback_points: List[str] = field(default_factory=list) # Bullet points on what worked / what needs work
+    edge_case_note: str = ""            # Advice on edge cases to test or consider
+    concepts_applied: List[str] = field(default_factory=list) # e.g. ["Loops", "String Manipulation"]
+    source: str = "ai_custom_evaluator"
+    provider: str = "mock"
+    model: str = "default"
+    error_message: Optional[str] = None
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "success": self.success,
+            "status": self.status,
+            "verdict": self.verdict,
+            "score": self.score,
+            "summary": self.summary,
+            "feedback_points": self.feedback_points,
+            "edge_case_note": self.edge_case_note,
+            "concepts_applied": self.concepts_applied,
+            "source": self.source,
+            "provider": self.provider,
+            "model": self.model,
+            "error_message": self.error_message
+        }
+
+
 class BaseLLMClient(ABC):
     """Abstract interface for all LLM providers (Mock, Ollama, Cloud)."""
 

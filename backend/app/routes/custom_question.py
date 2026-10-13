@@ -13,6 +13,7 @@ from app.services.custom_question import (
     validate_custom_question
 )
 from app.services.evaluator import TaskDefinition, evaluate_task
+from app.services.ai import evaluate_custom_solution_with_ai
 
 custom_question_bp = Blueprint("custom_question", __name__)
 
@@ -62,18 +63,7 @@ def validate_question():
 @custom_question_bp.route("/custom-questions/evaluate", methods=["POST"])
 def evaluate_custom():
     """
-    Evaluate Python code against a student's custom question definition.
-
-    Expected JSON body:
-      {
-        "code": "n = int(input())...",
-        "question": {
-          "id": "custom_question",
-          "title": "Star Pattern",
-          "description": "...",
-          "test_cases": [...]
-        }
-      }
+    Evaluate Python code against a student's custom question definition (deterministic).
     """
     data = request.get_json(silent=True)
     if data is None or not isinstance(data, dict):
@@ -115,4 +105,58 @@ def evaluate_custom():
 
     task = TaskDefinition.from_dict(question_data)
     result = evaluate_task(code=code, task=task)
+    return jsonify(result.to_dict()), 200
+
+
+@custom_question_bp.route("/custom-questions/ai-evaluate", methods=["POST"])
+def ai_evaluate_custom():
+    """
+    Evaluate Python code against a student's custom question prompt using AI.
+
+    Expected JSON body:
+      {
+        "code": "for i in range(1, n+1): print('*' * i)",
+        "question_prompt": "Write a program to print a right-angled star triangle...",
+        "question_title": "Right-Angled Star Triangle", # optional
+        "execution_result": {                           # optional
+          "stdout": "...",
+          "stderr": "...",
+          "exit_code": 0,
+          "status": "success"
+        }
+      }
+    """
+    data = request.get_json(silent=True)
+    if data is None or not isinstance(data, dict):
+        return jsonify({
+            "error": "Request body must be valid JSON",
+            "status": 400
+        }), 400
+
+    if "code" not in data:
+        return jsonify({
+            "error": "Missing required field: 'code'",
+            "status": 400
+        }), 400
+
+    code = data.get("code")
+    if not isinstance(code, str):
+        return jsonify({
+            "error": "Field 'code' must be a string",
+            "status": 400
+        }), 400
+
+    question_prompt = str(data.get("question_prompt", "") or "")
+    question_title = str(data.get("question_title", "") or "")
+    execution_result = data.get("execution_result")
+    if execution_result is not None and not isinstance(execution_result, dict):
+        execution_result = None
+
+    result = evaluate_custom_solution_with_ai(
+        code=code,
+        question_prompt=question_prompt,
+        question_title=question_title,
+        execution_result=execution_result
+    )
+
     return jsonify(result.to_dict()), 200

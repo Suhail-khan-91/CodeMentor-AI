@@ -147,6 +147,59 @@ We systematically addressed all visual clutter, dead links, duplicate call-to-ac
 | `frontend/src/components/curriculum/CourseChallengePanel.jsx` | Replaced legacy buttons with unified `AITutorPanel`. |
 | `frontend/src/components/CustomQuestionPanel.jsx` | Replaced custom tutor tab with unified `AITutorPanel`. |
 | `backend/app/services/ai/providers/cloud_provider.py` | Added OpenRouter headers (`HTTP-Referer`, `X-Title`) to cloud OpenAI client. |
+### 7. Custom Practice Mode Streamlining & AI Evaluation Engine
+* **Elimination of Confusing Authoring Overhead:**
+  - Removed the complex LeetCode problem-setter builder (stdin/stdout textareas, "+ Add Test Case", match mode dropdowns like *Trimmed*, *Exact Match*, *Float ±10⁻⁴*).
+  - Removed the clunky "Author View vs Solve View" mode toggle and the confusing `Tests (0/2)` sub-tab.
+* **Direct In-Place Question Editing:**
+  - Designed an intuitive, editable card right in the panel:
+    - **Problem Title** (optional/editable in place).
+    - **Problem Requirements / Prompt** (multiline textarea directly editable).
+    - Clear helper note: *"Empty = Free Sandbox Mode"*.
+* **Synchronized Quick-Starter Inspiration Chips:**
+  - Added a fast horizontal row of starter chips:
+    - `⭐ Star Triangle`
+    - `🔢 Even or Odd`
+    - `🔄 Reverse String`
+    - `🔠 Count Vowels`
+    - `🧹 Free Sandbox`
+  - Selecting a chip automatically populates the question prompt AND injects matching starter code into the Monaco editor, ensuring code and question are always in sync!
+* **True AI-Powered Solution Evaluation:**
+  - Created `backend/app/services/ai/custom_evaluator_engine.py` and route `POST /api/custom-questions/ai-evaluate`.
+  - Prompts the active LLM provider (OpenRouter, Ollama, or Offline Socratic Mock) to evaluate:
+    1. Does the Python code solve the user's question prompt?
+    2. Takes into account actual execution results (stdout, stderr, exit code).
+    3. Returns structured evaluation: Verdict badge, score (0-100%), summary, key feedback points, and edge case advice.
+* **Support for Free Sandbox Mode:**
+  - If the student leaves the question blank, the button becomes **"✨ Review Code with AI"**, analyzing general syntax, execution safety, and clean coding practices without forced test assertions.
+
+---
+
+## 📁 Modified Files Summary
+
+| File Path | Description of Changes |
+| :--- | :--- |
+| `frontend/src/pages/Home.jsx` | Streamlined hero to single-screen FYP presentation; removed dead `#architecture` links and redundant CTAs. |
+| `frontend/src/pages/Home.css` | Viewport sizing, removed unused styles for 4 modes, 12 feature cards, and bottom footer. |
+| `frontend/src/components/Navbar.jsx` | Removed duplicate "Open Workspace" button; cleaned navigation links to Course and Custom Practice. |
+| `frontend/src/pages/EditorPage.jsx` | Streamlined workspace modes to Course Track and Custom Practice; passed executionResult to CustomQuestionPanel. |
+| `frontend/src/pages/EditorPage.css` | Styled active track toggle tabs with cyan accent indicator. |
+| `frontend/src/components/ProgressModal.jsx` | Portaled to `document.body`; connected to 6-Module Curriculum with circular gauge and module breakdown. |
+| `frontend/src/components/ProgressModal.css` | Viewport center alignment, glassmorphism card styling, responsive module list. |
+| `frontend/src/components/AISettingsModal.jsx` | Portaled to `document.body`; added OpenRouter preset, API key field, endpoint, and model chips. |
+| `frontend/src/components/AISettingsModal.css` | Centered backdrop and card styling, chip selectors, and masked key styling. |
+| `frontend/src/components/AITutorPanel.jsx` | Clean, unified Socratic AI chat component with message stream, quick pills, and ⚙️ Settings trigger. |
+| `frontend/src/components/AITutorPanel.css` | Clean non-vibe-coded styling, message bubble hierarchy, responsive chat container. |
+| `frontend/src/components/curriculum/CourseChallengePanel.jsx` | Replaced legacy buttons with unified `AITutorPanel`. |
+| `frontend/src/components/CustomQuestionPanel.jsx` | Streamlined with in-place editable questions, quick inspiration chips, and true AI solution evaluation. |
+| `frontend/src/components/CustomQuestionPanel.css` | Modern styling for prompt textareas, quick starter chips, and elevated AI Review verdict cards. |
+| `frontend/src/services/api.js` | Added `evaluateCustomWithAI()` API helper calling `/api/custom-questions/ai-evaluate`. |
+| `backend/app/services/ai/base.py` | Added `AICustomEvaluationResponse` dataclass. |
+| `backend/app/services/ai/custom_evaluator_engine.py` | Built AI custom evaluation service with LLM prompting and deterministic offline heuristics. |
+| `backend/app/services/ai/__init__.py` | Exported custom evaluator engine symbols. |
+| `backend/app/routes/custom_question.py` | Added `POST /api/custom-questions/ai-evaluate` endpoint. |
+| `backend/tests/test_custom_question.py` | Added comprehensive unit tests for AI custom evaluation (star triangle, sandbox, syntax error, missing fields). |
+| `backend/app/services/ai/providers/cloud_provider.py` | Added OpenRouter headers (`HTTP-Referer`, `X-Title`) to cloud OpenAI client. |
 | `backend/app/services/ai/config_service.py` | Updated configuration schema and defaults for OpenRouter cloud provider. |
 
 ---
@@ -157,21 +210,21 @@ We systematically addressed all visual clutter, dead links, duplicate call-to-ac
    ```bash
    python -m pytest tests/
    ```
-   - **Result:** `233 / 233 passed (100%)` in 18.07s.
-   - Includes all 14 AI connection probe tests (`test_ai_config.py`).
+   - **Result:** `237 / 237 passed (100%)` in 18.36s.
+   - Includes all 26 custom question tests and 14 AI connection probe tests.
 
 2. **Frontend Production Build:**
    ```bash
    npm run build
    ```
-   - **Result:** Built cleanly in 136ms with zero errors.
+   - **Result:** Built cleanly in 459ms with zero errors.
 
 3. **Browser Visual & Interaction Verifications:**
-   - **Home Page (`http://localhost:5173`):** Verified single-screen hero, 2 primary CTA buttons, and removal of duplicate "Open Workspace" button.
-   - **Progress Modal:** Verified perfect viewport centering, circular gauge, and 6 module cards displaying live progress.
-   - **AI Settings Modal:** Verified perfect viewport centering, full visibility of provider tabs, and OpenRouter configuration with model pills.
-   - **Course Track (`/editor?mode=course`):** Verified unified AI Tutor chat with provider indicator, quick prompt pills, and settings button.
-   - **Custom Practice (`/editor?mode=custom`):** Verified exact same unified AI Tutor chat layout and functioning settings button.
+   - **Custom Practice (`/editor?mode=custom`):**
+     - Verified quick starter chips (`⭐ Star Triangle`, `🔢 Even or Odd`, etc.) properly switch prompts and Monaco starter code in sync.
+     - Verified in-place editable title and prompt textareas.
+     - Verified clicking **"Evaluate Solution with AI"** renders the AI Review Card with verdict (`✓ Solved / Correct Logic`), score (`100% Score`), summary, bulleted feedback points, and edge case tip.
+     - Verified switching to **AI Socratic Tutor** tab renders the unified chat interface with Settings gear button.
 
 ---
 

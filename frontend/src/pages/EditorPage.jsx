@@ -523,6 +523,7 @@ export default function EditorPage() {
             <section className="task-panel" aria-label="Custom Question Panel">
               <CustomQuestionPanel
                 code={code}
+                executionResult={result}
                 onApplyStarterCode={(starter) => setCode(starter)}
               />
             </section>

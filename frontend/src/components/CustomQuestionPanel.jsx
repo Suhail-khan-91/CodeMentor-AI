@@ -1,521 +1,363 @@
 /**
- * CustomQuestionPanel.jsx — Custom Question Authoring & Solving Component (Upgraded)
+ * CustomQuestionPanel.jsx — Streamlined Custom Practice Workspace
  *
- * Implements dual-mode workflow:
- * 1. Author Mode: Form with templates, title, description, and test case generator.
- * 2. Solve Mode: Scoped tabs for Question requirements, Test case breakdown, and integrated AI Tutor.
+ * Implements a clean, intuitive, beginner-friendly learning model:
+ * 1. Left Monaco Editor: Code input & execution.
+ * 2. Right Workspace:
+ *    - In-place editable question card (Title + Prompt) — no rigid modal authoring!
+ *    - Quick beginner inspiration chips (Star Triangle, Even/Odd, Reverse, Vowels, Free Sandbox).
+ *    - True AI Evaluation: Evaluates code against question prompt via AI (OpenRouter, Ollama, or Socratic Mock).
+ *    - Free Sandbox Mode: Clear question to code freely; AI provides general code quality review.
+ *    - Integrated Socratic AI Tutor tab with prompt pills and provider settings.
  */
 
 import { useState, useEffect } from 'react';
-import DiagnosticCard from './DiagnosticCard';
 import AITutorPanel from './AITutorPanel';
-import {
-  getCustomQuestionTemplates,
-  validateCustomQuestion,
-  evaluateCustomQuestion,
-  recordProgressAttempt
-} from '../services/api';
+import { evaluateCustomWithAI, recordProgressAttempt } from '../services/api';
 import './TaskEvaluationPanel.css';
 import './CustomQuestionPanel.css';
 
-const DEFAULT_CUSTOM_QUESTION = {
-  id: 'custom_star_triangle',
-  title: 'Right-Angled Star Triangle',
-  description: 'Write a program that takes an integer N from standard input and prints a right-angled triangle of asterisks (*) with N rows, where row i has i stars.',
-  starter_code: 'n = int(input())\n# Print a star triangle with n rows\nfor i in range(1, n + 1):\n    print("*" * i)\n',
-  test_cases: [
-    {
-      id: 'tc_star_1',
-      description: '3-row triangle',
-      stdin: '3',
-      expected_output: '*\n**\n***',
-      match_mode: 'trimmed'
-    },
-    {
-      id: 'tc_star_2',
-      description: '5-row triangle',
-      stdin: '5',
-      expected_output: '*\n**\n***\n****\n*****',
-      match_mode: 'trimmed'
-    }
-  ]
-};
+const QUICK_PROMPTS = [
+  {
+    id: 'star_triangle',
+    label: '⭐ Star Triangle',
+    title: 'Right-Angled Star Triangle',
+    prompt: 'Write a program that takes an integer N (e.g. 5) and prints a right-angled triangle of asterisks (*) where row i has i stars.',
+    starterCode: '# Right-Angled Star Triangle\nn = 5\nfor i in range(1, n + 1):\n    print("*" * i)\n'
+  },
+  {
+    id: 'even_odd',
+    label: '🔢 Even or Odd',
+    title: 'Even or Odd Number Checker',
+    prompt: 'Write a program that takes an integer number and checks if it is even or odd. Print "Even" if divisible by 2, otherwise print "Odd".',
+    starterCode: '# Even or Odd Checker\nnum = 7\nif num % 2 == 0:\n    print("Even")\nelse:\n    print("Odd")\n'
+  },
+  {
+    id: 'reverse_string',
+    label: '🔄 Reverse String',
+    title: 'Reverse a String or Sentence',
+    prompt: 'Write a program that takes a string and prints it in reverse order.',
+    starterCode: '# Reverse String\ntext = "CodeMentor"\nreversed_text = text[::-1]\nprint(reversed_text)\n'
+  },
+  {
+    id: 'count_vowels',
+    label: '🔠 Count Vowels',
+    title: 'Count Vowels in a String',
+    prompt: 'Write a program that takes a string and counts how many vowels (a, e, i, o, u) it contains.',
+    starterCode: '# Count Vowels\ntext = "Hello Python World"\nvowels = "aeiouAEIOU"\ncount = sum(1 for char in text if char in vowels)\nprint(f"Total vowels: {count}")\n'
+  },
+  {
+    id: 'free_sandbox',
+    label: '🧹 Free Sandbox',
+    title: '',
+    prompt: '',
+    starterCode: '# Free Sandbox Mode\n# Write any Python code here and run it or ask AI to review it!\n\ndef main():\n    print("Hello from CodeMentor AI!")\n\nif __name__ == "__main__":\n    main()\n'
+  }
+];
 
 export default function CustomQuestionPanel({
   code,
+  executionResult = null,
   onApplyStarterCode,
 }) {
-  const [question, setQuestion] = useState(DEFAULT_CUSTOM_QUESTION);
-  const [isEditing, setIsEditing] = useState(false);
-  const [templates, setTemplates] = useState([]);
-  const [validationError, setValidationError] = useState(null);
+  const [questionTitle, setQuestionTitle] = useState(QUICK_PROMPTS[0].title);
+  const [questionPrompt, setQuestionPrompt] = useState(QUICK_PROMPTS[0].prompt);
+  const [selectedPromptId, setSelectedPromptId] = useState('star_triangle');
 
-  // Evaluation & Tab state
-  const [activeSubTab, setActiveSubTab] = useState('question'); // 'question' | 'tests' | 'tutor'
+  const [activeTab, setActiveTab] = useState('review'); // 'review' | 'tutor'
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [evaluationResult, setEvaluationResult] = useState(null);
   const [evalError, setEvalError] = useState(null);
-  const [expandedTc, setExpandedTc] = useState(null);
 
+  // Sync initial starter code on first mount if starter code matches default
   useEffect(() => {
-    getCustomQuestionTemplates()
-      .then((res) => {
-        if (res?.templates?.length > 0) {
-          setTemplates(res.templates);
-        }
-      })
-      .catch((err) => {
-        console.warn('Failed to fetch custom question templates:', err);
-      });
+    if (onApplyStarterCode && selectedPromptId === 'star_triangle') {
+      onApplyStarterCode(QUICK_PROMPTS[0].starterCode);
+    }
   }, []);
 
-  const handleSelectTemplate = (templateId) => {
-    const selected = templates.find((t) => t.id === templateId);
-    if (selected) {
-      setQuestion(JSON.parse(JSON.stringify(selected)));
-      setEvaluationResult(null);
-      setValidationError(null);
-      if (selected.starter_code && onApplyStarterCode) {
-        onApplyStarterCode(selected.starter_code);
-      }
+  const handleSelectQuickPrompt = (item) => {
+    setQuestionTitle(item.title);
+    setQuestionPrompt(item.prompt);
+    setSelectedPromptId(item.id);
+    setEvaluationResult(null);
+    setEvalError(null);
+
+    if (onApplyStarterCode && item.starterCode) {
+      onApplyStarterCode(item.starterCode);
     }
   };
 
-  const toggleAccordion = (tcId) => {
-    setExpandedTc((prev) => (prev === tcId ? null : tcId));
-  };
-
-  const handleAddTestCase = () => {
-    const newTc = {
-      id: `tc_custom_${Date.now()}`,
-      description: `Test Case ${question.test_cases.length + 1}`,
-      stdin: '',
-      expected_output: '',
-      match_mode: 'trimmed'
-    };
-    setQuestion((prev) => ({
-      ...prev,
-      test_cases: [...prev.test_cases, newTc]
-    }));
-  };
-
-  const handleUpdateTestCase = (index, field, value) => {
-    setQuestion((prev) => {
-      const updated = [...prev.test_cases];
-      updated[index] = { ...updated[index], [field]: value };
-      return { ...prev, test_cases: updated };
-    });
-  };
-
-  const handleRemoveTestCase = (index) => {
-    setQuestion((prev) => ({
-      ...prev,
-      test_cases: prev.test_cases.filter((_, idx) => idx !== index)
-    }));
-  };
-
-  const handleSaveQuestion = async () => {
-    setValidationError(null);
-    try {
-      const res = await validateCustomQuestion(question);
-      if (res?.valid) {
-        setIsEditing(false);
-        setEvaluationResult(null);
-      } else {
-        setValidationError(res?.error || 'Validation failed.');
-      }
-    } catch (err) {
-      setValidationError(err.message || 'Validation request failed.');
-    }
-  };
-
-  const handleEvaluateCustom = async () => {
+  const handleEvaluateAI = async () => {
     if (isEvaluating) return;
     setIsEvaluating(true);
     setEvalError(null);
 
     try {
-      const res = await evaluateCustomQuestion(code, question);
-      setEvaluationResult(res);
-      setActiveSubTab('tests');
-      const firstFail = res.test_results?.find((t) => !t.passed);
-      if (firstFail) {
-        setExpandedTc(firstFail.test_case_id);
-      }
+      const res = await evaluateCustomWithAI({
+        code,
+        question_prompt: questionPrompt,
+        question_title: questionTitle,
+        execution_result: executionResult
+      });
 
-      // Record progress under custom category
+      setEvaluationResult(res);
+
+      // Record telemetry in background
       recordProgressAttempt({
-        taskId: question.id || 'custom_task',
-        taskTitle: question.title || 'Custom Question',
+        taskId: selectedPromptId ? `custom_${selectedPromptId}` : 'custom_user_prompt',
+        taskTitle: questionTitle || 'Custom Practice',
         category: 'custom',
-        scorePercentage: res.score_percentage || 0,
-        passedAll: !!res.passed_all,
-        passedTests: res.passed_tests || 0,
-        totalTests: res.total_tests || 0,
+        scorePercentage: res.score || 0,
+        passedAll: res.verdict === 'correct' || res.verdict === 'clean_code',
+        passedTests: res.verdict === 'correct' ? 1 : 0,
+        totalTests: 1,
       })
         .then(() => {
           window.dispatchEvent(new CustomEvent('progress-updated'));
         })
-        .catch((progErr) => {
-          console.warn('Failed to record custom task progress:', progErr);
-        });
+        .catch(() => {});
     } catch (err) {
-      setEvalError(err.message || 'Failed to evaluate custom question.');
+      setEvalError(err.message || 'Failed to evaluate custom solution with AI.');
     } finally {
       setIsEvaluating(false);
     }
   };
 
+  const hasPrompt = !!questionPrompt.trim();
+
   return (
-    <div className="custom-q-shell" role="region" aria-label="Custom Question Workspace">
-      {/* ── Header Bar ── */}
+    <div className="custom-q-shell" role="region" aria-label="Custom Practice Workspace">
+      {/* ── Top Header Bar ── */}
       <div className="custom-q-header">
         <div className="custom-q-header__left">
           <span className="badge badge--blue">
-            <span>✏️</span> Custom Question
+            <span>✏️</span> Custom Practice
+          </span>
+          <span className="custom-mode-subtag">
+            {hasPrompt ? 'Guided Challenge' : 'Free Sandbox'}
           </span>
         </div>
 
         <div className="custom-q-header__right">
-          {templates.length > 0 && isEditing && (
-            <select
-              className="input custom-template-select"
-              onChange={(e) => handleSelectTemplate(e.target.value)}
-              defaultValue=""
-              aria-label="Load pre-made question template"
-            >
-              <option value="" disabled>Load Template…</option>
-              {templates.map((tpl) => (
-                <option key={tpl.id} value={tpl.id}>
-                  {tpl.title}
-                </option>
-              ))}
-            </select>
-          )}
-
-          <button
-            type="button"
-            className="btn btn--ghost btn-sm custom-toggle-btn"
-            onClick={() => setIsEditing(!isEditing)}
-            id="btn-toggle-edit-custom-q"
-          >
-            {isEditing ? '👁️ Solve View' : '✏️ Edit Question'}
-          </button>
+          <span className="custom-status-indicator">
+            <span className="custom-status-dot" />
+            AI Ready
+          </span>
         </div>
       </div>
 
-      {/* ── State 1: Author / Editor Form ── */}
-      {isEditing ? (
-        <div className="custom-author-pane">
-          {validationError && (
-            <div className="custom-alert custom-alert--error" role="alert">
-              <span>⚠️</span> {validationError}
-            </div>
-          )}
-
-          <div className="field-group">
-            <label htmlFor="custom-q-title" className="field-label">
-              Question Title *
-            </label>
-            <input
-              id="custom-q-title"
-              type="text"
-              className="input"
-              value={question.title}
-              onChange={(e) => setQuestion({ ...question, title: e.target.value })}
-              placeholder="e.g. Reverse a String"
-            />
-          </div>
-
-          <div className="field-group">
-            <label htmlFor="custom-q-desc" className="field-label">
-              Problem Description *
-            </label>
-            <textarea
-              id="custom-q-desc"
-              className="textarea"
-              style={{ fontFamily: 'var(--font-body)' }}
-              rows={3}
-              value={question.description}
-              onChange={(e) => setQuestion({ ...question, description: e.target.value })}
-              placeholder="Explain expected inputs, logic, and output format..."
-            />
-          </div>
-
-          <div className="field-group">
-            <label htmlFor="custom-q-starter" className="field-label">
-              Starter Code Template (Optional)
-            </label>
-            <textarea
-              id="custom-q-starter"
-              className="textarea"
-              rows={2}
-              value={question.starter_code || ''}
-              onChange={(e) => setQuestion({ ...question, starter_code: e.target.value })}
-              placeholder="# Starter snippet..."
-            />
-          </div>
-
-          {/* Test Cases Manager */}
-          <div className="custom-tc-section">
-            <div className="custom-tc-header">
-              <span className="field-label" style={{ margin: 0 }}>
-                Test Cases ({question.test_cases.length})
-              </span>
-              <button
-                type="button"
-                className="btn btn--ghost btn-sm"
-                onClick={handleAddTestCase}
-                id="btn-add-test-case"
-              >
-                + Add Test Case
-              </button>
-            </div>
-
-            {question.test_cases.map((tc, idx) => (
-              <div key={tc.id || idx} className="custom-tc-card">
-                <div className="custom-tc-card__top">
-                  <input
-                    type="text"
-                    className="input custom-tc-desc"
-                    value={tc.description}
-                    onChange={(e) => handleUpdateTestCase(idx, 'description', e.target.value)}
-                    placeholder={`Test Case ${idx + 1}`}
-                  />
-                  <select
-                    className="input custom-tc-mode"
-                    value={tc.match_mode || 'trimmed'}
-                    onChange={(e) => handleUpdateTestCase(idx, 'match_mode', e.target.value)}
-                  >
-                    <option value="trimmed">Trimmed</option>
-                    <option value="exact">Exact Match</option>
-                    <option value="ignore_case">Ignore Case</option>
-                    <option value="numeric_float">Float (±10⁻⁴)</option>
-                  </select>
-                  <button
-                    type="button"
-                    className="btn btn--ghost btn-icon btn-sm"
-                    onClick={() => handleRemoveTestCase(idx)}
-                    title="Delete test case"
-                  >
-                    🗑️
-                  </button>
-                </div>
-
-                <div className="custom-tc-fields">
-                  <div>
-                    <span className="field-label">Standard Input (stdin):</span>
-                    <textarea
-                      className="textarea"
-                      rows={2}
-                      value={tc.stdin}
-                      onChange={(e) => handleUpdateTestCase(idx, 'stdin', e.target.value)}
-                      placeholder="(empty or sample input)"
-                    />
-                  </div>
-                  <div>
-                    <span className="field-label">Expected Output (stdout):</span>
-                    <textarea
-                      className="textarea"
-                      rows={2}
-                      value={tc.expected_output}
-                      onChange={(e) => handleUpdateTestCase(idx, 'expected_output', e.target.value)}
-                      placeholder="Expected stdout..."
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="custom-author-actions">
+      {/* ── Quick Starter Inspiration Chips ── */}
+      <div className="custom-chips-bar" aria-label="Quick challenge inspiration chips">
+        <span className="custom-chips-label">Quick Starters:</span>
+        <div className="custom-chips-list">
+          {QUICK_PROMPTS.map((item) => (
             <button
+              key={item.id}
               type="button"
-              className="btn btn--accent"
-              style={{ width: '100%' }}
-              onClick={handleSaveQuestion}
-              id="btn-save-custom-q"
+              className={`custom-chip ${selectedPromptId === item.id ? 'custom-chip--active' : ''}`}
+              onClick={() => handleSelectQuickPrompt(item)}
+              title={item.title || 'Clear to Free Sandbox'}
             >
-              ✓ Save & Start Solving
+              {item.label}
             </button>
-          </div>
+          ))}
         </div>
-      ) : (
-        /* ── State 2: Solve & Evaluation View ── */
-        <div className="custom-solve-pane">
-          {/* Sub-Tabs */}
-          <div className="task-scoped-tabs" role="tablist">
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activeSubTab === 'question'}
-              className={`task-tab ${activeSubTab === 'question' ? 'task-tab--active' : ''}`}
-              style={activeSubTab === 'question' ? { color: 'var(--blue)', borderBottomColor: 'var(--blue)' } : {}}
-              onClick={() => setActiveSubTab('question')}
-            >
-              Question
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activeSubTab === 'tests'}
-              className={`task-tab ${activeSubTab === 'tests' ? 'task-tab--active' : ''}`}
-              style={activeSubTab === 'tests' ? { color: 'var(--blue)', borderBottomColor: 'var(--blue)' } : {}}
-              onClick={() => setActiveSubTab('tests')}
-            >
-              Tests {evaluationResult ? `(${evaluationResult.passed_tests}/${evaluationResult.total_tests})` : `(${question.test_cases.length})`}
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activeSubTab === 'tutor'}
-              className={`task-tab ${activeSubTab === 'tutor' ? 'task-tab--active' : ''}`}
-              style={activeSubTab === 'tutor' ? { color: 'var(--blue)', borderBottomColor: 'var(--blue)' } : {}}
-              onClick={() => setActiveSubTab('tutor')}
-            >
-              AI Tutor
-            </button>
-          </div>
+      </div>
 
-          <div className="custom-solve-content">
-            {/* SUB-TAB 1: QUESTION */}
-            {activeSubTab === 'question' && (
-              <div className="task-tab-pane">
-                {evaluationResult && (
-                  <div className="task-score-card">
-                    <div className="task-score-card__top">
-                      <span className="task-score-label">CUSTOM EVALUATION SCORE</span>
-                      <span className="task-score-value">{evaluationResult.score_percentage}%</span>
-                    </div>
-                    <div className="task-score-track">
-                      <div
-                        className={`task-score-fill task-score-fill--${evaluationResult.status}`}
-                        style={{ width: `${evaluationResult.score_percentage}%` }}
-                      />
-                    </div>
-                    <span className="task-score-sub">
-                      {evaluationResult.passed_tests} / {evaluationResult.total_tests} test cases passing
-                    </span>
-                  </div>
-                )}
+      {/* ── Top Navigation Tabs ── */}
+      <div className="task-scoped-tabs" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'review'}
+          className={`task-tab ${activeTab === 'review' ? 'task-tab--active' : ''}`}
+          style={activeTab === 'review' ? { color: 'var(--blue)', borderBottomColor: 'var(--blue)' } : {}}
+          onClick={() => setActiveTab('review')}
+        >
+          Question & AI Evaluation
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'tutor'}
+          className={`task-tab ${activeTab === 'tutor' ? 'task-tab--active' : ''}`}
+          style={activeTab === 'tutor' ? { color: 'var(--blue)', borderBottomColor: 'var(--blue)' } : {}}
+          onClick={() => setActiveTab('tutor')}
+        >
+          AI Socratic Tutor
+        </button>
+      </div>
 
-                <div className="task-prompt-block">
-                  <h3 className="custom-solve-title">{question.title}</h3>
-                  <p className="task-prompt-text">{question.description}</p>
-                </div>
-
-                <div className="custom-grade-action-card">
-                  <button
-                    type="button"
-                    className="btn btn--accent"
-                    onClick={handleEvaluateCustom}
-                    disabled={isEvaluating}
-                    id="btn-evaluate-custom-q"
-                  >
-                    <span>{isEvaluating ? '⏳' : '🎯'}</span>
-                    <span>{isEvaluating ? 'Grading Tests…' : 'Grade Against Custom Tests'}</span>
-                  </button>
-                  <span className="custom-tc-tag">
-                    {question.test_cases.length} test case{question.test_cases.length === 1 ? '' : 's'} defined
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {/* SUB-TAB 2: TESTS */}
-            {activeSubTab === 'tests' && (
-              <div className="task-tab-pane">
-                {evalError && (
-                  <div className="custom-alert custom-alert--error">
-                    <span>⚠️</span> {evalError}
-                  </div>
-                )}
-
-                {evaluationResult ? (
-                  <div className="task-results-container">
-                    <div className="test-cards-list">
-                      {evaluationResult.test_results?.map((tr, idx) => {
-                        const isExpanded = expandedTc === tr.test_case_id;
-
-                        return (
-                          <div key={tr.test_case_id || idx} className={`test-card test-card--${tr.passed ? 'passed' : 'failed'}`}>
-                            <button
-                              type="button"
-                              className="test-card__trigger"
-                              onClick={() => toggleAccordion(tr.test_case_id)}
-                            >
-                              <div className="test-card__trigger-left">
-                                <span className={`tc-status-pill ${tr.passed ? 'tc-status--passed' : 'tc-status--failed'}`}>
-                                  {tr.passed ? '✓ Passed' : '✗ Failed'}
-                                </span>
-                                <span className="test-card__name">{tr.description}</span>
-                              </div>
-                              <span className="test-chevron">{isExpanded ? '▲' : '▼'}</span>
-                            </button>
-
-                            {isExpanded && (
-                              <div className="test-card__details">
-                                {tr.diagnostic && tr.diagnostic.has_diagnostic && (
-                                  <DiagnosticCard
-                                    diagnostic={tr.diagnostic}
-                                    code={code}
-                                    executionResult={tr}
-                                  />
-                                )}
-
-                                <div className="test-diff-grid">
-                                  {tr.stdin && (
-                                    <div className="diff-box">
-                                      <span className="diff-box__label">Input (stdin):</span>
-                                      <pre className="diff-box__code"><code>{tr.stdin}</code></pre>
-                                    </div>
-                                  )}
-                                  <div className="diff-box">
-                                    <span className="diff-box__label">Expected Output:</span>
-                                    <pre className="diff-box__code diff-box__code--expected">
-                                      <code>{tr.expected_output || '[empty]'}</code>
-                                    </pre>
-                                  </div>
-                                  <div className="diff-box">
-                                    <span className="diff-box__label">Actual Output:</span>
-                                    <pre className={`diff-box__code ${tr.passed ? 'diff-box__code--pass' : 'diff-box__code--fail'}`}>
-                                      <code>{tr.actual_output || '[empty]'}</code>
-                                    </pre>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="task-tests-empty">
-                    <div className="tests-empty-icon">🎯</div>
-                    <h4 className="tests-empty-title">Grade Your Solution</h4>
-                    <p className="tests-empty-desc">
-                      Click <strong>Grade Against Custom Tests</strong> to run your solution against the defined test suite.
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* SUB-TAB 3: AI TUTOR */}
-            {activeSubTab === 'tutor' && (
-              <div className="task-tab-pane" style={{ padding: 0, height: '100%' }}>
-                <AITutorPanel
-                  code={code}
-                  activeTask={question}
-                  evaluationResult={evaluationResult}
-                  diagnostic={evaluationResult?.test_results?.find((t) => t.diagnostic)?.diagnostic}
+      {/* ── Tab Content ── */}
+      <div className="custom-tab-container">
+        {activeTab === 'review' ? (
+          <div className="custom-review-pane">
+            {/* Direct In-Place Editable Question Card */}
+            <div className="custom-editable-card">
+              <div className="custom-field-row">
+                <label htmlFor="custom-q-title" className="custom-field-label">
+                  Problem Title (Optional)
+                </label>
+                <input
+                  id="custom-q-title"
+                  type="text"
+                  className="input custom-title-input"
+                  value={questionTitle}
+                  onChange={(e) => {
+                    setQuestionTitle(e.target.value);
+                    setSelectedPromptId(null);
+                  }}
+                  placeholder="e.g. Reverse a String or Find Maximum Number"
                 />
               </div>
+
+              <div className="custom-field-row" style={{ marginTop: '10px' }}>
+                <div className="custom-prompt-label-group">
+                  <label htmlFor="custom-q-prompt" className="custom-field-label">
+                    Problem Requirements / Prompt
+                  </label>
+                  <span className="custom-prompt-hint">
+                    {hasPrompt ? 'AI will evaluate against this prompt' : 'Empty = Free Sandbox Mode'}
+                  </span>
+                </div>
+                <textarea
+                  id="custom-q-prompt"
+                  className="textarea custom-prompt-textarea"
+                  rows={4}
+                  value={questionPrompt}
+                  onChange={(e) => {
+                    setQuestionPrompt(e.target.value);
+                    setSelectedPromptId(null);
+                  }}
+                  placeholder="Type or paste your Python coding question, assignment instructions, or interview challenge here... (Leave empty for Free Sandbox)"
+                />
+              </div>
+            </div>
+
+            {/* AI Evaluation Action Button */}
+            <div className="custom-eval-action-bar">
+              <button
+                type="button"
+                className="btn btn--accent custom-eval-btn"
+                onClick={handleEvaluateAI}
+                disabled={isEvaluating}
+                id="btn-evaluate-custom-ai"
+              >
+                <span>{isEvaluating ? '⏳' : hasPrompt ? '🤖' : '✨'}</span>
+                <span>
+                  {isEvaluating
+                    ? hasPrompt
+                      ? 'Evaluating Solution with AI…'
+                      : 'Reviewing Code with AI…'
+                    : hasPrompt
+                    ? 'Evaluate Solution with AI'
+                    : 'Review Code with AI'}
+                </span>
+              </button>
+
+              <span className="custom-eval-note">
+                {hasPrompt
+                  ? 'Tests code logic against question requirements'
+                  : 'Checks syntax, execution, and code quality'}
+              </span>
+            </div>
+
+            {/* Error Message if API fails */}
+            {evalError && (
+              <div className="custom-alert custom-alert--error" role="alert">
+                <span>⚠️</span> {evalError}
+              </div>
+            )}
+
+            {/* AI Evaluation Results Card */}
+            {evaluationResult && (
+              <div className="custom-ai-result-card" role="region" aria-label="AI Evaluation Verdict">
+                <div className="custom-ai-result-header">
+                  <div className="custom-ai-result-verdict-group">
+                    <span
+                      className={`custom-verdict-pill custom-verdict-pill--${evaluationResult.verdict}`}
+                    >
+                      {evaluationResult.verdict === 'correct' && '✓ Solved / Correct Logic'}
+                      {evaluationResult.verdict === 'clean_code' && '✓ Clean Sandbox Execution'}
+                      {evaluationResult.verdict === 'needs_work' && '⚠️ Needs Refinement'}
+                      {evaluationResult.verdict === 'runtime_error' && '❌ Runtime Error'}
+                      {evaluationResult.verdict === 'syntax_error' && '❌ Syntax Error'}
+                      {!['correct', 'clean_code', 'needs_work', 'runtime_error', 'syntax_error'].includes(
+                        evaluationResult.verdict
+                      ) && `Status: ${evaluationResult.verdict}`}
+                    </span>
+
+                    <span className="custom-score-badge">
+                      {evaluationResult.score}% Score
+                    </span>
+                  </div>
+
+                  <span className="custom-provider-tag">
+                    Evaluated by {evaluationResult.provider || 'AI Engine'}
+                  </span>
+                </div>
+
+                {/* Summary Text */}
+                {evaluationResult.summary && (
+                  <p className="custom-ai-summary">
+                    {evaluationResult.summary}
+                  </p>
+                )}
+
+                {/* Feedback Bullet Points */}
+                {evaluationResult.feedback_points?.length > 0 && (
+                  <div className="custom-feedback-section">
+                    <span className="custom-section-title">Key Feedback Points:</span>
+                    <ul className="custom-feedback-list">
+                      {evaluationResult.feedback_points.map((point, idx) => (
+                        <li key={idx} className="custom-feedback-item">
+                          {point}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Edge Case Tip Box */}
+                {evaluationResult.edge_case_note && (
+                  <div className="custom-edge-tip">
+                    <span className="custom-edge-tip__icon">💡</span>
+                    <div className="custom-edge-tip__content">
+                      <strong>Edge Case Tip:</strong> {evaluationResult.edge_case_note}
+                    </div>
+                  </div>
+                )}
+
+                {/* Concepts Applied */}
+                {evaluationResult.concepts_applied?.length > 0 && (
+                  <div className="custom-concepts-row">
+                    <span className="custom-concepts-label">Concepts:</span>
+                    {evaluationResult.concepts_applied.map((concept, idx) => (
+                      <span key={idx} className="custom-concept-tag">
+                        {concept}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
             )}
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="custom-tutor-pane">
+            <AITutorPanel
+              code={code}
+              activeTask={{
+                id: selectedPromptId || 'custom_task',
+                title: questionTitle || 'Custom Practice Problem',
+                description: questionPrompt || 'Freeform Python Sandbox'
+              }}
+              evaluationResult={evaluationResult}
+              diagnostic={executionResult?.diagnostic}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

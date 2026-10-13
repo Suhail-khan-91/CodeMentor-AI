@@ -1,34 +1,44 @@
-/* CustomQuestionPanel.css — Authoring & Solving Styles */
+/* CustomQuestionPanel.css — Streamlined Custom Practice Styles */
 
 .custom-q-shell {
   display: flex;
   flex-direction: column;
   height: 100%;
   min-height: 0;
-  background: rgba(14, 19, 32, 0.88);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(14, 19, 32, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.10);
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.45), 0 0 28px rgba(56, 189, 248, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-/* ───── Header ───── */
+/* ───── Top Header ───── */
 .custom-q-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  padding: 10px 16px;
+  background: rgba(18, 23, 36, 0.90);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   flex-shrink: 0;
 }
 
 .custom-q-header__left {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+}
+
+.custom-mode-subtag {
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .custom-q-header__right {
@@ -37,131 +47,360 @@
   gap: 8px;
 }
 
-.custom-template-select {
-  width: auto;
-  font-size: 0.78rem;
-  padding: 4px 8px;
-}
-
-.custom-toggle-btn {
-  font-size: 0.78rem;
+.custom-status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.74rem;
   font-weight: 600;
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.10);
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(16, 185, 129, 0.25);
 }
 
-/* ───── Authoring Pane ───── */
-.custom-author-pane {
-  padding: 16px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  flex: 1;
+.custom-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
 }
 
-.custom-alert {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  border-radius: var(--r-sm);
-  font-size: 0.8rem;
-}
-.custom-alert--error {
-  background: var(--red-dim);
-  border: 1px solid var(--red-line);
-  color: var(--red);
-}
-
-.custom-tc-section {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 6px;
-}
-
-.custom-tc-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.custom-tc-card {
-  padding: 12px;
-  background: var(--bg-raised);
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.custom-tc-card__top {
+/* ───── Quick Starter Inspiration Chips ───── */
+.custom-chips-bar {
   display: flex;
   align-items: center;
   gap: 8px;
+  padding: 8px 14px;
+  background: rgba(10, 14, 24, 0.70);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+  overflow-x: auto;
 }
 
-.custom-tc-desc {
-  flex: 1;
-  font-size: 0.8rem;
-  padding: 5px 8px;
+.custom-chips-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 
-.custom-tc-mode {
-  width: auto;
-  font-size: 0.76rem;
-  padding: 5px 8px;
-}
-
-.custom-tc-fields {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.custom-tc-fields .textarea {
-  font-size: 0.78rem;
-  min-height: 60px;
-}
-
-.custom-author-actions {
-  margin-top: 10px;
-}
-
-/* ───── Solving View ───── */
-.custom-solve-pane {
+.custom-chips-list {
   display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 0;
-  flex: 1;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
 }
 
-.custom-solve-content {
-  flex: 1;
-  overflow-y: auto;
-  min-height: 0;
+.custom-chip {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: var(--text-2);
+  font-size: 0.74rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
 }
 
-.custom-solve-title {
-  font-size: 1.05rem;
-  font-weight: 700;
+.custom-chip:hover {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.35);
   color: var(--text-1);
 }
 
-.custom-grade-action-card {
+.custom-chip--active {
+  background: rgba(56, 189, 248, 0.18);
+  border-color: #38bdf8;
+  color: #38bdf8;
+  font-weight: 600;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.20);
+}
+
+/* ───── Tab Container ───── */
+.custom-tab-container {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.custom-review-pane {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.custom-tutor-pane {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ───── Editable Question Card ───── */
+.custom-editable-card {
+  background: rgba(18, 23, 36, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.custom-field-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.custom-field-label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-3);
+}
+
+.custom-title-input {
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 8px 12px;
+  background: rgba(10, 14, 24, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: var(--text-1);
+}
+
+.custom-prompt-label-group {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 14px;
-  background: var(--bg-raised);
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
 }
 
-.custom-tc-tag {
-  font-family: var(--font-mono);
-  font-size: 0.74rem;
+.custom-prompt-hint {
+  font-size: 0.70rem;
   color: var(--text-3);
+}
+
+.custom-prompt-textarea {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  padding: 10px 12px;
+  background: rgba(10, 14, 24, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: var(--text-1);
+  resize: vertical;
+  min-height: 85px;
+}
+
+.custom-prompt-textarea:focus,
+.custom-title-input:focus {
+  border-color: #38bdf8;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+}
+
+/* ───── Evaluation Action Bar ───── */
+.custom-eval-action-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.custom-eval-btn {
+  width: 100%;
+  padding: 11px 16px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 9px;
+  box-shadow: 0 4px 16px rgba(56, 189, 248, 0.22);
+}
+
+.custom-eval-note {
+  font-size: 0.72rem;
+  color: var(--text-3);
+  text-align: center;
+}
+
+/* ───── AI Evaluation Results Card ───── */
+.custom-ai-result-card {
+  background: rgba(18, 24, 40, 0.95);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  animation: resultSlideIn 0.22s ease-out;
+}
+
+@keyframes resultSlideIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.custom-ai-result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.custom-ai-result-verdict-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.custom-verdict-pill {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+}
+
+.custom-verdict-pill--correct {
+  background: rgba(16, 185, 129, 0.18);
+  border: 1px solid #10b981;
+  color: #34d399;
+}
+
+.custom-verdict-pill--clean_code {
+  background: rgba(6, 182, 212, 0.18);
+  border: 1px solid #06b6d4;
+  color: #38bdf8;
+}
+
+.custom-verdict-pill--needs_work {
+  background: rgba(245, 158, 11, 0.18);
+  border: 1px solid #f59e0b;
+  color: #fbbf24;
+}
+
+.custom-verdict-pill--runtime_error,
+.custom-verdict-pill--syntax_error {
+  background: rgba(244, 63, 94, 0.18);
+  border: 1px solid #f43f5e;
+  color: #fb7185;
+}
+
+.custom-score-badge {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 6px;
+  color: var(--text-1);
+}
+
+.custom-provider-tag {
+  font-size: 0.70rem;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+}
+
+.custom-ai-summary {
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: var(--text-1);
+  margin: 0;
+}
+
+/* ───── Feedback Points ───── */
+.custom-feedback-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.custom-section-title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-3);
+}
+
+.custom-feedback-list {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.custom-feedback-item {
+  font-size: 0.80rem;
+  line-height: 1.45;
+  color: var(--text-2);
+}
+
+/* ───── Edge Case Tip Box ───── */
+.custom-edge-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 8px;
+}
+
+.custom-edge-tip__icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.custom-edge-tip__content {
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: #fde68a;
+}
+
+/* ───── Concepts Applied Row ───── */
+.custom-concepts-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.custom-concepts-label {
+  font-size: 0.70rem;
+  color: var(--text-3);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.custom-concept-tag {
+  font-size: 0.70rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.10);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  color: #38bdf8;
 }
