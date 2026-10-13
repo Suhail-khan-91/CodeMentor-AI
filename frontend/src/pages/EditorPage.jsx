@@ -1,83 +1,48 @@
 /**
- * EditorPage.jsx — Professional Coding Workspace (Phase A14 Live Integration).
+ * EditorPage.jsx — Professional Coding Workspace
  *
  * 3-Zone Modern IDE Architecture:
- * - Zone 1: Monaco Code Editor with filename tabs, language tag, keyboard shortcuts
- * - Zone 2: Interactive Terminal & Diagnostic Console (stdout/stderr streams, exit codes, execution telemetry)
- * - Zone 3: Contextual Learning Pane (AI Socratic Tutor in Free Play, Task Evaluation in Practice, Custom Question Engine, Debug Challenge Console)
- *
- * Full compliance with Part A requirements:
- * - Free Play execution (POST /api/run)
- * - Task grading (POST /api/evaluate)
- * - Educational diagnostic cards (Phase A4)
- * - Progressive hints (Phase A6)
- * - AI Tutor Socratic chat (Phase A7)
- * - Custom questions (Phase A10)
- * - Assistance tracking (Phase A11)
- * - Progress & score synchronization (Phase A12)
- * - Debug mode challenges (Phase A13)
- * - Ctrl+Enter execution shortcut
+ * - Zone 1: Monaco Code Editor with syntax highlighting and keyboard shortcuts
+ * - Zone 2: Interactive Terminal & Diagnostic Console (stdout/stderr, exit codes, compiler diagnostics)
+ * - Zone 3: Contextual Learning Pane:
+ *     - Course Track: 32-Session Curriculum, 3-Tier Hints, Socratic Tutor, and Test Suite Evaluation
+ *     - Custom Practice: Student-authored questions, custom test cases, and automated grading
  */
 
 import { useState, useCallback, useEffect } from 'react';
 import CodeEditor, { DEFAULT_PYTHON_CODE } from '../components/CodeEditor';
 import DiagnosticCard from '../components/DiagnosticCard';
-import TaskEvaluationPanel from '../components/TaskEvaluationPanel';
 import CustomQuestionPanel from '../components/CustomQuestionPanel';
-import DebugChallengePanel from '../components/DebugChallengePanel';
 import CourseChallengePanel from '../components/curriculum/CourseChallengePanel';
-import AITutorPanel from '../components/AITutorPanel';
 import HelpUsageWidget from '../components/HelpUsageWidget';
 import { findChallengeById, getModule } from '../services/curriculumService';
-import {
-  runCode,
-  evaluateTask,
-  getSampleTasks,
-  fetchHints,
-  recordProgressAttempt,
-  getDebugChallenges,
-  evaluateDebugChallenge,
-} from '../services/api';
+import { runCode } from '../services/api';
 import './EditorPage.css';
 
 export default function EditorPage() {
   const getInitialMode = () => {
     try {
       const urlMode = new URLSearchParams(window.location.search).get('mode');
-      if (urlMode === 'custom' || urlMode === 'task' || urlMode === 'editor' || urlMode === 'debug' || urlMode === 'course') {
-        return urlMode;
+      if (urlMode === 'custom') {
+        return 'custom';
       }
     } catch (e) {}
-    return 'editor';
+    return 'course';
   };
 
-  const [mode, setMode] = useState(getInitialMode); // 'editor' | 'task' | 'custom' | 'debug' | 'course'
+  const [mode, setMode] = useState(getInitialMode); // 'course' | 'custom'
   const [code, setCode] = useState(DEFAULT_PYTHON_CODE);
 
   // Terminal active tab: 'output' | 'diagnostics'
   const [terminalTab, setTerminalTab] = useState('output');
 
-  // Runner & Diagnostics state (Free Play Mode)
+  // Runner & Diagnostics state
   const [isRunning, setIsRunning] = useState(false);
   const [result, setResult] = useState(null);
   const [apiError, setApiError] = useState(null);
   const [showDiagnostic, setShowDiagnostic] = useState(true);
 
-  // Tasks & Evaluator state (Task Evaluation Mode)
-  const [tasks, setTasks] = useState([]);
-  const [activeTask, setActiveTask] = useState(null);
-  const [isEvaluating, setIsEvaluating] = useState(false);
-  const [evaluationResult, setEvaluationResult] = useState(null);
-  const [hintsData, setHintsData] = useState(null);
-
-  // Debug Mode state (Phase A13)
-  const [debugChallenges, setDebugChallenges] = useState([]);
-  const [activeDebugChallenge, setActiveDebugChallenge] = useState(null);
-  const [isDebugEvaluating, setIsDebugEvaluating] = useState(false);
-  const [debugEvaluationResult, setDebugEvaluationResult] = useState(null);
-  const [debugHintsData, setDebugHintsData] = useState(null);
-
-  // Course & Curriculum Mode state (Phase B4)
+  // Course & Curriculum Mode state
   const [activeCourseChallenge, setActiveCourseChallenge] = useState(null);
   const [courseChallengeMeta, setCourseChallengeMeta] = useState({});
   const [examQuestionsList, setExamQuestionsList] = useState([]);
@@ -151,85 +116,19 @@ export default function EditorPage() {
     }
   }, []);
 
-  // Load sample practice tasks on mount
-  useEffect(() => {
-    getSampleTasks()
-      .then((data) => {
-        if (data?.tasks?.length > 0) {
-          setTasks(data.tasks);
-          setActiveTask(data.tasks[0]);
-        }
-      })
-      .catch((err) => {
-        console.warn('Failed to load sample tasks:', err);
-      });
-
-    // Load Phase A13 debug challenges
-    getDebugChallenges()
-      .then((data) => {
-        if (data?.challenges?.length > 0) {
-          setDebugChallenges(data.challenges);
-          setActiveDebugChallenge(data.challenges[0]);
-          if (getInitialMode() === 'debug' && data.challenges[0].buggy_code) {
-            setCode(data.challenges[0].buggy_code);
-          }
-        }
-      })
-      .catch((err) => {
-        console.warn('Failed to load debug challenges:', err);
-      });
-  }, []);
-
   const handleCodeChange = useCallback((newCode) => {
     setCode(newCode);
   }, []);
 
-  const handleSelectTask = useCallback((taskId) => {
-    const selected = tasks.find((t) => t.id === taskId);
-    if (selected) {
-      setActiveTask(selected);
-      setEvaluationResult(null);
-      setHintsData(null);
-      if (selected.starter_code) {
-        setCode(selected.starter_code);
-      }
-    }
-  }, [tasks]);
-
-  const handleSelectDebugChallenge = useCallback((challengeId) => {
-    const selected = debugChallenges.find((c) => c.id === challengeId);
-    if (selected) {
-      setActiveDebugChallenge(selected);
-      setDebugEvaluationResult(null);
-      setDebugHintsData(null);
-      if (selected.buggy_code) {
-        setCode(selected.buggy_code);
-      }
-    }
-  }, [debugChallenges]);
-
-  const handleResetToBuggy = useCallback(() => {
-    if (activeDebugChallenge?.buggy_code) {
-      setCode(activeDebugChallenge.buggy_code);
-      setDebugEvaluationResult(null);
-      setDebugHintsData(null);
-    }
-  }, [activeDebugChallenge]);
-
   const handleSwitchMode = (newMode) => {
     setMode(newMode);
-    // Sync URL query parameter without full reload
     try {
       const url = new URL(window.location);
       url.searchParams.set('mode', newMode);
       window.history.replaceState({}, '', url);
     } catch (e) {}
 
-    if (newMode === 'task' && activeTask && activeTask.starter_code && code === DEFAULT_PYTHON_CODE) {
-      setCode(activeTask.starter_code);
-    } else if (newMode === 'debug' && activeDebugChallenge?.buggy_code) {
-      setCode(activeDebugChallenge.buggy_code);
-    } else if (newMode === 'course' && activeCourseChallenge?.starter_code) {
+    if (newMode === 'course' && activeCourseChallenge?.starter_code) {
       setCode(activeCourseChallenge.starter_code);
     }
   };
@@ -263,23 +162,15 @@ export default function EditorPage() {
   }, [examQuestionsList, currentExamIndex]);
 
   const handleResetCode = useCallback(() => {
-    if (mode === 'task' && activeTask?.starter_code) {
-      setCode(activeTask.starter_code);
-    } else if (mode === 'debug' && activeDebugChallenge?.buggy_code) {
-      setCode(activeDebugChallenge.buggy_code);
-    } else if (mode === 'course' && activeCourseChallenge?.starter_code) {
+    if (mode === 'course' && activeCourseChallenge?.starter_code) {
       setCode(activeCourseChallenge.starter_code);
     } else {
       setCode(DEFAULT_PYTHON_CODE);
     }
     setResult(null);
-    setEvaluationResult(null);
-    setDebugEvaluationResult(null);
-    setHintsData(null);
-    setDebugHintsData(null);
     setApiError(null);
     setShowDiagnostic(true);
-  }, [mode, activeTask, activeDebugChallenge, activeCourseChallenge]);
+  }, [mode, activeCourseChallenge]);
 
   const handleClearOutput = useCallback(() => {
     setResult(null);
@@ -288,10 +179,10 @@ export default function EditorPage() {
   }, []);
 
   /**
-   * Execute code via backend Code Runner API (Free Play / Script execution).
+   * Execute code via backend Code Runner API.
    */
   const handleRun = useCallback(async () => {
-    if (isRunning || isEvaluating || isDebugEvaluating) return;
+    if (isRunning) return;
 
     setIsRunning(true);
     setApiError(null);
@@ -309,110 +200,20 @@ export default function EditorPage() {
     } finally {
       setIsRunning(false);
     }
-  }, [code, isRunning, isEvaluating, isDebugEvaluating]);
+  }, [code, isRunning]);
 
-  /**
-   * Evaluate code against all test cases for active task (Phase A5/A6).
-   */
-  const handleEvaluate = useCallback(async () => {
-    if (!activeTask || isEvaluating || isRunning) return;
-
-    setIsEvaluating(true);
-    setApiError(null);
-
-    try {
-      const evalRes = await evaluateTask(code, activeTask);
-      setEvaluationResult(evalRes);
-
-      // Phase A6: If solution did not pass all tests, fetch progressive hints
-      if (!evalRes.passed_all) {
-        try {
-          const hintRes = await fetchHints(code, activeTask.id, evalRes);
-          setHintsData(hintRes);
-        } catch (hintErr) {
-          console.warn('Hints service unavailable:', hintErr);
-        }
-      } else {
-        // Solution passed 100% — clear hints
-        setHintsData(null);
-      }
-
-      // Phase A12: Record task evaluation attempt in Progress & Score Engine
-      try {
-        recordProgressAttempt({
-          taskId: activeTask.id,
-          taskTitle: activeTask.title,
-          category: 'starter',
-          scorePercentage: evalRes.score_percentage || 0,
-          passedAll: !!evalRes.passed_all,
-          passedTests: evalRes.passed_tests || 0,
-          totalTests: evalRes.total_tests || 0,
-        })
-          .then(() => {
-            window.dispatchEvent(new CustomEvent('progress-updated'));
-          })
-          .catch((progErr) => {
-            console.warn('Failed to record progress attempt:', progErr);
-          });
-      } catch (err) {
-        console.warn('Error recording progress attempt:', err);
-      }
-    } catch (err) {
-      setApiError(err.message || 'Failed to evaluate task on backend');
-    } finally {
-      setIsEvaluating(false);
-    }
-  }, [code, activeTask, isEvaluating, isRunning]);
-
-  /**
-   * Evaluate repaired code against active Debug Mode challenge test cases (Phase A13).
-   */
-  const handleEvaluateDebug = useCallback(async () => {
-    if (!activeDebugChallenge || isDebugEvaluating || isRunning) return;
-
-    setIsDebugEvaluating(true);
-    setApiError(null);
-
-    try {
-      const res = await evaluateDebugChallenge(activeDebugChallenge.id, code);
-      if (res?.evaluation) {
-        setDebugEvaluationResult(res.evaluation);
-        if (res.hints) {
-          setDebugHintsData({
-            has_hints: true,
-            hints: res.hints,
-            rule_name: res.hints.rule_name,
-            matched_mistake: res.hints.matched_mistake,
-            source: res.hints.source || 'rule_based',
-          });
-        }
-        window.dispatchEvent(new CustomEvent('progress-updated'));
-      }
-    } catch (err) {
-      setApiError(err.message || 'Failed to evaluate debug challenge on backend');
-    } finally {
-      setIsDebugEvaluating(false);
-    }
-  }, [code, activeDebugChallenge, isDebugEvaluating, isRunning]);
-
-  // Keyboard shortcut: Ctrl+Enter executes or evaluates depending on mode
+  // Keyboard shortcut: Ctrl+Enter executes script
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         e.preventDefault();
-        if (mode === 'task') {
-          handleEvaluate();
-        } else if (mode === 'debug') {
-          handleEvaluateDebug();
-        } else {
-          handleRun();
-        }
+        handleRun();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [mode, handleRun, handleEvaluate, handleEvaluateDebug]);
+  }, [handleRun]);
 
   // Helper to render status badge in terminal header
   const renderStatusBadge = () => {
@@ -452,43 +253,20 @@ export default function EditorPage() {
   };
 
   const getModeBadgeInfo = () => {
-    switch (mode) {
-      case 'course':
-        return {
-          tag: 'CampusX Course Track',
-          accentClass: 'mode-accent--cyan',
-          title: 'Interactive Python Curriculum',
-          desc: 'Solve real-world CampusX Python challenges, read 3-tier hints, consult the AI tutor, and verify test cases.',
-        };
-      case 'task':
-        return {
-          tag: 'Task Practice Track',
-          accentClass: 'mode-accent--amber',
-          title: 'Curriculum & Test Grading',
-          desc: 'Code against comprehensive unit tests with instant evaluation, score breakdown, and tiered hints.',
-        };
-      case 'debug':
-        return {
-          tag: 'Bug Diagnosis Track',
-          accentClass: 'mode-accent--violet',
-          title: 'Debug Mode: Fix Broken Code',
-          desc: 'Diagnose and fix real-world Python bugs with pedagogical hints, syntax explanations, and unit tests.',
-        };
-      case 'custom':
-        return {
-          tag: 'Challenge Authoring Engine',
-          accentClass: 'mode-accent--blue',
-          title: 'Custom Question Playground',
-          desc: 'Design bespoke Python coding questions with custom input/output test specifications and automated grading.',
-        };
-      default:
-        return {
-          tag: 'Sandbox Environment',
-          accentClass: 'mode-accent--mint',
-          title: 'Python Free Play & Diagnostics',
-          desc: 'Isolated Python sandbox with instant plain-English syntax diagnostics and interactive Socratic AI guidance.',
-        };
+    if (mode === 'custom') {
+      return {
+        tag: 'Custom Practice Track',
+        accentClass: 'mode-accent--blue',
+        title: 'Custom Question Playground',
+        desc: 'Design bespoke Python coding questions with custom input/output test specifications and automated grading.',
+      };
     }
+    return {
+      tag: 'CampusX Course Track',
+      accentClass: 'mode-accent--cyan',
+      title: 'Interactive Python Curriculum',
+      desc: 'Solve real-world CampusX Python challenges, read 3-tier hints, consult the AI tutor, and verify test cases.',
+    };
   };
 
   const modeInfo = getModeBadgeInfo();
@@ -519,27 +297,7 @@ export default function EditorPage() {
               id="tab-course-mode"
             >
               <span className="mode-tab__dot" />
-              <span>Course</span>
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={mode === 'editor'}
-              className={`mode-tab mode-tab--editor ${mode === 'editor' ? 'mode-tab--active' : ''}`}
-              onClick={() => handleSwitchMode('editor')}
-            >
-              <span className="mode-tab__dot" />
-              <span>Free Play</span>
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={mode === 'task'}
-              className={`mode-tab mode-tab--task ${mode === 'task' ? 'mode-tab--active' : ''}`}
-              onClick={() => handleSwitchMode('task')}
-            >
-              <span className="mode-tab__dot" />
-              <span>Task Eval</span>
+              <span>Course Track</span>
             </button>
             <button
               type="button"
@@ -550,18 +308,7 @@ export default function EditorPage() {
               id="tab-custom-mode"
             >
               <span className="mode-tab__dot" />
-              <span>Custom</span>
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={mode === 'debug'}
-              className={`mode-tab mode-tab--debug ${mode === 'debug' ? 'mode-tab--active' : ''}`}
-              onClick={() => handleSwitchMode('debug')}
-              id="tab-debug-mode"
-            >
-              <span className="mode-tab__dot" />
-              <span>Debug</span>
+              <span>Custom Practice</span>
             </button>
           </div>
         </div>
@@ -576,77 +323,23 @@ export default function EditorPage() {
             {/* Primary Action Toolbar */}
             <div className="editor-panel__toolbar">
               <div className="editor-panel__toolbar-left">
-                {mode === 'task' ? (
-                  <>
-                    <button
-                      id="btn-evaluate-task"
-                      className="btn btn--primary btn--accent-amber"
-                      onClick={handleEvaluate}
-                      disabled={isEvaluating || isRunning}
-                      aria-label="Evaluate task against all test cases"
-                      title="Run test suite against solution (Ctrl+Enter)"
-                    >
-                      <span aria-hidden="true">{isEvaluating ? '⏳' : '⚡'}</span>
-                      {isEvaluating ? 'Evaluating…' : 'Evaluate Task'}
-                    </button>
-
-                    <button
-                      id="btn-run-code"
-                      className="btn btn--secondary"
-                      onClick={handleRun}
-                      disabled={isRunning || isEvaluating}
-                      aria-label="Run code in terminal"
-                      title="Run script in terminal without grading"
-                    >
-                      <span aria-hidden="true">{isRunning ? '⏳' : '▶'}</span>
-                      {isRunning ? 'Running…' : 'Run Script'}
-                    </button>
-                  </>
-                ) : mode === 'debug' ? (
-                  <>
-                    <button
-                      id="btn-evaluate-debug"
-                      className="btn btn--primary btn--accent-violet"
-                      onClick={handleEvaluateDebug}
-                      disabled={isDebugEvaluating || isRunning}
-                      aria-label="Evaluate fix against test cases"
-                      title="Grade repaired code against tests (Ctrl+Enter)"
-                    >
-                      <span aria-hidden="true">{isDebugEvaluating ? '⏳' : '⚡'}</span>
-                      {isDebugEvaluating ? 'Evaluating…' : 'Evaluate Fix'}
-                    </button>
-
-                    <button
-                      id="btn-run-code"
-                      className="btn btn--secondary"
-                      onClick={handleRun}
-                      disabled={isRunning || isDebugEvaluating}
-                      aria-label="Run code in terminal"
-                      title="Run script in terminal without grading"
-                    >
-                      <span aria-hidden="true">{isRunning ? '⏳' : '▶'}</span>
-                      {isRunning ? 'Running…' : 'Run Script'}
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    id="btn-run-code"
-                    className="btn btn--primary btn--accent-mint"
-                    onClick={handleRun}
-                    disabled={isRunning}
-                    aria-label={isRunning ? 'Executing code…' : 'Run code (Ctrl+Enter)'}
-                    title="Execute Python code (Shortcut: Ctrl+Enter)"
-                  >
-                    <span aria-hidden="true">{isRunning ? '⏳' : '▶'}</span>
-                    {isRunning ? 'Running…' : 'Run Code'}
-                  </button>
-                )}
+                <button
+                  id="btn-run-code"
+                  className="btn btn--primary btn--accent-mint"
+                  onClick={handleRun}
+                  disabled={isRunning}
+                  aria-label={isRunning ? 'Executing code…' : 'Run code (Ctrl+Enter)'}
+                  title="Execute Python code in terminal (Ctrl+Enter)"
+                >
+                  <span aria-hidden="true">{isRunning ? '⏳' : '▶'}</span>
+                  {isRunning ? 'Running…' : 'Run Code'}
+                </button>
 
                 <button
                   id="btn-clear-code"
                   className="btn btn--ghost"
                   onClick={handleResetCode}
-                  disabled={isRunning || isEvaluating || isDebugEvaluating}
+                  disabled={isRunning}
                   aria-label="Reset editor code"
                   title="Reset code to initial template"
                 >
@@ -656,11 +349,10 @@ export default function EditorPage() {
               </div>
 
               <div className="editor-panel__toolbar-right">
-                {/* Phase A11: Help / AI Assistance Counter */}
                 <HelpUsageWidget />
 
                 <span className="editor-panel__shortcut-hint">
-                  <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to {mode === 'task' || mode === 'debug' ? 'evaluate' : 'run'}
+                  <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run
                 </span>
 
                 <span className="editor-panel__char-count" aria-live="polite">
@@ -827,7 +519,14 @@ export default function EditorPage() {
 
         {/* Right Column: Contextual Learning & Mode Experience */}
         <div className="workspace-right-column">
-          {mode === 'course' ? (
+          {mode === 'custom' ? (
+            <section className="task-panel" aria-label="Custom Question Panel">
+              <CustomQuestionPanel
+                code={code}
+                onApplyStarterCode={(starter) => setCode(starter)}
+              />
+            </section>
+          ) : (
             <section className="task-panel" aria-label="Course Challenge Panel">
               <CourseChallengePanel
                 challenge={activeCourseChallenge}
@@ -839,47 +538,6 @@ export default function EditorPage() {
                 hasNext={examQuestionsList.length > 0 ? currentExamIndex < examQuestionsList.length - 1 : false}
                 hasPrev={examQuestionsList.length > 0 ? currentExamIndex > 0 : false}
                 onBackToCourse={() => (window.location.href = '/courses')}
-              />
-            </section>
-          ) : mode === 'task' ? (
-            <section className="task-panel" aria-label="Task Evaluation Results">
-              <TaskEvaluationPanel
-                code={code}
-                tasks={tasks}
-                activeTask={activeTask}
-                onSelectTask={handleSelectTask}
-                evaluationResult={evaluationResult}
-                isEvaluating={isEvaluating}
-                hintsData={hintsData}
-              />
-            </section>
-          ) : mode === 'custom' ? (
-            <section className="task-panel" aria-label="Custom Question Panel">
-              <CustomQuestionPanel
-                code={code}
-                onApplyStarterCode={(starter) => setCode(starter)}
-              />
-            </section>
-          ) : mode === 'debug' ? (
-            <section className="task-panel" aria-label="Debug Challenge Panel">
-              <DebugChallengePanel
-                code={code}
-                challenges={debugChallenges}
-                activeChallenge={activeDebugChallenge}
-                onSelectChallenge={handleSelectDebugChallenge}
-                onResetToBuggy={handleResetToBuggy}
-                evaluationResult={debugEvaluationResult}
-                isEvaluating={isDebugEvaluating}
-                hintsData={debugHintsData}
-              />
-            </section>
-          ) : (
-            /* Free Play Mode: Dedicated AI Tutor Panel in Zone 3 */
-            <section className="tutor-freeplay-panel" aria-label="AI Socratic Tutor">
-              <AITutorPanel
-                code={code}
-                diagnostic={result?.diagnostic}
-                executionDetails={result}
               />
             </section>
           )}

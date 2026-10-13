@@ -197,7 +197,7 @@ export default function DiagnosticCard({
                 ? 'Hide AI Deep Dive'
                 : 'Explain Error with AI'}
             </span>
-            <span className="diagnostic-card__btn-ai-tag">Phase A9</span>
+            <span className="diagnostic-card__btn-ai-tag">AI Powered</span>
           </button>
         </div>
 

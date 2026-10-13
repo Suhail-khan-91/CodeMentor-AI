@@ -100,6 +100,12 @@
   border: 1px solid rgba(56, 239, 189, 0.3);
 }
 
+.mode-accent--cyan {
+  background: rgba(56, 189, 248, 0.12);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
 .mode-accent--amber {
   background: rgba(251, 191, 36, 0.12);
   color: #fbbf24;

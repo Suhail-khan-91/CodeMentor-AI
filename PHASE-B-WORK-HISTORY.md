@@ -91,9 +91,28 @@ Curriculum content is curated and adapted from CampusX's Data Science Mentorship
   - Every challenge & exam question includes 3-tier progressive hints (`level_1_nudge`, `level_2_strategy`, `level_3_clue`).
   - All solution codes verified against their test cases with automated subprocess execution.
 
+### Phase B6: Final Year Project UI/UX Streamlining & Academic Clean-Up
+- **Objectives**:
+  - Transform Landing Page into a single-screen, non-scrolling showcase eliminating duplicate CTAs, dead links, and internal "Phase A1–A14" AI development tags.
+  - Streamline Workspace Modes down to 2 distinct tracks: **Course Track** (full 32-session curriculum with tests, hints, Socratic tutor) and **Custom Practice** (student problem authoring & custom test suite grading).
+  - Remove redundant modes (`Free Play`, `Task Eval`, `Debug Mode`) and dead anchor navigation (`#architecture`, `#features`).
+- **Files Modified**:
+  - `frontend/src/pages/Home.jsx`: Reduced to a clean, single-screen hero with 2 primary actions (`Start Python Course` → `/courses`, `Custom Practice` → `/editor?mode=custom`). Preserved `sum_two_numbers.py` interactive terminal card.
+  - `frontend/src/pages/Home.css`: Adjusted hero viewport fitting and removed obsolete stats row, 4-mode cards, 12-feature cards, and footer styles.
+  - `frontend/src/components/Navbar.jsx`: Cleaned navbar links to `Python Course` and `Custom Practice`. Removed `Phase A14` badge and dead anchor links.
+  - `frontend/src/pages/EditorPage.jsx`: Streamlined mode switcher to `Course Track` and `Custom Practice`. Defaulted initial mode to `course`. Removed unused legacy panel components.
+  - `frontend/src/pages/EditorPage.css`: Styled active mode tabs and added `.mode-accent--cyan`.
+  - `frontend/src/components/CustomQuestionPanel.jsx` & `.css`: Imported shared test/tab styles so problem authoring and solve views render cleanly.
+  - `frontend/src/components/DiagnosticCard.jsx`: Replaced internal `Phase A9` label with `AI Powered`.
+- **Verification**:
+  - `npm run build`: Built cleanly in 125ms (0 errors).
+  - `pytest`: 233 / 233 passing in 18.23s.
+  - Browser subagent visual verification confirmed single-screen hero, 2 clean mode tabs, and functioning IDE zones.
+
 ---
 
 ## 🧪 Verification & Test Results
+
 
 1. **Automated Backend Test Suite**:
    - `python -m pytest tests/`

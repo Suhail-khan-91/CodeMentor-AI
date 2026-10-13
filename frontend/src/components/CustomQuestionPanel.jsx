@@ -15,6 +15,7 @@ import {
   evaluateCustomQuestion,
   recordProgressAttempt
 } from '../services/api';
+import './TaskEvaluationPanel.css';
 import './CustomQuestionPanel.css';
 
 const DEFAULT_CUSTOM_QUESTION = {

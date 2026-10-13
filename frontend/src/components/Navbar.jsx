@@ -79,9 +79,7 @@ export default function Navbar() {
           ) : (
             <nav className="navbar__nav-links" aria-label="Main Navigation">
               <a href="/courses" className="navbar__nav-link" style={{ color: '#38bdf8', fontWeight: '600' }}>Python Course</a>
-              <a href="#features" className="navbar__nav-link">Features</a>
-              <a href="#architecture" className="navbar__nav-link">How it Works</a>
-              <a href="/editor" className="navbar__nav-link">IDE Workspace</a>
+              <a href="/editor?mode=custom" className="navbar__nav-link">Custom Practice</a>
             </nav>
           )}
         </div>
@@ -128,15 +126,11 @@ export default function Navbar() {
             <span>AI Settings</span>
           </button>
 
-          {!isEditor ? (
+          {!isEditor && (
             <a href="/editor" className="btn btn--accent navbar__cta-btn">
               <span>Open Workspace</span>
               <span aria-hidden="true">→</span>
             </a>
-          ) : (
-            <span className="navbar__phase-badge" title="Platform Build Phase">
-              Phase A14
-            </span>
           )}
         </div>
       </div>
