@@ -195,6 +195,7 @@ export default function EditorPage() {
 
   const handleSwitchMode = (newMode) => {
     setMode(newMode);
+    setStdin('');
     try {
       const url = new URL(window.location);
       url.searchParams.set('mode', newMode);
@@ -216,6 +217,7 @@ export default function EditorPage() {
         ...prev,
         examQuestionIndex: nextIdx,
       }));
+      setStdin('');
       if (q.starter_code) setCode(q.starter_code);
     }
   }, [examQuestionsList, currentExamIndex]);
@@ -230,6 +232,7 @@ export default function EditorPage() {
         ...prev,
         examQuestionIndex: prevIdx,
       }));
+      setStdin('');
       if (q.starter_code) setCode(q.starter_code);
     }
   }, [examQuestionsList, currentExamIndex]);
@@ -240,6 +243,7 @@ export default function EditorPage() {
     } else {
       setCode(DEFAULT_PYTHON_CODE);
     }
+    setStdin('');
     setResult(null);
     setApiError(null);
     setShowDiagnostic(true);
@@ -248,20 +252,32 @@ export default function EditorPage() {
   const handleClearOutput = useCallback(() => {
     setResult(null);
     setApiError(null);
+    setStdin('');
     setShowDiagnostic(true);
   }, []);
 
   /**
    * Execute code via backend Code Runner API with stdin and attached data files.
+   *
+   * @param {string|null} customStdin - Explicit stdin input string (e.g. from prompt).
+   * @param {boolean} isFreshRun - If true, execution resets stdin buffer to prompt cleanly.
    */
-  const handleRun = useCallback(async (customStdin = null) => {
+  const handleRun = useCallback(async (customStdin = null, isFreshRun = false) => {
     if (isRunning) return;
 
     setIsRunning(true);
     setApiError(null);
     setShowDiagnostic(true);
 
-    const effectiveStdin = typeof customStdin === 'string' ? customStdin : stdin;
+    let effectiveStdin = '';
+    if (isFreshRun) {
+      setStdin('');
+      effectiveStdin = '';
+    } else if (typeof customStdin === 'string') {
+      effectiveStdin = customStdin;
+    } else {
+      effectiveStdin = stdin;
+    }
 
     try {
       const executionResult = await runCode(code, effectiveStdin, attachedFiles);
@@ -282,6 +298,11 @@ export default function EditorPage() {
           }, 80);
         }
       }
+
+      // Auto-clear standard input once consumed by a non-EOF run so the next run prompts fresh!
+      if (!isEof && effectiveStdin) {
+        setStdin('');
+      }
     } catch (err) {
       setApiError(err.message || 'Failed to connect to backend code runner');
       setTerminalTab('output');
@@ -290,12 +311,12 @@ export default function EditorPage() {
     }
   }, [code, stdin, attachedFiles, isRunning]);
 
-  // Keyboard shortcut: Ctrl+Enter executes script
+  // Keyboard shortcut: Ctrl+Enter executes script fresh
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         e.preventDefault();
-        handleRun();
+        handleRun(null, true);
       }
     };
 
@@ -411,7 +432,7 @@ export default function EditorPage() {
             <button
               type="button"
               className="btn-console-run-now"
-              onClick={() => handleRun()}
+              onClick={() => handleRun(stdin, false)}
               disabled={isRunning}
             >
               <span>▶</span> Send Input & Run
@@ -430,14 +451,14 @@ export default function EditorPage() {
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
-                  handleRun();
+                  handleRun(stdin, false);
                 }
               }}
             />
             <button
               type="button"
               className="btn-console-run-now"
-              onClick={() => handleRun()}
+              onClick={() => handleRun(stdin, false)}
               disabled={isRunning}
             >
               <span>▶</span> Send
@@ -522,7 +543,7 @@ export default function EditorPage() {
                 <button
                   id="btn-run-code"
                   className="btn btn--primary btn--accent-mint"
-                  onClick={handleRun}
+                  onClick={() => handleRun(null, true)}
                   disabled={isRunning}
                   aria-label={isRunning ? 'Executing code…' : 'Run code (Ctrl+Enter)'}
                   title="Execute Python code in terminal (Ctrl+Enter)"

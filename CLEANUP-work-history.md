@@ -400,14 +400,19 @@ We systematically addressed all visual clutter, dead links, duplicate call-to-ac
 4. **CSS Styling (`EditorPage.css`)**:
    - Replaced obsolete EOF notice with complete styles for `.terminal-console-input-wrap`, `.terminal-console-singleline-box`, `.terminal-console-multiline-box`, `.btn-console-run-now`, `.btn-console-pill`, and `.terminal-diag-quick-notice`.
 
+4. **Automatic Standard Input Auto-Clear Lifecycle (`EditorPage.jsx`)**:
+   - Standard input is automatically consumed and cleared (`setStdin('')`) as soon as execution completes with exit code 0 or any non-EOF exit.
+   - The interactive prompt box returns to a fresh, clean state without lingering stale input text.
+   - Clicking **Run Code** on the toolbar (or pressing <kbd>Ctrl</kbd>+<kbd>Enter</kbd>) resets the stdin buffer (`isFreshRun = true`), ensuring the program executes from scratch and prompts anew whenever `input()` is called.
+   - Question steppers (`handleNextCourseQuestion`, `handlePrevCourseQuestion`), editor reset (`handleResetCode`), output clear (`handleClearOutput`), and mode switches (`handleSwitchMode`) all cleanly reset `stdin`.
+
 ### 3. Verification
-- **Production Build**: `npm run build` completed with 0 errors.
+- **Production Build**: `npm run build` completed with 0 errors in 123ms.
 - **Browser Subagent Test**:
-  - Evaluated `age = int(input("Enter your age: ")) \n print("ok", age)`:
-    - Initially paused with `⏳ Input Required` in `Terminal Output`.
-    - Typed `25` into the focused prompt and pressed <kbd>Enter</kbd>.
-    - Immediate execution produced `Enter your age: ok 25` with `● Success (Exit 0)`.
-  - Switched to `📁 Data Files`, attached `students.csv`, and verified code snippet insertion.
+  - **Run 1**: Executed `age = int(input("Enter your age: ")) \n print("ok", age)`. Paused with `⏳ Input Required`.
+  - **Input 1**: Typed `25` and pressed <kbd>Enter</kbd>. Output displayed `Enter your age: ok 25` with `● Success (Exit 0)`. Input field automatically cleared.
+  - **Run 2**: Clicked **Run Code** again without manually clicking clear. Program executed from scratch and paused with `⏳ Input Required` fresh.
+  - **Input 2**: Typed `42` and pressed <kbd>Enter</kbd>. Output displayed `Enter your age: ok 42` with exit 0. Input field auto-cleared.
 
 ---
 
