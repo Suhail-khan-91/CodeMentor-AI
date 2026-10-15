@@ -302,3 +302,33 @@ def test_api_run_invalid_json(client):
         headers={"Content-Type": "text/plain"}
     )
     assert response.status_code == 400
+
+
+def test_api_run_with_stdin(client):
+    code = "d = input()\nm = input()\ny = input()\nprint(f'{d}/{m}/{y}')"
+    response = client.post("/api/run", json={"code": code, "stdin": "25\n12\n2024"})
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["status"] == "success"
+    assert data["stdout"].strip() == "25/12/2024"
+
+
+def test_api_run_with_files(client):
+    code = "with open('users.csv') as f:\n    print(f.read().strip())"
+    files = [{"name": "users.csv", "content": "name,role\nalex,developer"}]
+    response = client.post("/api/run", json={"code": code, "files": files})
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["status"] == "success"
+    assert "alex,developer" in data["stdout"]
+
+
+def test_api_run_with_matplotlib_plot(client):
+    code = "import matplotlib.pyplot as plt\nplt.plot([1, 2], [10, 20])\nplt.title('Test Chart')"
+    response = client.post("/api/run", json={"code": code})
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["status"] == "success"
+    assert "plot_image" in data
+    assert data["plot_image"].startswith("data:image/png;base64,")
+

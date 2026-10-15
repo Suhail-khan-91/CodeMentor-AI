@@ -8,9 +8,10 @@ environment scrubbing, output truncation, and error extraction.
 import os
 import sys
 import time
+import base64
 import tempfile
 import subprocess
-from typing import Optional, Dict
+from typing import Optional, Dict, List, Any
 
 from app.services.runner.base import BaseRunner, ExecutionResult
 from app.services.runner.parser import parse_traceback
@@ -48,13 +49,20 @@ class SubprocessRunner(BaseRunner):
             if key in os.environ:
                 safe_env[key] = os.environ[key]
 
-        # Force unbuffered UTF-8 I/O and disable bytecode generation
+        # Force unbuffered UTF-8 I/O, disable bytecode generation, and set headless Agg backend for matplotlib
         safe_env["PYTHONUNBUFFERED"] = "1"
         safe_env["PYTHONIOENCODING"] = "utf-8"
         safe_env["PYTHONDONTWRITEBYTECODE"] = "1"
+        safe_env["MPLBACKEND"] = "Agg"
         return safe_env
 
-    def run(self, code: str, stdin: str = "", timeout: Optional[float] = None) -> ExecutionResult:
+    def run(
+        self,
+        code: str,
+        stdin: str = "",
+        files: Optional[List[Dict[str, str]]] = None,
+        timeout: Optional[float] = None
+    ) -> ExecutionResult:
         """Execute code in a separate Python process inside a temporary directory."""
         effective_timeout = timeout if timeout is not None else self.default_timeout
 
@@ -74,9 +82,33 @@ class SubprocessRunner(BaseRunner):
 
         # Create temporary directory for isolation
         with tempfile.TemporaryDirectory(prefix="codementor_run_") as temp_dir:
+            # Write any attached data files (e.g. data.csv, dataset files)
+            if files and isinstance(files, list):
+                for f_item in files:
+                    if isinstance(f_item, dict) and "name" in f_item:
+                        clean_name = os.path.basename(f_item["name"])
+                        f_content = f_item.get("content", "")
+                        with open(os.path.join(temp_dir, clean_name), "w", encoding="utf-8") as df:
+                            df.write(f_content)
+
+            # Auto-capture Matplotlib figures if plotting libraries are used
+            script_content = code
+            if "matplotlib" in code or "plt." in code or "seaborn" in code or "sns." in code:
+                plot_hook = (
+                    "\n\n# CodeMentor Auto-Capture\n"
+                    "try:\n"
+                    "    import matplotlib.pyplot as _cm_plt\n"
+                    "    if _cm_plt.get_fignums():\n"
+                    "        _cm_plt.savefig('_codementor_plot.png', bbox_inches='tight', dpi=120)\n"
+                    "        _cm_plt.close('all')\n"
+                    "except Exception:\n"
+                    "    pass\n"
+                )
+                script_content = code + plot_hook
+
             script_path = os.path.join(temp_dir, SCRIPT_FILENAME)
             with open(script_path, "w", encoding="utf-8") as f:
-                f.write(code)
+                f.write(script_content)
 
             env = self._build_safe_env()
             cmd = [sys.executable, "-u", "-B", SCRIPT_FILENAME]
@@ -159,6 +191,25 @@ class SubprocessRunner(BaseRunner):
             if stderr_truncated:
                 stderr_str += "\n... [Error output truncated: maximum 64KB limit reached]"
 
+            # Check for captured or generated plot images
+            plot_image = None
+            target_plot_file = os.path.join(temp_dir, "_codementor_plot.png")
+            if not os.path.exists(target_plot_file):
+                # Check if code saved custom images
+                for fname in os.listdir(temp_dir):
+                    if fname.lower().endswith((".png", ".jpg", ".jpeg", ".svg")) and fname != SCRIPT_FILENAME:
+                        target_plot_file = os.path.join(temp_dir, fname)
+                        break
+
+            if os.path.exists(target_plot_file):
+                try:
+                    with open(target_plot_file, "rb") as img_file:
+                        b64_data = base64.b64encode(img_file.read()).decode("utf-8")
+                        mime = "png" if target_plot_file.lower().endswith(".png") else "jpeg"
+                        plot_image = f"data:image/{mime};base64,{b64_data}"
+                except Exception:
+                    pass
+
             # Handle timeout scenario
             if timed_out:
                 return ExecutionResult(
@@ -170,7 +221,8 @@ class SubprocessRunner(BaseRunner):
                     timed_out=True,
                     error_type="TimeoutError",
                     error_message=f"Execution exceeded maximum allowed time ({effective_timeout:.1f}s)",
-                    line_number=None
+                    line_number=None,
+                    plot_image=plot_image
                 )
 
             # Process completed normally or with error
@@ -184,7 +236,8 @@ class SubprocessRunner(BaseRunner):
                     timed_out=False,
                     error_type=None,
                     error_message=None,
-                    line_number=None
+                    line_number=None,
+                    plot_image=plot_image
                 )
             else:
                 # Parse traceback to extract structured details for A4 / A5
@@ -200,5 +253,6 @@ class SubprocessRunner(BaseRunner):
                     timed_out=False,
                     error_type=parsed["error_type"] or "RuntimeError",
                     error_message=parsed["error_message"] or "Script exited with non-zero exit code",
-                    line_number=parsed["line_number"]
+                    line_number=parsed["line_number"],
+                    plot_image=plot_image
                 )

@@ -95,8 +95,8 @@ export async function checkHealth() {
  *   }|null
  * }>}
  */
-export async function runCode(code, stdin = '') {
-  return apiPost('/api/run', { code, stdin });
+export async function runCode(code, stdin = '', files = []) {
+  return apiPost('/api/run', { code, stdin, files });
 }
 
 /**

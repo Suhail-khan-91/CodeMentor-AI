@@ -23,6 +23,7 @@ class ExecutionResult:
     error_type: Optional[str] = None
     error_message: Optional[str] = None
     line_number: Optional[int] = None
+    plot_image: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert result to a structured dictionary for JSON response."""
@@ -34,7 +35,7 @@ class ExecutionResult:
         elif self.error_message:
             error_summary = self.error_message
 
-        return {
+        result = {
             "status": self.status,
             "stdout": self.stdout,
             "stderr": self.stderr,
@@ -48,18 +49,28 @@ class ExecutionResult:
                 "line_number": self.line_number
             }
         }
+        if self.plot_image:
+            result["plot_image"] = self.plot_image
+        return result
 
 
 class BaseRunner(ABC):
     """Abstract base class for all code execution backends."""
 
     @abstractmethod
-    def run(self, code: str, stdin: str = "", timeout: Optional[float] = None) -> ExecutionResult:
+    def run(
+        self,
+        code: str,
+        stdin: str = "",
+        files: Optional[list] = None,
+        timeout: Optional[float] = None
+    ) -> ExecutionResult:
         """
         Execute Python code and return an ExecutionResult.
 
         :param code: Python source code string to execute
         :param stdin: Optional standard input data to supply to the process
+        :param files: Optional list of files to place in execution workspace [{"name": "...", "content": "..."}]
         :param timeout: Execution timeout in seconds (uses runner default if None)
         :return: ExecutionResult dataclass instance
         """

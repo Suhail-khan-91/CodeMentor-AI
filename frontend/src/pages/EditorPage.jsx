@@ -19,6 +19,29 @@ import { findChallengeById, getModule } from '../services/curriculumService';
 import { runCode } from '../services/api';
 import './EditorPage.css';
 
+// Starter CSV datasets for pandas / numpy / matplotlib practice
+const STARTER_DATASETS = {
+  'students.csv': `name,grade,math,science,attendance
+Alice,10,95,92,98
+Bob,11,82,85,90
+Charlie,10,78,74,85
+Diana,12,91,96,95
+Evan,11,88,89,92`,
+  'sales.csv': `date,product,category,units,revenue
+2024-01-01,Laptop,Electronics,5,6000.0
+2024-01-02,Headphones,Electronics,12,1200.0
+2024-01-02,Desk,Furniture,3,750.0
+2024-01-03,Chair,Furniture,8,1200.0
+2024-01-04,Monitor,Electronics,6,1800.0`,
+  'iris.csv': `sepal_length,sepal_width,petal_length,petal_width,species
+5.1,3.5,1.4,0.2,setosa
+4.9,3.0,1.4,0.2,setosa
+7.0,3.2,4.7,1.4,versicolor
+6.4,3.2,4.5,1.5,versicolor
+6.3,3.3,6.0,2.5,virginica
+5.8,2.7,5.1,1.9,virginica`,
+};
+
 export default function EditorPage() {
   const getInitialMode = () => {
     try {
@@ -33,8 +56,14 @@ export default function EditorPage() {
   const [mode, setMode] = useState(getInitialMode); // 'course' | 'custom'
   const [code, setCode] = useState(DEFAULT_PYTHON_CODE);
 
-  // Terminal active tab: 'output' | 'diagnostics'
+  // Terminal active tab: 'output' | 'input' | 'data' | 'plot' | 'diagnostics'
   const [terminalTab, setTerminalTab] = useState('output');
+
+  // Standard input (stdin) state for interactive user input
+  const [stdin, setStdin] = useState('');
+
+  // Attached data files state for pd.read_csv / file I/O
+  const [attachedFiles, setAttachedFiles] = useState([]);
 
   // Runner & Diagnostics state
   const [isRunning, setIsRunning] = useState(false);
@@ -47,6 +76,39 @@ export default function EditorPage() {
   const [courseChallengeMeta, setCourseChallengeMeta] = useState({});
   const [examQuestionsList, setExamQuestionsList] = useState([]);
   const [currentExamIndex, setCurrentExamIndex] = useState(0);
+
+  // CSV file upload handler
+  const handleFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target.result;
+      setAttachedFiles((prev) => {
+        const filtered = prev.filter((f) => f.name !== file.name);
+        return [...filtered, { name: file.name, content, size: file.size }];
+      });
+      setTerminalTab('data');
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
+  // Quick starter dataset loader
+  const handleLoadStarterDataset = (filename) => {
+    const content = STARTER_DATASETS[filename];
+    if (!content) return;
+    setAttachedFiles((prev) => {
+      const filtered = prev.filter((f) => f.name !== filename);
+      return [...filtered, { name: filename, content, size: content.length }];
+    });
+    setTerminalTab('data');
+  };
+
+  // Remove attached data file
+  const handleRemoveFile = (filename) => {
+    setAttachedFiles((prev) => prev.filter((f) => f.name !== filename));
+  };
 
   // Load course challenge or transferred walkthrough code on mount
   useEffect(() => {
@@ -71,6 +133,9 @@ export default function EditorPage() {
         if (found.challenge.starter_code) {
           setCode(found.challenge.starter_code);
         }
+        if (found.challenge.test_cases?.[0]?.stdin) {
+          setStdin(found.challenge.test_cases[0].stdin);
+        }
         return;
       }
     }
@@ -93,6 +158,9 @@ export default function EditorPage() {
         if (questions[0].starter_code) {
           setCode(questions[0].starter_code);
         }
+        if (questions[0].test_cases?.[0]?.stdin) {
+          setStdin(questions[0].test_cases[0].stdin);
+        }
         return;
       }
     }
@@ -112,6 +180,9 @@ export default function EditorPage() {
       });
       if (getInitialMode() === 'course' && firstChal.starter_code) {
         setCode(firstChal.starter_code);
+      }
+      if (firstChal.test_cases?.[0]?.stdin) {
+        setStdin(firstChal.test_cases[0].stdin);
       }
     }
   }, []);
@@ -179,7 +250,7 @@ export default function EditorPage() {
   }, []);
 
   /**
-   * Execute code via backend Code Runner API.
+   * Execute code via backend Code Runner API with stdin and attached data files.
    */
   const handleRun = useCallback(async () => {
     if (isRunning) return;
@@ -187,20 +258,25 @@ export default function EditorPage() {
     setIsRunning(true);
     setApiError(null);
     setShowDiagnostic(true);
-    setTerminalTab('output');
 
     try {
-      const executionResult = await runCode(code);
+      const executionResult = await runCode(code, stdin, attachedFiles);
       setResult(executionResult);
-      if (executionResult?.diagnostic?.has_diagnostic) {
+
+      if (executionResult?.plot_image) {
+        setTerminalTab('plot');
+      } else if (executionResult?.diagnostic?.has_diagnostic) {
         setTerminalTab('diagnostics');
+      } else {
+        setTerminalTab('output');
       }
     } catch (err) {
       setApiError(err.message || 'Failed to connect to backend code runner');
+      setTerminalTab('output');
     } finally {
       setIsRunning(false);
     }
-  }, [code, isRunning]);
+  }, [code, stdin, attachedFiles, isRunning]);
 
   // Keyboard shortcut: Ctrl+Enter executes script
   useEffect(() => {
@@ -262,10 +338,10 @@ export default function EditorPage() {
       };
     }
     return {
-      tag: 'CampusX Course Track',
+      tag: 'Python Mastery Track',
       accentClass: 'mode-accent--cyan',
       title: 'Interactive Python Curriculum',
-      desc: 'Solve real-world CampusX Python challenges, read 3-tier hints, consult the AI tutor, and verify test cases.',
+      desc: 'Solve real-world Python challenges, read 3-tier hints, consult the AI tutor, and verify test cases.',
     };
   };
 
@@ -381,6 +457,38 @@ export default function EditorPage() {
                   >
                     Terminal Output
                   </button>
+                  <button
+                    type="button"
+                    className={`output-panel__tab ${terminalTab === 'input' ? 'output-panel__tab--active' : ''}`}
+                    onClick={() => setTerminalTab('input')}
+                    title="Provide standard input for input() calls"
+                  >
+                    <span>📥</span>
+                    Input (stdin)
+                    {stdin.trim() && <span className="output-panel__tab-dot output-panel__tab-dot--cyan" />}
+                  </button>
+                  <button
+                    type="button"
+                    className={`output-panel__tab ${terminalTab === 'data' ? 'output-panel__tab--active' : ''}`}
+                    onClick={() => setTerminalTab('data')}
+                    title="Attach CSV data files for pandas/numpy"
+                  >
+                    <span>📁</span>
+                    Data Files {attachedFiles.length > 0 ? `(${attachedFiles.length})` : ''}
+                    {attachedFiles.length > 0 && <span className="output-panel__tab-dot output-panel__tab-dot--purple" />}
+                  </button>
+                  {result?.plot_image && (
+                    <button
+                      type="button"
+                      className={`output-panel__tab output-panel__tab--has-plot ${terminalTab === 'plot' ? 'output-panel__tab--active' : ''}`}
+                      onClick={() => setTerminalTab('plot')}
+                      title="View generated Matplotlib plot"
+                    >
+                      <span>📈</span>
+                      Plot Chart
+                      <span className="output-panel__tab-dot output-panel__tab-dot--green" />
+                    </button>
+                  )}
                   {result?.diagnostic?.has_diagnostic && (
                     <button
                       type="button"
@@ -415,61 +523,307 @@ export default function EditorPage() {
             </div>
 
             <div className="output-panel__body">
-              {/* 1. Loading state */}
-              {isRunning && (
-                <div className="output-state output-state--running">
-                  <div className="output-pulse-loader" aria-hidden="true" />
-                  <p className="output-state__text">Executing script in isolated Python sandbox…</p>
-                </div>
-              )}
-
-              {/* 2. API / Connection error */}
-              {!isRunning && apiError && (
-                <div className="output-state output-state--api-error">
-                  <span className="output-state__icon" aria-hidden="true">⚠️</span>
-                  <p className="output-state__error-title">Backend Connection Failed</p>
-                  <p className="output-state__error-msg">{apiError}</p>
-                  <p className="output-state__error-hint">
-                    Ensure the Flask backend is running on <code>http://localhost:5000</code>.
-                  </p>
-                </div>
-              )}
-
-              {/* 3. Idle state (no run yet) */}
-              {!isRunning && !apiError && !result && (
-                <div className="output-state output-state--idle">
-                  <div className="output-state__icon-box">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <polyline points="4 17 10 11 4 5" />
-                      <line x1="12" y1="19" x2="20" y2="19" />
-                    </svg>
+              {/* TAB 1: Standard Input (stdin) */}
+              {terminalTab === 'input' && (
+                <div className="terminal-stdin-container">
+                  <div className="terminal-stdin-header">
+                    <div>
+                      <h4 className="terminal-stdin-title">Standard Input Stream (stdin)</h4>
+                      <p className="terminal-stdin-sub">
+                        Each line feeds one <code>input()</code> call in your Python program.
+                      </p>
+                    </div>
+                    <div className="terminal-stdin-actions">
+                      {mode === 'course' && activeCourseChallenge?.test_cases?.[0]?.stdin && (
+                        <button
+                          type="button"
+                          className="btn-stdin-action btn-stdin-sample"
+                          onClick={() => setStdin(activeCourseChallenge.test_cases[0].stdin)}
+                          title="Copy input from first challenge testcase"
+                        >
+                          📋 Use Sample Input
+                        </button>
+                      )}
+                      {stdin && (
+                        <button
+                          type="button"
+                          className="btn-stdin-action btn-stdin-clear"
+                          onClick={() => setStdin('')}
+                        >
+                          Clear
+                        </button>
+                      )}
+                    </div>
                   </div>
-                  <p className="output-state__text">
-                    Press <strong>Run Code</strong> or <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to execute.
-                  </p>
-                  <p className="output-state__subtext">
-                    Standard output (<code>stdout</code>), raw tracebacks, and plain-English diagnostics render here.
-                  </p>
+                  <textarea
+                    id="terminal-stdin-input"
+                    className="terminal-stdin-textarea"
+                    value={stdin}
+                    onChange={(e) => setStdin(e.target.value)}
+                    placeholder="Type or paste input here...&#10;e.g.&#10;25&#10;12&#10;2024"
+                    rows={6}
+                    spellCheck={false}
+                  />
+                  <div className="terminal-stdin-footer">
+                    <span className="terminal-stdin-hint">
+                      {stdin.trim() ? `${stdin.split('\n').length} line(s) queued for input()` : 'No input queued (program will receive EOF if input() is called)'}
+                    </span>
+                    <button
+                      type="button"
+                      className="btn-run-with-input"
+                      onClick={handleRun}
+                      disabled={isRunning}
+                    >
+                      <span>▶</span> Run Code with Input
+                    </button>
+                  </div>
                 </div>
               )}
 
-              {/* 4. Execution Result & Diagnostics */}
-              {!isRunning && !apiError && result && (
+              {/* TAB 2: Data Files (CSV & Datasets) */}
+              {terminalTab === 'data' && (
+                <div className="terminal-data-container">
+                  <div className="terminal-data-header">
+                    <div>
+                      <h4 className="terminal-data-title">Attached Data Files (CSV / Datasets)</h4>
+                      <p className="terminal-data-sub">
+                        Files placed here are available in the current working directory for <code>pd.read_csv('filename')</code> or <code>open('filename')</code>.
+                      </p>
+                    </div>
+                    <label className="btn-upload-file">
+                      📁 Upload File (.csv)
+                      <input
+                        type="file"
+                        accept=".csv,.txt,.tsv,.json"
+                        style={{ display: 'none' }}
+                        onChange={handleFileUpload}
+                      />
+                    </label>
+                  </div>
+
+                  {/* Preset Datasets */}
+                  <div className="terminal-data-presets">
+                    <span className="terminal-data-presets-label">Quick Starter Datasets:</span>
+                    <button
+                      type="button"
+                      className="btn-preset-dataset"
+                      onClick={() => handleLoadStarterDataset('students.csv')}
+                    >
+                      📊 + students.csv
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-preset-dataset"
+                      onClick={() => handleLoadStarterDataset('sales.csv')}
+                    >
+                      📈 + sales.csv
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-preset-dataset"
+                      onClick={() => handleLoadStarterDataset('iris.csv')}
+                    >
+                      🌸 + iris.csv
+                    </button>
+                  </div>
+
+                  {/* Active Files List */}
+                  <div className="terminal-data-list">
+                    {attachedFiles.length === 0 ? (
+                      <div className="terminal-data-empty">
+                        <span className="terminal-data-empty-icon">📂</span>
+                        <p>No data files attached yet.</p>
+                        <p className="terminal-data-empty-sub">
+                          Upload your own CSV or click one of the quick starter datasets above to practice data analysis with Pandas.
+                        </p>
+                      </div>
+                    ) : (
+                      attachedFiles.map((file) => (
+                        <div key={file.name} className="attached-file-card">
+                          <div className="attached-file-card__info">
+                            <span className="attached-file-card__icon">📄</span>
+                            <div>
+                              <strong className="attached-file-card__name">{file.name}</strong>
+                              <span className="attached-file-card__meta">
+                                {file.size ? `${(file.size / 1024).toFixed(1)} KB` : 'Attached'} • {file.content.split('\n').length} lines
+                              </span>
+                            </div>
+                          </div>
+                          <div className="attached-file-card__actions">
+                            <button
+                              type="button"
+                              className="btn-copy-code-snippet"
+                              onClick={() => {
+                                const snippet = `# Load dataset with pandas\nimport pandas as pd\ndf = pd.read_csv('${file.name}')\nprint(df.head())\n`;
+                                setCode((prev) => prev.trim() ? prev + '\n\n' + snippet : snippet);
+                              }}
+                              title="Append loading code to editor"
+                            >
+                              Insert <code>pd.read_csv</code> Snippet
+                            </button>
+                            <button
+                              type="button"
+                              className="btn-remove-file"
+                              onClick={() => handleRemoveFile(file.name)}
+                              title="Remove file"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 3: Plot Output */}
+              {terminalTab === 'plot' && (
+                <div className="terminal-plot-container">
+                  {result?.plot_image ? (
+                    <>
+                      <div className="terminal-plot-header">
+                        <div className="terminal-plot-title-row">
+                          <span className="terminal-plot-badge">Matplotlib Rendered</span>
+                          <span className="terminal-plot-sub">Figure automatically captured from execution</span>
+                        </div>
+                        <a
+                          href={result.plot_image}
+                          download="codementor_plot.png"
+                          className="btn-download-plot"
+                        >
+                          ⬇ Download PNG
+                        </a>
+                      </div>
+                      <div className="terminal-plot-frame">
+                        <img
+                          src={result.plot_image}
+                          alt="Generated Visualization Chart"
+                          className="terminal-plot-img"
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <div className="output-state output-state--idle">
+                      <p className="output-state__text">No plot figures generated in the last run.</p>
+                      <p className="output-state__subtext">
+                        Use <code>import matplotlib.pyplot as plt</code> and call <code>plt.plot()</code> or <code>plt.show()</code> to view charts here.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* TAB 4: Compiler Diagnostics */}
+              {terminalTab === 'diagnostics' && showDiagnostic && result?.diagnostic?.has_diagnostic && (
                 <div className="output-content">
-                  {/* Diagnostics Tab View */}
-                  {terminalTab === 'diagnostics' && showDiagnostic && result.diagnostic && result.diagnostic.has_diagnostic && (
-                    <DiagnosticCard
-                      diagnostic={result.diagnostic}
-                      code={code}
-                      executionResult={result}
-                      onClose={() => setShowDiagnostic(false)}
-                    />
+                  <DiagnosticCard
+                    diagnostic={result.diagnostic}
+                    code={code}
+                    executionResult={result}
+                    onClose={() => setShowDiagnostic(false)}
+                  />
+                </div>
+              )}
+
+              {/* TAB 5: Terminal Output */}
+              {terminalTab === 'output' && (
+                <>
+                  {/* Loading state */}
+                  {isRunning && (
+                    <div className="output-state output-state--running">
+                      <div className="output-pulse-loader" aria-hidden="true" />
+                      <p className="output-state__text">Executing script in isolated Python sandbox…</p>
+                    </div>
                   )}
 
-                  {/* Standard Output Stream */}
-                  {terminalTab === 'output' && (
-                    <>
-                      {/* Diagnostic Banner if there is an error but user is in output tab */}
+                  {/* API / Connection error */}
+                  {!isRunning && apiError && (
+                    <div className="output-state output-state--api-error">
+                      <span className="output-state__icon" aria-hidden="true">⚠️</span>
+                      <p className="output-state__error-title">Backend Connection Failed</p>
+                      <p className="output-state__error-msg">{apiError}</p>
+                      <p className="output-state__error-hint">
+                        Ensure the Flask backend is running on <code>http://localhost:5000</code>.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Idle state */}
+                  {!isRunning && !apiError && !result && (
+                    <div className="output-state output-state--idle">
+                      <div className="output-state__icon-box">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <polyline points="4 17 10 11 4 5" />
+                          <line x1="12" y1="19" x2="20" y2="19" />
+                        </svg>
+                      </div>
+                      <p className="output-state__text">
+                        Press <strong>Run Code</strong> or <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to execute.
+                      </p>
+                      <p className="output-state__subtext">
+                        Standard output (<code>stdout</code>), raw tracebacks, and plain-English diagnostics render here.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Output content when result exists */}
+                  {!isRunning && !apiError && result && (
+                    <div className="output-content">
+                      {/* Special EOFError Guidance Card */}
+                      {(result.error_type === 'EOFError' || result.stderr?.includes('EOF when reading a line')) && (
+                        <div className="terminal-eof-notice">
+                          <div className="terminal-eof-notice__header">
+                            <span className="terminal-eof-notice__icon">📥</span>
+                            <div>
+                              <strong>Standard Input Required (EOFError)</strong>
+                              <p className="terminal-eof-notice__sub">
+                                Your program asked for user input using <code>input()</code>, but standard input was empty or ran out of lines.
+                              </p>
+                            </div>
+                          </div>
+                          <div className="terminal-eof-notice__actions">
+                            <button
+                              type="button"
+                              className="btn-eof-action btn-eof-primary"
+                              onClick={() => setTerminalTab('input')}
+                            >
+                              ✍️ Enter Input in "Input (stdin)" Tab
+                            </button>
+                            {mode === 'course' && activeCourseChallenge?.test_cases?.[0]?.stdin && (
+                              <button
+                                type="button"
+                                className="btn-eof-action btn-eof-secondary"
+                                onClick={() => {
+                                  setStdin(activeCourseChallenge.test_cases[0].stdin);
+                                  setTerminalTab('input');
+                                }}
+                              >
+                                📋 Fill Sample Input ({activeCourseChallenge.test_cases[0].stdin.replace(/\n/g, ' ')})
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Matplotlib plot notice banner if plot available */}
+                      {result.plot_image && (
+                        <div className="terminal-plot-quick-banner">
+                          <div className="terminal-plot-quick-banner__left">
+                            <span className="terminal-plot-quick-banner__icon">📈</span>
+                            <span>Matplotlib figure rendered successfully!</span>
+                          </div>
+                          <button
+                            type="button"
+                            className="btn-view-chart"
+                            onClick={() => setTerminalTab('plot')}
+                          >
+                            View Chart →
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Diagnostic Banner if there is an error */}
                       {showDiagnostic && result.diagnostic && result.diagnostic.has_diagnostic && (
                         <div className="terminal-diag-quick-notice">
                           <div className="terminal-diag-quick-notice__left">
@@ -504,14 +858,14 @@ export default function EditorPage() {
                         </div>
                       )}
 
-                      {!result.stdout && !result.stderr && (
+                      {!result.stdout && !result.stderr && !result.plot_image && (
                         <p className="output-empty-note">
                           [Process completed with exit code 0 — no standard output printed]
                         </p>
                       )}
-                    </>
+                    </div>
                   )}
-                </div>
+                </>
               )}
             </div>
           </section>

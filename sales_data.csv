@@ -1,0 +1,17 @@
+Date,Product,Category,City,Units_Sold,Unit_Price_INR,Customer_Rating
+2026-01-05,Wireless Mouse,Accessories,Mumbai,45,650,4.2
+2026-01-12,Mechanical Keyboard,Accessories,Bengaluru,30,2400,4.6
+2026-01-18,27-inch Monitor,Displays,Delhi,15,14500,4.5
+2026-01-25,USB-C Hub,Accessories,Hyderabad,60,1200,3.9
+2026-02-02,Laptop Stand,Ergonomics,Pune,50,850,4.3
+2026-02-10,Wireless Mouse,Accessories,Chennai,55,650,4.1
+2026-02-14,Noise-Cancelling Headphones,Audio,Mumbai,25,5500,4.8
+2026-02-20,Webcam 1080p,Video,Bengaluru,,1800,4.0
+2026-03-01,27-inch Monitor,Displays,Hyderabad,20,14500,4.7
+2026-03-08,Mechanical Keyboard,Accessories,Delhi,35,2400,
+2026-03-15,Ergonomic Chair,Ergonomics,Mumbai,12,11000,4.6
+2026-03-22,Bluetooth Speaker,Audio,Pune,40,2100,4.4
+2026-04-03,USB-C Hub,Accessories,Bengaluru,70,1200,4.1
+2026-04-10,Laptop Stand,Ergonomics,Chennai,45,850,4.3
+2026-04-18,Noise-Cancelling Headphones,Audio,Delhi,30,5500,4.7
+2026-04-25,Wireless Mouse,Accessories,Mumbai,65,650,4.4

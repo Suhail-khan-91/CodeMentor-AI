@@ -58,8 +58,15 @@ def run_code():
             "status": 400
         }), 400
 
+    files = data.get("files", [])
+    if files is not None and not isinstance(files, list):
+        return jsonify({
+            "error": "Field 'files' must be a list if provided",
+            "status": 400
+        }), 400
+
     runner = get_runner()
-    result = runner.run(code=code, stdin=stdin)
+    result = runner.run(code=code, stdin=stdin, files=files)
     response_data = result.to_dict()
 
     # Generate diagnostic if execution failed or timed out (Phase A4)

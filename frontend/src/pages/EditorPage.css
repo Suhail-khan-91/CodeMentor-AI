@@ -395,6 +395,33 @@
   box-shadow: 0 0 6px #ef4444;
 }
 
+.output-panel__tab-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-left: 2px;
+}
+
+.output-panel__tab-dot--cyan {
+  background: #06b6d4;
+  box-shadow: 0 0 6px #06b6d4;
+}
+
+.output-panel__tab-dot--purple {
+  background: #a855f7;
+  box-shadow: 0 0 6px #a855f7;
+}
+
+.output-panel__tab-dot--green {
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981;
+}
+
+.output-panel__tab--has-plot {
+  color: #34d399;
+}
+
 .output-panel__header-right {
   display: flex;
   align-items: center;
@@ -720,4 +747,556 @@
   width: 100%;
   display: flex;
   flex-direction: column;
+}
+
+/* ═════════════════════════════════════════════════════════════════
+   TERMINAL EXTENSIONS: Stdin, Data Files, Plot Viewer & EOF Notice
+   ═════════════════════════════════════════════════════════════════ */
+
+/* ── Standard Input (stdin) Tab ── */
+.terminal-stdin-container {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.terminal-stdin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.terminal-stdin-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin: 0;
+}
+
+.terminal-stdin-sub {
+  font-size: 0.73rem;
+  color: #94a3b8;
+  margin: 2px 0 0 0;
+}
+
+.terminal-stdin-sub code,
+.terminal-data-sub code {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.08);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+}
+
+.terminal-stdin-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-stdin-action {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-stdin-sample:hover {
+  background: rgba(6, 182, 212, 0.15);
+  border-color: #06b6d4;
+  color: #67e8f9;
+}
+
+.btn-stdin-clear:hover {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+}
+
+.terminal-stdin-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #e2e8f0;
+  resize: vertical;
+  min-height: 110px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.terminal-stdin-textarea:focus {
+  border-color: #06b6d4;
+  box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
+}
+
+.terminal-stdin-textarea::placeholder {
+  color: #475569;
+}
+
+.terminal-stdin-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.terminal-stdin-hint {
+  font-size: 0.72rem;
+  color: #64748b;
+  font-family: var(--font-mono, monospace);
+}
+
+.btn-run-with-input {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 7px 15px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(6, 182, 212, 0.3);
+  transition: all 0.15s ease;
+}
+
+.btn-run-with-input:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(6, 182, 212, 0.45);
+}
+
+.btn-run-with-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Data Files (CSV / Datasets) Tab ── */
+.terminal-data-container {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.terminal-data-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.terminal-data-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin: 0;
+}
+
+.terminal-data-sub {
+  font-size: 0.73rem;
+  color: #94a3b8;
+  margin: 2px 0 0 0;
+}
+
+.btn-upload-file {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(168, 85, 247, 0.14);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  color: #c084fc;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 6px 13px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-upload-file:hover {
+  background: rgba(168, 85, 247, 0.25);
+  border-color: #c084fc;
+  color: #f3e8ff;
+}
+
+.terminal-data-presets {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+}
+
+.terminal-data-presets-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.btn-preset-dataset {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-preset-dataset:hover {
+  background: rgba(99, 102, 241, 0.18);
+  border-color: #818cf8;
+  color: #ffffff;
+}
+
+.terminal-data-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.terminal-data-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 26px 16px;
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.terminal-data-empty-icon {
+  font-size: 1.8rem;
+  margin-bottom: 6px;
+}
+
+.terminal-data-empty p {
+  margin: 2px 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.terminal-data-empty-sub {
+  font-size: 0.73rem !important;
+  color: #64748b !important;
+  font-weight: 400 !important;
+  max-width: 440px;
+}
+
+.attached-file-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 12px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+
+.attached-file-card:hover {
+  border-color: rgba(168, 85, 247, 0.35);
+  background: rgba(15, 23, 42, 0.8);
+}
+
+.attached-file-card__info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.attached-file-card__icon {
+  font-size: 1.15rem;
+}
+
+.attached-file-card__name {
+  font-size: 0.82rem;
+  color: #f1f5f9;
+  font-family: var(--font-mono, monospace);
+  display: block;
+}
+
+.attached-file-card__meta {
+  font-size: 0.68rem;
+  color: #64748b;
+  display: block;
+}
+
+.attached-file-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-copy-code-snippet {
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #a5b4fc;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-copy-code-snippet code {
+  color: #38efbd;
+  background: transparent;
+  padding: 0;
+  font-family: var(--font-mono, monospace);
+}
+
+.btn-copy-code-snippet:hover {
+  background: rgba(99, 102, 241, 0.24);
+  border-color: #818cf8;
+  color: #ffffff;
+}
+
+.btn-remove-file {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  font-size: 0.85rem;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-remove-file:hover {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+}
+
+/* ── Plot Chart Tab (Matplotlib) ── */
+.terminal-plot-container {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.terminal-plot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.terminal-plot-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.terminal-plot-badge {
+  display: inline-block;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #34d399;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+}
+
+.terminal-plot-sub {
+  font-size: 0.73rem;
+  color: #94a3b8;
+}
+
+.btn-download-plot {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.14);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #34d399;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.btn-download-plot:hover {
+  background: rgba(16, 185, 129, 0.25);
+  border-color: #10b981;
+  color: #ffffff;
+}
+
+.terminal-plot-frame {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: auto;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.terminal-plot-img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  display: block;
+}
+
+/* ── EOFError Guidance Notice in Output Tab ── */
+.terminal-eof-notice {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 8px;
+}
+
+.terminal-eof-notice__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.terminal-eof-notice__icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.terminal-eof-notice__header strong {
+  font-size: 0.82rem;
+  color: #fbbf24;
+  display: block;
+}
+
+.terminal-eof-notice__sub {
+  font-size: 0.74rem;
+  color: #cbd5e1;
+  margin: 3px 0 0 0;
+  line-height: 1.45;
+}
+
+.terminal-eof-notice__sub code {
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.1);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+}
+
+.terminal-eof-notice__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-left: 28px;
+}
+
+.btn-eof-action {
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-eof-primary {
+  background: rgba(245, 158, 11, 0.2);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  color: #fef3c7;
+}
+
+.btn-eof-primary:hover {
+  background: rgba(245, 158, 11, 0.32);
+  border-color: #fbbf24;
+}
+
+.btn-eof-secondary {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+}
+
+.btn-eof-secondary:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+/* ── Plot Quick Banner in Output Tab ── */
+.terminal-plot-quick-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 8px;
+  font-size: 0.76rem;
+  gap: 10px;
+}
+
+.terminal-plot-quick-banner__left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #a7f3d0;
+  font-weight: 500;
+}
+
+.terminal-plot-quick-banner__icon {
+  font-size: 1rem;
+}
+
+.terminal-plot-quick-banner__btn {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #34d399;
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.terminal-plot-quick-banner__btn:hover {
+  background: rgba(16, 185, 129, 0.28);
+  color: #ffffff;
 }

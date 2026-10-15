@@ -177,7 +177,7 @@ export default function ProgressModal({ isOpen, onClose }) {
           <div className="progress-modules-section">
             <div className="progress-modules-header">
               <h3 className="progress-modules-title">Module-by-Module Breakdown</h3>
-              <span className="progress-modules-sub">CampusX Data Science Track</span>
+              <span className="progress-modules-sub">Python Mastery Track</span>
             </div>
 
             <div className="progress-modules-list">

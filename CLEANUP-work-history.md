@@ -299,6 +299,40 @@ We systematically addressed all visual clutter, dead links, duplicate call-to-ac
 
 ---
 
+## 📊 Section 10: Standard Input (stdin), CSV Data Upload & Matplotlib Plot Viewer (October 15, 2026)
+
+### 1. Problem Statement
+1. **EOFError on `input()`:** When executing programs with `input()` (e.g. Session 1 Challenge 1 with `day = input()`, `month = input()`, `year = input()`), clicking "Run Code" caused `EOFError: EOF when reading a line` because standard input was empty and the UI had no input mechanism.
+2. **No Data File Support for Pandas/NumPy:** Practice with Pandas/NumPy required data files, but there was no way to upload `.csv` datasets or attach sample tables.
+3. **No Visual Chart Renderer for Matplotlib:** Plotting calls (`plt.plot()`, `plt.show()`) in headless subprocesses were lost or threw GUI backend errors without a display canvas.
+
+### 2. Architectural Solution & Implementation
+1. **Backend Subprocess Sandbox Upgrades (`backend/app/services/runner/`):**
+   - **`safe_env["MPLBACKEND"] = "Agg"`**: Configured headless, thread-safe rendering for Matplotlib.
+   - **Automated Plot Capture Hook**: Appends a figure extraction hook to user code checking `plt.get_fignums()` and saving figures to `_codementor_plot.png`.
+   - **Plot Image Base64 Data URI**: Encodes the generated plot as a base64 PNG data URI in `ExecutionResult.plot_image`.
+   - **Virtual File Injection**: The runner accepts `files: [{name: "...", content: "..."}]` and safely writes them into the isolated execution `temp_dir`, allowing seamless `pd.read_csv('filename')` and standard Python `open()`.
+2. **Runner Route & Services:**
+   - `POST /api/run` validates and passes `files` and `stdin` directly to `runner.run(code, stdin=stdin, files=files)`.
+   - Frontend `api.js` updated to forward `runCode(code, stdin, files)`.
+3. **Integrated Terminal Extension Tabs (`EditorPage.jsx` & `EditorPage.css`):**
+   - **📥 Input (stdin) Tab**: Real-time multi-line standard input queue with sample input loader, line counter, clear action, and direct "▶ Run Code with Input" button. Automatically pre-populated for curriculum test cases.
+   - **📁 Data Files (CSV) Tab**: Upload custom CSV/TSV datasets, one-click load preset starter datasets (`students.csv`, `sales.csv`, `iris.csv`), and instant "Insert `pd.read_csv` Snippet" button.
+   - **📈 Plot Chart Tab**: Renders high-resolution Matplotlib figures with download PNG action. Automatically switches to this tab when a plot is generated.
+   - **Smart EOFError Alert Card**: When code hits an `EOFError`, renders an interactive guidance card in Terminal Output with one-click navigation to the Input tab or instant sample input fill.
+4. **Branding Cleanup:**
+   - Replaced remaining "CampusX Course Track" badges in `EditorPage.jsx` and `ProgressModal.jsx` with "Python Mastery Track".
+
+### 3. Verification & QA
+- **Backend Pytest Suite:** All 240 tests passed (`240 / 240 passed (100%)` in 19.79s).
+- **Frontend Production Build:** `vite build` completed with 0 errors.
+- **Live Browser End-to-End Test:**
+  - Session 1 Lesson 1 date challenge ran with standard input without EOFError and matched 100% of test cases.
+  - Attached `students.csv` and inserted `pd.read_csv('students.csv')` snippet.
+  - Ran Matplotlib script; generated and displayed line chart in Plot Chart tab with download option.
+
+---
+
 ## 🚀 How to Run the Project
 
 ### Start the Backend (Terminal 1)
