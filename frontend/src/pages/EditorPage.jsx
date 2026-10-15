@@ -849,6 +849,49 @@ export default function EditorPage() {
                         </div>
                       )}
 
+                      {/* Interactive Inline Input Prompt Bar if program uses input() */}
+                      {code.includes('input(') && (
+                        <div className="terminal-inline-input-bar">
+                          <div className="terminal-inline-input-bar__header">
+                            <span className="terminal-inline-input-bar__icon">📥</span>
+                            <span className="terminal-inline-input-bar__title">Enter Input for Program</span>
+                            <span className="terminal-inline-input-bar__sub">
+                              (Feeds <code>input()</code> calls)
+                            </span>
+                          </div>
+                          <div className="terminal-inline-input-bar__controls">
+                            <input
+                              type="text"
+                              className="terminal-inline-input-field"
+                              placeholder="Type input value here (e.g. 25) and press Enter..."
+                              value={stdin}
+                              onChange={(e) => setStdin(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  handleRun();
+                                }
+                              }}
+                            />
+                            <button
+                              type="button"
+                              className="btn-inline-submit-input"
+                              onClick={handleRun}
+                              disabled={isRunning}
+                            >
+                              <span>▶</span> Run with Input
+                            </button>
+                            <button
+                              type="button"
+                              className="btn-switch-stdin-tab"
+                              onClick={() => setTerminalTab('input')}
+                              title="Switch to full multi-line input editor"
+                            >
+                              Multi-line Mode →
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
                       {result.stderr && (
                         <div className="output-stream-container">
                           <span className="output-stream-label output-stream-label--error">Raw Python Traceback</span>
