@@ -9,7 +9,7 @@
  *     - Custom Practice: Student-authored questions, custom test cases, and automated grading
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import CodeEditor, { DEFAULT_PYTHON_CODE } from '../components/CodeEditor';
 import DiagnosticCard from '../components/DiagnosticCard';
 import CustomQuestionPanel from '../components/CustomQuestionPanel';
@@ -56,11 +56,13 @@ export default function EditorPage() {
   const [mode, setMode] = useState(getInitialMode); // 'course' | 'custom'
   const [code, setCode] = useState(DEFAULT_PYTHON_CODE);
 
-  // Terminal active tab: 'output' | 'input' | 'data' | 'plot' | 'diagnostics'
+  // Terminal active tab: 'output' | 'data' | 'plot' | 'diagnostics'
   const [terminalTab, setTerminalTab] = useState('output');
 
-  // Standard input (stdin) state for interactive user input
+  // Standard input (stdin) state for unified interactive terminal console
   const [stdin, setStdin] = useState('');
+  const [isMultilineInput, setIsMultilineInput] = useState(false);
+  const inlineInputRef = useRef(null);
 
   // Attached data files state for pd.read_csv / file I/O
   const [attachedFiles, setAttachedFiles] = useState([]);
@@ -252,23 +254,33 @@ export default function EditorPage() {
   /**
    * Execute code via backend Code Runner API with stdin and attached data files.
    */
-  const handleRun = useCallback(async () => {
+  const handleRun = useCallback(async (customStdin = null) => {
     if (isRunning) return;
 
     setIsRunning(true);
     setApiError(null);
     setShowDiagnostic(true);
 
+    const effectiveStdin = typeof customStdin === 'string' ? customStdin : stdin;
+
     try {
-      const executionResult = await runCode(code, stdin, attachedFiles);
+      const executionResult = await runCode(code, effectiveStdin, attachedFiles);
       setResult(executionResult);
+
+      const isEof = executionResult?.error_type === 'EOFError' || executionResult?.stderr?.includes('EOF when reading a line');
 
       if (executionResult?.plot_image) {
         setTerminalTab('plot');
-      } else if (executionResult?.diagnostic?.has_diagnostic) {
+      } else if (executionResult?.diagnostic?.has_diagnostic && !isEof) {
         setTerminalTab('diagnostics');
       } else {
         setTerminalTab('output');
+        if (isEof) {
+          setTimeout(() => {
+            inlineInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            inlineInputRef.current?.focus();
+          }, 80);
+        }
       }
     } catch (err) {
       setApiError(err.message || 'Failed to connect to backend code runner');
@@ -314,6 +326,11 @@ export default function EditorPage() {
       return <span className="output-badge output-badge--idle">Ready</span>;
     }
 
+    const isEof = result.error_type === 'EOFError' || result.stderr?.includes('EOF when reading a line');
+    if (isEof) {
+      return <span className="output-badge output-badge--warning">⏳ Input Required</span>;
+    }
+
     switch (result.status) {
       case 'success':
         return <span className="output-badge output-badge--success">● Success (Exit 0)</span>;
@@ -326,6 +343,109 @@ export default function EditorPage() {
       default:
         return <span className="output-badge output-badge--error">● {result.status}</span>;
     }
+  };
+
+  // Interactive Unified Terminal Input Bar (feeder for input() calls)
+  const renderConsoleInput = (isEof = false) => {
+    if (!code.includes('input(') && !isEof) return null;
+
+    return (
+      <div className={`terminal-console-input-wrap ${isEof ? 'terminal-console-input-wrap--active-eof' : ''}`}>
+        <div className="terminal-console-input-header">
+          <div className="terminal-console-input-header__left">
+            <span className="terminal-console-prompt-symbol">❯_</span>
+            <span className="terminal-console-input-title">
+              {isEof ? 'Program paused — enter value for input():' : 'Terminal Standard Input:'}
+            </span>
+            {stdin.trim() && (
+              <span className="terminal-console-queued-pill">
+                {stdin.split('\n').length} line(s) ready
+              </span>
+            )}
+          </div>
+          <div className="terminal-console-actions-right">
+            {mode === 'course' && activeCourseChallenge?.test_cases?.[0]?.stdin && (
+              <button
+                type="button"
+                className="btn-console-pill"
+                onClick={() => {
+                  setStdin(activeCourseChallenge.test_cases[0].stdin);
+                  setTimeout(() => inlineInputRef.current?.focus(), 50);
+                }}
+                title="Fill sample input from challenge test case"
+              >
+                📋 Sample Input
+              </button>
+            )}
+            {stdin && (
+              <button
+                type="button"
+                className="btn-console-pill btn-console-pill--clear"
+                onClick={() => setStdin('')}
+              >
+                Clear
+              </button>
+            )}
+            <button
+              type="button"
+              className="btn-console-pill"
+              onClick={() => setIsMultilineInput((prev) => !prev)}
+              title="Toggle between single line and multi-line input box"
+            >
+              {isMultilineInput ? 'Single Line' : 'Multi-line ↕'}
+            </button>
+          </div>
+        </div>
+
+        {isMultilineInput ? (
+          <div className="terminal-console-multiline-box">
+            <textarea
+              ref={inlineInputRef}
+              className="terminal-console-textarea"
+              value={stdin}
+              onChange={(e) => setStdin(e.target.value)}
+              placeholder="Type inputs line by line (one per input() call)&#10;e.g.&#10;25&#10;12&#10;2024"
+              rows={4}
+              spellCheck={false}
+            />
+            <button
+              type="button"
+              className="btn-console-run-now"
+              onClick={() => handleRun()}
+              disabled={isRunning}
+            >
+              <span>▶</span> Send Input & Run
+            </button>
+          </div>
+        ) : (
+          <div className="terminal-console-singleline-box">
+            <span className="terminal-console-prompt-chevron">›</span>
+            <input
+              ref={inlineInputRef}
+              type="text"
+              className="terminal-console-input"
+              placeholder={isEof ? "Type value (e.g. 25) and press Enter ↵" : "Enter input value and press Enter ↵"}
+              value={stdin}
+              onChange={(e) => setStdin(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleRun();
+                }
+              }}
+            />
+            <button
+              type="button"
+              className="btn-console-run-now"
+              onClick={() => handleRun()}
+              disabled={isRunning}
+            >
+              <span>▶</span> Send
+            </button>
+          </div>
+        )}
+      </div>
+    );
   };
 
   const getModeBadgeInfo = () => {
@@ -441,7 +561,7 @@ export default function EditorPage() {
             <CodeEditor
               value={code}
               onChange={handleCodeChange}
-              height="460px"
+              height="400px"
             />
           </section>
 
@@ -456,16 +576,7 @@ export default function EditorPage() {
                     onClick={() => setTerminalTab('output')}
                   >
                     Terminal Output
-                  </button>
-                  <button
-                    type="button"
-                    className={`output-panel__tab ${terminalTab === 'input' ? 'output-panel__tab--active' : ''}`}
-                    onClick={() => setTerminalTab('input')}
-                    title="Provide standard input for input() calls"
-                  >
-                    <span>📥</span>
-                    Input (stdin)
-                    {stdin.trim() && <span className="output-panel__tab-dot output-panel__tab-dot--cyan" />}
+                    {stdin.trim() && <span className="output-panel__tab-dot output-panel__tab-dot--cyan" title="Standard input queued" />}
                   </button>
                   <button
                     type="button"
@@ -489,7 +600,7 @@ export default function EditorPage() {
                       <span className="output-panel__tab-dot output-panel__tab-dot--green" />
                     </button>
                   )}
-                  {result?.diagnostic?.has_diagnostic && (
+                  {result?.diagnostic?.has_diagnostic && !(result.error_type === 'EOFError' || result.stderr?.includes('EOF when reading a line')) && (
                     <button
                       type="button"
                       className={`output-panel__tab output-panel__tab--has-diag ${terminalTab === 'diagnostics' ? 'output-panel__tab--active' : ''}`}
@@ -523,64 +634,7 @@ export default function EditorPage() {
             </div>
 
             <div className="output-panel__body">
-              {/* TAB 1: Standard Input (stdin) */}
-              {terminalTab === 'input' && (
-                <div className="terminal-stdin-container">
-                  <div className="terminal-stdin-header">
-                    <div>
-                      <h4 className="terminal-stdin-title">Standard Input Stream (stdin)</h4>
-                      <p className="terminal-stdin-sub">
-                        Each line feeds one <code>input()</code> call in your Python program.
-                      </p>
-                    </div>
-                    <div className="terminal-stdin-actions">
-                      {mode === 'course' && activeCourseChallenge?.test_cases?.[0]?.stdin && (
-                        <button
-                          type="button"
-                          className="btn-stdin-action btn-stdin-sample"
-                          onClick={() => setStdin(activeCourseChallenge.test_cases[0].stdin)}
-                          title="Copy input from first challenge testcase"
-                        >
-                          📋 Use Sample Input
-                        </button>
-                      )}
-                      {stdin && (
-                        <button
-                          type="button"
-                          className="btn-stdin-action btn-stdin-clear"
-                          onClick={() => setStdin('')}
-                        >
-                          Clear
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                  <textarea
-                    id="terminal-stdin-input"
-                    className="terminal-stdin-textarea"
-                    value={stdin}
-                    onChange={(e) => setStdin(e.target.value)}
-                    placeholder="Type or paste input here...&#10;e.g.&#10;25&#10;12&#10;2024"
-                    rows={6}
-                    spellCheck={false}
-                  />
-                  <div className="terminal-stdin-footer">
-                    <span className="terminal-stdin-hint">
-                      {stdin.trim() ? `${stdin.split('\n').length} line(s) queued for input()` : 'No input queued (program will receive EOF if input() is called)'}
-                    </span>
-                    <button
-                      type="button"
-                      className="btn-run-with-input"
-                      onClick={handleRun}
-                      disabled={isRunning}
-                    >
-                      <span>▶</span> Run Code with Input
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* TAB 2: Data Files (CSV & Datasets) */}
+              {/* TAB 1: Data Files (CSV & Datasets) */}
               {terminalTab === 'data' && (
                 <div className="terminal-data-container">
                   <div className="terminal-data-header">
@@ -751,163 +805,96 @@ export default function EditorPage() {
 
                   {/* Idle state */}
                   {!isRunning && !apiError && !result && (
-                    <div className="output-state output-state--idle">
-                      <div className="output-state__icon-box">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <polyline points="4 17 10 11 4 5" />
-                          <line x1="12" y1="19" x2="20" y2="19" />
-                        </svg>
+                    <div className="output-state-wrap">
+                      <div className="output-state output-state--idle">
+                        <div className="output-state__icon-box">
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <polyline points="4 17 10 11 4 5" />
+                            <line x1="12" y1="19" x2="20" y2="19" />
+                          </svg>
+                        </div>
+                        <p className="output-state__text">
+                          Press <strong>Run Code</strong> or <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to execute.
+                        </p>
+                        <p className="output-state__subtext">
+                          Standard output (<code>stdout</code>), raw tracebacks, and plain-English diagnostics render here.
+                        </p>
                       </div>
-                      <p className="output-state__text">
-                        Press <strong>Run Code</strong> or <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to execute.
-                      </p>
-                      <p className="output-state__subtext">
-                        Standard output (<code>stdout</code>), raw tracebacks, and plain-English diagnostics render here.
-                      </p>
+                      {renderConsoleInput(false)}
                     </div>
                   )}
 
                   {/* Output content when result exists */}
-                  {!isRunning && !apiError && result && (
-                    <div className="output-content">
-                      {/* Special EOFError Guidance Card */}
-                      {(result.error_type === 'EOFError' || result.stderr?.includes('EOF when reading a line')) && (
-                        <div className="terminal-eof-notice">
-                          <div className="terminal-eof-notice__header">
-                            <span className="terminal-eof-notice__icon">📥</span>
-                            <div>
-                              <strong>Standard Input Required (EOFError)</strong>
-                              <p className="terminal-eof-notice__sub">
-                                Your program asked for user input using <code>input()</code>, but standard input was empty or ran out of lines.
-                              </p>
+                  {!isRunning && !apiError && result && (() => {
+                    const isEof = result.error_type === 'EOFError' || result.stderr?.includes('EOF when reading a line');
+
+                    return (
+                      <div className="output-content">
+                        {/* Matplotlib plot notice banner if plot available */}
+                        {result.plot_image && (
+                          <div className="terminal-plot-quick-banner">
+                            <div className="terminal-plot-quick-banner__left">
+                              <span className="terminal-plot-quick-banner__icon">📈</span>
+                              <span>Matplotlib figure rendered successfully!</span>
                             </div>
-                          </div>
-                          <div className="terminal-eof-notice__actions">
                             <button
                               type="button"
-                              className="btn-eof-action btn-eof-primary"
-                              onClick={() => setTerminalTab('input')}
+                              className="btn-view-chart"
+                              onClick={() => setTerminalTab('plot')}
                             >
-                              ✍️ Enter Input in "Input (stdin)" Tab
+                              View Chart →
                             </button>
-                            {mode === 'course' && activeCourseChallenge?.test_cases?.[0]?.stdin && (
-                              <button
-                                type="button"
-                                className="btn-eof-action btn-eof-secondary"
-                                onClick={() => {
-                                  setStdin(activeCourseChallenge.test_cases[0].stdin);
-                                  setTerminalTab('input');
-                                }}
-                              >
-                                📋 Fill Sample Input ({activeCourseChallenge.test_cases[0].stdin.replace(/\n/g, ' ')})
-                              </button>
-                            )}
                           </div>
-                        </div>
-                      )}
+                        )}
 
-                      {/* Matplotlib plot notice banner if plot available */}
-                      {result.plot_image && (
-                        <div className="terminal-plot-quick-banner">
-                          <div className="terminal-plot-quick-banner__left">
-                            <span className="terminal-plot-quick-banner__icon">📈</span>
-                            <span>Matplotlib figure rendered successfully!</span>
-                          </div>
-                          <button
-                            type="button"
-                            className="btn-view-chart"
-                            onClick={() => setTerminalTab('plot')}
-                          >
-                            View Chart →
-                          </button>
-                        </div>
-                      )}
-
-                      {/* Diagnostic Banner if there is an error */}
-                      {showDiagnostic && result.diagnostic && result.diagnostic.has_diagnostic && (
-                        <div className="terminal-diag-quick-notice">
-                          <div className="terminal-diag-quick-notice__left">
-                            <span className="terminal-diag-quick-notice__tag">Diagnostic Detected</span>
-                            <span className="terminal-diag-quick-notice__type">{result.diagnostic.error_type}</span>
-                          </div>
-                          <button
-                            type="button"
-                            className="terminal-diag-quick-notice__btn"
-                            onClick={() => setTerminalTab('diagnostics')}
-                          >
-                            View Diagnostic Analysis →
-                          </button>
-                        </div>
-                      )}
-
-                      {result.stdout && (
-                        <div className="output-stream-container">
-                          <span className="output-stream-label">Standard Output</span>
-                          <pre className="output-stream output-stream--stdout">
-                            <code>{result.stdout}</code>
-                          </pre>
-                        </div>
-                      )}
-
-                      {/* Interactive Inline Input Prompt Bar if program uses input() */}
-                      {code.includes('input(') && (
-                        <div className="terminal-inline-input-bar">
-                          <div className="terminal-inline-input-bar__header">
-                            <span className="terminal-inline-input-bar__icon">📥</span>
-                            <span className="terminal-inline-input-bar__title">Enter Input for Program</span>
-                            <span className="terminal-inline-input-bar__sub">
-                              (Feeds <code>input()</code> calls)
-                            </span>
-                          </div>
-                          <div className="terminal-inline-input-bar__controls">
-                            <input
-                              type="text"
-                              className="terminal-inline-input-field"
-                              placeholder="Type input value here (e.g. 25) and press Enter..."
-                              value={stdin}
-                              onChange={(e) => setStdin(e.target.value)}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                  handleRun();
-                                }
-                              }}
-                            />
+                        {/* Diagnostic Banner if there is an error (suppressed for EOFError) */}
+                        {showDiagnostic && result.diagnostic && result.diagnostic.has_diagnostic && !isEof && (
+                          <div className="terminal-diag-quick-notice">
+                            <div className="terminal-diag-quick-notice__left">
+                              <span className="terminal-diag-quick-notice__tag">Diagnostic Detected</span>
+                              <span className="terminal-diag-quick-notice__type">{result.diagnostic.error_type}</span>
+                            </div>
                             <button
                               type="button"
-                              className="btn-inline-submit-input"
-                              onClick={handleRun}
-                              disabled={isRunning}
+                              className="terminal-diag-quick-notice__btn"
+                              onClick={() => setTerminalTab('diagnostics')}
                             >
-                              <span>▶</span> Run with Input
-                            </button>
-                            <button
-                              type="button"
-                              className="btn-switch-stdin-tab"
-                              onClick={() => setTerminalTab('input')}
-                              title="Switch to full multi-line input editor"
-                            >
-                              Multi-line Mode →
+                              View Diagnostic Analysis →
                             </button>
                           </div>
-                        </div>
-                      )}
+                        )}
 
-                      {result.stderr && (
-                        <div className="output-stream-container">
-                          <span className="output-stream-label output-stream-label--error">Raw Python Traceback</span>
-                          <pre className="output-stream output-stream--stderr">
-                            <code>{result.stderr}</code>
-                          </pre>
-                        </div>
-                      )}
+                        {/* Standard Output stream */}
+                        {result.stdout && (
+                          <div className="output-stream-container">
+                            <span className="output-stream-label">Standard Output</span>
+                            <pre className="output-stream output-stream--stdout">
+                              <code>{result.stdout}</code>
+                            </pre>
+                          </div>
+                        )}
 
-                      {!result.stdout && !result.stderr && !result.plot_image && (
-                        <p className="output-empty-note">
-                          [Process completed with exit code 0 — no standard output printed]
-                        </p>
-                      )}
-                    </div>
-                  )}
+                        {/* Unified Interactive Terminal Input Line directly under stdout */}
+                        {renderConsoleInput(isEof)}
+
+                        {/* Raw Python Traceback (only for real code errors, NOT EOFError) */}
+                        {result.stderr && !isEof && (
+                          <div className="output-stream-container">
+                            <span className="output-stream-label output-stream-label--error">Raw Python Traceback</span>
+                            <pre className="output-stream output-stream--stderr">
+                              <code>{result.stderr}</code>
+                            </pre>
+                          </div>
+                        )}
+
+                        {!result.stdout && !result.stderr && !result.plot_image && !isEof && (
+                          <p className="output-empty-note">
+                            [Process completed with exit code 0 — no standard output printed]
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </>
               )}
             </div>

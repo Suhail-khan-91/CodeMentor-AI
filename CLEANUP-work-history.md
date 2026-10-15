@@ -365,6 +365,52 @@ We systematically addressed all visual clutter, dead links, duplicate call-to-ac
 
 ---
 
+## 💻 Section 12: Unified Interactive Terminal Console & Streamlined Data Files Tab (October 15, 2026)
+
+### 1. Root Cause Analysis
+- **Problem Reported**: When running code that calls `input()` (such as `age = int(input("Enter your age: "))`), if no input had been pre-filled, Python raised `EOFError: EOF when reading a line`.
+- **UX Flaw in Previous Implementation**:
+  - The IDE diagnostic listener detected the error and automatically switched away from the Terminal Output tab to the red `Compiler Diagnostic` tab, scaring users into thinking their valid code was broken.
+  - Users had to manually navigate to a separate, disconnected `Input (stdin)` tab to supply values before running.
+- **User Directive**:
+  - Implement Option 2 ("Unified Console"): Eliminate the separate disconnected `Input (stdin)` tab.
+  - Embed the standard input prompt directly into `Terminal Output` beneath `stdout` like modern interactive online compilers (Replit, Programiz).
+  - Preserve the `📁 Data Files` tab for uploading CSV datasets and using Pandas starter datasets.
+  - Intercept `EOFError` gracefully without ever switching tabs or displaying a scary traceback.
+
+### 2. Implementation Details
+1. **Interactive Prompt Feeder in Terminal Output (`EditorPage.jsx`)**:
+   - Removed standalone `Input (stdin)` tab from `output-panel__tabs`.
+   - Embedded `renderConsoleInput(isEof)` directly inside `terminalTab === 'output'` directly below `result.stdout`.
+   - Displays an active, auto-focused interactive prompt line (`❯_`) with a chevron `›`, input box, and `Send` button.
+   - Pressing <kbd>Enter</kbd> or clicking `Send` immediately re-executes the code with the supplied input.
+   - Multi-line input mode toggle (`Multi-line ↕`) for programs requiring multiple sequential `input()` calls.
+   - Course Track sample input autofill button (`📋 Sample Input`).
+2. **EOFError Graceful Interception**:
+   - Intercepts `isEof = error_type === 'EOFError' || stderr?.includes('EOF when reading a line')`.
+   - Never switches to `Compiler Diagnostic` tab on `EOFError`.
+   - Suppresses raw Python traceback on `EOFError` so only the program's output prompt (e.g. `Enter your age: `) is shown.
+   - Changes status badge to `⏳ Input Required` (amber/warning) instead of `● Runtime Error`.
+   - Smoothly scrolls and auto-focuses the input field.
+3. **Preserved & Elevated `📁 Data Files` Tab**:
+   - Header with `📁 Upload File (.csv)` button supporting `.csv`, `.tsv`, `.txt`, `.json`.
+   - Quick Starter Datasets: `📊 + students.csv`, `📈 + sales.csv`, `🌸 + iris.csv`.
+   - Active attached files list with `Insert pd.read_csv Snippet` and file deletion.
+   - Tab badge showing active attached file count (e.g. `📁 Data Files (1) ●`).
+4. **CSS Styling (`EditorPage.css`)**:
+   - Replaced obsolete EOF notice with complete styles for `.terminal-console-input-wrap`, `.terminal-console-singleline-box`, `.terminal-console-multiline-box`, `.btn-console-run-now`, `.btn-console-pill`, and `.terminal-diag-quick-notice`.
+
+### 3. Verification
+- **Production Build**: `npm run build` completed with 0 errors.
+- **Browser Subagent Test**:
+  - Evaluated `age = int(input("Enter your age: ")) \n print("ok", age)`:
+    - Initially paused with `⏳ Input Required` in `Terminal Output`.
+    - Typed `25` into the focused prompt and pressed <kbd>Enter</kbd>.
+    - Immediate execution produced `Enter your age: ok 25` with `● Success (Exit 0)`.
+  - Switched to `📁 Data Files`, attached `students.csv`, and verified code snippet insertion.
+
+---
+
 ## 🚀 How to Run the Project
 
 ### Start the Backend (Terminal 1)
