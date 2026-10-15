@@ -266,15 +266,10 @@ export default function CourseExplorer() {
                               target="_blank"
                               rel="noreferrer"
                               className="session-external-link"
-                              title="Watch original CampusX YouTube lecture"
+                              title="Watch video lecture"
                             >
                               <span>▶</span> YouTube
                             </a>
-                          )}
-                          {session.notebook_file && (
-                            <span className="session-meta-pill" title="Jupyter Colab notebook verified">
-                              📓 Notebook
-                            </span>
                           )}
                         </div>
 
