@@ -1,0 +1,285 @@
+
+========================================
+PAGE 1
+========================================
+Project Report titled "Automatic Parking System" Submitted to Department of Data science and artificial intelligence p.ccred.itee eaautonoqo Hindi Vidya Prachar Samiti's RAMNIRANJA&JHUNJHUNWALA COLLEGE OF ARTS, SCIENCE & COMMERCE For Partial Fulfillment for Degree of Bachelor of Science (DSAI) 2025 - 2026 In the Subject Project (V Semester) Submitted by Kunal Gupta -10248 Mohd Suhail Khan - 10253
+
+========================================
+PAGE 2
+========================================
+indLUidyaerachæSamiffs-RAMNLRANJAYJHUNJHUNWALA-COLLEGE-QE-ARTS, SCIENCE & COMMERCE CERTIFICATE This is to certify that Kunal gupta(10248) and Mohd Suhail Khan(10253), a third year student of Bachelor of Data Science and Artifical Intelligence has successfully completed the project entitled "Automatic Parking System" as a part of academic in the subject Project (V Semester) which is approved for degree of Bachelor of Data Science and Artifical Intelligence Project Guide Coordinator Examiner
+
+========================================
+PAGE 3
+========================================
+»ccred.iteq Hindi Vidya Prachar Samiti's RAMNIRANJAN JHUNJHUNWALA COLLEGE OF ARTS, SCIENCE & COMMERCE (PLAGIARISM CERTIFICATE This is to certify that MRs,KUNAL GUPTA and MRs.MOHD SUHAIL KHAN a final year student of Bachelor of Data science and Artifical Intelligence from University of Mumbai has submitted the project book content for plagiarism check. It was found that his content is good, as per format and the duplication is under UGC Recommended rules given in UGC Public Notice on Draft UGC Regulations- 2017(N0.F.1-8/2010 (CPP-II)). In-Charge Plagiarism Committee Date: Stamp: Project Guide Coordinator
+
+========================================
+PAGE 4
+========================================
+PREFACE It gives me great pleasure to present this project documentation and application developed as part of my final year project. The idea originated from the growing challenges of parking management in urban areas, such as traffic congestion, time wastage, and lack of automation. Existing parking systems are often costly, relying on licensed software and expensive infrastructure, which makes them unsuitable for small parking owners. To address this, I designed an open-source automatic parking slot detection and online booking platform using YOLO for slot and number plate detection, Streamlit for prototype development, and RDBMS for database management. The project aims to provide a cost-effective, scalable, and automated solution that reduces human effort while improving efficiency in parking management. This black book reflects the journey of developing the system and the effort put into making it practical and user-friendly.
+
+========================================
+PAGE 5
+========================================
+ACKNOWLEDGEMENT take this opportunity to express my deep sense of gratitude to all those who have contributed to the successful completion of this project and black book documentation. First and foremost, I would like to sincerely thank my project guide for their constant support, valuable suggestions, and expert guidance throughout the project. Their encouragement, timely feedback, and technical insights have been instrumental in shaping the project and enhancing my understanding of the subject. I am also grateful to the Head of Department and all faculty members of my institute for providing me with the opportunity to carry out this project, as well as for their encouragement, cooperation, and availability whenever I needed help. Their teaching and guidance during the course of my studies have played an important role in the successful comple I extend my heartfelt thanks to my classmates and friends who prox feedback, shared ideas, and supported me during various stages c collaboration and motivation kept me focused and inspired. I also wish to acknowledge the immense moral support and encouragement given by my family. Their patience, motivation, and belief in me have always been a source of strength and inspiration. Without their support, the successful completion of this project would not have been possible. Finally, I thank everyone who directly or indirectly contributed to this project. This work is a reflection of the collective guidance, support, and encouragement I received, and I remain truly grateful to all. INDEX
+
+========================================
+PAGE 6
+========================================
+No. 2. 3. CONTENT INTRODUCTION 1.1 BACKGROUND SURVEY OF TECHNOLOGIES 2.1 AVAILABLE TECHNOLOGIES REQUIREMENT ANAL YSIS 3.1 PROBLEM DEFINATION SYSTEM DESIGN 4.1 MODULE 4.2 FEATURE 4.3 DATA SCHEMA 4.4 EVENT TABLE Page No. 1 1 2 3 4 4 5 7 8
+
+========================================
+PAGE 7
+========================================
+5. 6 7 IMPLEMENTA TION AND TESTING 5.1 IMPLEMENTATION APPROACHES RESUL TS AND DISCUSSION CONCLUSION 7.1 CONCLUSION 30 42 44 49 49 5
+
+========================================
+PAGE 8
+========================================
+CHAPTER 1 INTRODUCTION Parking has become one of the most pressing issues in modern cities. With the increase in urbanization, population growth, and the rising number of vehicles on roads, the problem of finding an available parking slot has intensified. In most cases, drivers waste a significant amount of time and fuel searching for free parking slots. This not only leads to personal frustration but also contributes to traffic congestion, increased pollution, and inefficient resource usage. Conventional parking management systems depend heavily on manual monitoring, ticketing, and supervision, which are prone to human errors and inefficiencies. Moreover, many of the existing automated systems are based on licensed software that comes with very high setup and maintenance costs. Smaller parking areas such as those in local markets, offices, and community spaces cannot afford such solutions. To address this problem, we have developed an open-source parking slot detection and online booking platform. The system uses computer vision models integrated with CCTV cameras to monitor parking lots, detect available slots, and recognize vehicle number plates. In parallel, a user-friendly web-based booking platform allows drivers to check availability and reserve their slot before reaching the parking lot. The uniqueness of our solution lies in its cost-effectiveness and open-source adaptability, which makes it accessible for both large and small parking operators. By eliminating the dependency on licensed, expensive software, the system democratizes access to smart parking management. The solution is scalable, reliable, and contributes to reducing human effort, operational costs, and environmental impact.
+
+========================================
+PAGE 9
+========================================
+CHAPTER 1 INTRODUCTION Objectives The main aim of this project is to build a practical, affordable, and automated parking slot management system. To achieve this, the specific objectives are: • To develop an automated mechanism that detects parking slot availability using CCTV footage and computer vision techniques. • To enable real-time updates of slot availability on a centralized platform accessible by end- users. • To provide an online booking system so that users can reserve slots before arriving at the parking location. • To design the system with open-source tools and frameworks to avoid expensive licensing costs. • To minimize human involvement in daily operations, thereby reducing human errors and savmg manpower costs. • To provide scalability so that the same system can be implemented in small parking spaces as well as large-scale public parking areas. • To encourage smoother traffic management by reducing unnecessary waiting time and congestion near parking zones. Scope The scope of this project extends beyond just building a prototype. It envisions the future of smart cities, where parking systems are seamlessly integrated with urban mobility. • For drivers, the system provides convenience by allowing them to locate, check, and reserve parking slots from their smartphone or web browser. • For parking owners, it reduces the dependency on manual staff and makes slot monitoring more efficient. For society, it reduces unnecessary vehicle movement, thereby lowering traffic congestion and fuel wastage. • For future scalability, the system can be integrated with IoT devices, payment gateways, and smart navigation apps like Google Maps. 2
+
+========================================
+PAGE 10
+========================================
+CHAPTER 1 INTRODUCTION Application The applicability of this system is vast because parking is a universal issue. Some major domains of use include: • Commercial Spaces: Shopping malls, multiplexes, and office complexes can use it to streamline customer parking. • Public Transport Hubs: Metro stations, bus depots, and railway stations often suffer from high parking demand, where this system can play a critical role. • Healthcare Institutions: Hospitals and clinics require efficient parking solutions to reduce stress for patients and visitors. • Government & Public Utilities: Smart cities and municipal corporations can use it for community parking spaces. • Event Venues: Stadiums, convention centers, and exhibitions can use the system to manage temporary parking surges. 3
+
+========================================
+PAGE 11
+========================================
+CHAPTER 2 SURVEY OF TECHNOLOGIES Available Technologies A survey of existing parking solutions revealed that while advanced parking systems are available, they come with significant drawbacks: 1. High Licensing Costs: Most proprietary software solutions require costly licenses, making them unsuitable for small parking operators. 2. Complex Hardware: Advanced sensors and high-end devices increase installation and maintenance costs. 3. Limited Flexibility: Proprietary systems are less customizable and lock customers into vendor-specific hardware/software. In contrast, our project leverages open-source technologies such as YOLO (computer vision), Streamlit (rapid prototyping), and Flask (deployment), combined with affordable hardware like CCTV cameras. This allows us to provide similar functionality at a fraction of the cost, with more flexibility. Technologies Used • YOLO (You Only Look Once): Used for real-time object detection, specifically to recognize empty and occupied parking slots, as well as number plate recognition. OpenCV: For processing video input from CCTV cameras and integrating detection models. • Streamlit: Used to create the prototype user interface for testing booking and slot availability features. • Flask: For building the backend APIs and enabling platform deployment. RDBMS (MySQL/PostgreSQL): To store user records, booking transactions, slot availability, and historical data. These technologies collectively provide a robust and affordable smart parking solution. 4
+
+========================================
+PAGE 12
+========================================
+CHAPTER 3 REQUIREMENT ANALYSIS problem Definition: Drivers waste time and fuel searching for slots, often finding that the lot is already full. This causes frustration, congestion, and inefficiency. Requirement Specification: • Hardware Requirements: CCTV camera with a wide view of the parking lot. o Computer system capable of running YOLO models (mid-range CPU/GPU is sufficient). o Network connectivity for data transfer and user platform access. Software Requirements: Python 3.12 0 Flask 3.1.2 o Streamlit for prototype interface YOLO model for slot detection and number plate recognition o RDBMS for database operations OpenCV for image/video processing Planning and Scheduling The project was executed in structured phases: I. Literature survey of existing parking solutions. 2. Identifying shortcomings of current licensed systems. 3. Designing the system architecture for an open-source model. 4. Building a Streamlit prototype for slot booking and visualization. 5. Training and integrating YOLO for real-time slot detection. 6. Database design for storing user, slot, and transaction records. 7. Backend integration using Flask for deployment. 8. Testing with simulated CCTV inputs and refining the model. 9. Final deployment and demonstration. 5
+
+========================================
+PAGE 13
+========================================
+CHAPTER 3 REQUIREMENT ANALYSIS problem Definition: Drivers waste time and fuel searching for slots, often finding that the lot is already full. This causes frustration, congestion, and inefficiency. Requirement Specification: • Hardware Requirements: CCTV camera with a wide view of the parking lot. o Computer system capable of running YOLO models (mid-range CPU/GPU is sufficient). o Network connectivity for data transfer and user platform access. Software Requirements: 0 Python 3.12 0 Flask 3.1.2 o Streamlit for prototype interface o YOLO model for slot detection and number plate recognition RDBMS for database operations o OpenCV for image/video processing Planning and Scheduling The project was executed in structured phases: I. Literature survey of existing parking solutions. 2. Identifying shortcomings of current licensed systems. 3. Designing the system architecture for an open-source model. 4. Building a Streamlit prototype for slot booking and visualization. 5. Training and integrating YOLO for real-time slot detection. 6. Database design for storing user, slot, and transaction records. 7. Backend integration using Flask for deployment. 8. Testing with simulated CCTV inputs and refining the model. 9. Final deployment and demonstration. 6
+
+========================================
+PAGE 14
+========================================
+CHAPTER 4 SYSTEM DESIGN 4.1 Basic Modules • Presentation Layer (Front-end) Streamlit prototype/web interface for users to check and book parking slots. Allows login/registration, slot booking, and payment. • Application Layer (Back-end) Flask server handles requests between front-end and database. YOLO model + OpenCV for slot detection and number plate recognition. • Logic for slot availability and booking management. • Database Layer (Data Storage) • RDBMS (MySQL/PostgreSQL) stores user details, slot information, records, and payments. • Ensures data integrity and prevents double-booking. 4.2 feature T l. User Registration & Login • Secure sign-up and login functionality for users. • Each user can manage their vehicle details and booking history. 2. Real-time Slot Detection booking • Integration with CCTV + YOLO model to detect whether slots are occupied or free. Updates slot status in real-time for users. 3. Parking Slot Availability Dashboard Users can view all nearby parking areas. • Displays available slots, location, and per-hour charges. 4. Online Slot Booking Users can pre-book a slot before reaching the parking area. • Reduces time wasted in searching for slots. 5. Number Plate Recognition YOLO + OpenCV detects and verifies vehicle number plates. • Ensures only valid/registered vehicles can book and enter. 6. Online Payment System • Integration of multiple payment methods (UPI, cards, cash). Generates digital receipts for each booking. 7. Booking History & Reports Users can track their past bookings and payments. Admin can generate reports of parking usage, revenue, and occupancy. 8. Admin Panel 7
+
+========================================
+PAGE 15
+========================================
+CHAPTER 4 SYSTEM DESIGN 4.3 data schema Booking Payment Admin booking_id (PK) user_id (FK) slot_id (FK) start_time end time status payment_id (PK) booking_id (FK) amount payment_mode status admin_id (PK) name email password INT INT INT DATETIME DATETIME VARCHAR(20) INT DECIMAL(72) VARCHAR(20) VARCHAR(20) INT VARCHAR(50) VARCHAR(IOO) VARCHAR(50) 8 Unique booking ID Reference to User Reference to Slot Booking start Booking end Active/CompIeted Unique payment ID Refers to Booking Payment amount UPI, card, Cash Success/Failed Admin unique ID Admin name Admin email Admin password
+
+========================================
+PAGE 16
+========================================
+CHAPTER 4 SYSTEM DESIGN Booking Payment Admin booking_id (PK) user_id (FK) slot_id (FK) start_time end_time status payment_id (PK) booking_id (FK) amount payment_mode status admin_id (PK) name email password INT INT INT DATETIME DATETIME VARCHAR(20) INT INT VARCHAR(20) VARCHAR(20) INT VARCHAR(50) VARCHAR(IOO) VARCHAR(50) 9 Unique booking ID Reference to User Reference to Slot Booking start Booking end Active/Completed Unique payment ID Refers to Booking Payment amount IJPI, Card, Cash Success/Failed Admin unique ID Admin name Admin email Admin password
+
+========================================
+PAGE 17
+========================================
+CHAPTER 4 SYSTEM DESIGN 4.4 Event table Event ID El E7 E8 E9 Event Name User Registration Login Slot Detection Update Search Parking Slot Book Slot Payment Booking Confirmation Cancel Booking Generate Report Actor User User/Admin CCTV + YOLO User User User System User/Admin Admin 10 Description New user creates account System validates credentials Updates DB with occupied/free status User checks available slots User books available slot User pays for booking Confirms booking in DB Cancels a booking Admin views booking/payment records
+
+========================================
+PAGE 18
+========================================
+4.3 DATA DICTIONARY l. Table Name: Users Table Description. This table consists of data required for authentication of the users on the website. The authentication takes place using the username and the hashed password stored in this table. Fields username password emal Description t IS e umque assigned for 1 every authenticated user. every user. It is the password used t authenticate a user. It is the email address of user. Data Type VARCHAR(20) VARCHAR(20) VARCHAR(20) Constraint NULL NOT NULL NOT NULL NOT NULL 2. Table Name: Details Table Description: This table consists of data that a user can edit and add to their profile which will be visible on the profile. s did P one split escnpUon This is the details id unique to every user. This is the user id. This is the date of birth o the user. T IS IS the contact number of the user. This is the splitting percentage of the funds a team 11 ata ype DATE onstramt PRIMARY KEY, NOT NULL FOREIGN KEY, NOT NOT NULL NOT NULL
+
+========================================
+PAGE 19
+========================================
+3. Table Name: Sessions Table Description: The tables contains the session related data unique to every user to maintain sessions. le session expires s post Description IS IS the session 1 unique to a particular session of a user. session in the json forma ISIS e Imes amp o the expiration of a session. Data Type JSON Constramt PRIM RYKEY, NOT NULL NOT NULL 4. Table Name: Posts Table Description: The tables contains the posts of the update wall and the posts posted by the users will be fetched using this table. Description This is the unique id of I every post on the update wall. post. This is the user id of the user who has posted the post. 12 Data Type TEXT onstralnt PRIMARY KEY, NOT NULL NOT NULL FOREIGN KEY, NOT NULL
+
+========================================
+PAGE 20
+========================================
+5. Table Name: Payment Table Description: The tables contain data which has data of money related transactions. escriptlon Is 1st e paymen 1 which will be unique for every transaction that ata ype amount uid Fields tid tname happens. s IS e amoun transferred from one location to another. is IS eul o e receiver who is receiving the donation. s ISt eul o t e user who is donating to another user. 6. Table Name: Team Table Description: The table contains the users who are in a team and their data. onstramts NULL NOT NU L NOT NULL FOREIGN NULL Constraints Y, NOT Description This is the unique team i which will be unique for This is the name of the team which user will provide. 13 Data Type INT PRIMARY KEY, NOT NULL
+
+========================================
+PAGE 21
+========================================
+7. Team Name: User_Team Team Description: This table is created for user and team relationship so that we are able to fetch the matches. Fields uid tl Description T IS ISt e userl o t e user which is unique to every use. s IS e eaml o e team to which the user belongs to. Data Type INT INT Constraints FOREIGN KEY FOREIGN KEY
+
+========================================
+PAGE 22
+========================================
+o 4.4 EVENT TABLE vent r. 1. 2. 3. 4. 6. 8. rigger Registration. Register new user. Logging in Pro e Creation Settings Team creation account E It pro 1 e Edit settings Create team. ource New User, Existing User. User User User User(Team Leader) User(Team Leader) User(Team Leader) 15 ctlvlty a new user. Authenticate the user his account. d account details. Edit settings user adding a like team or setting splitting percentage. Creating a new team for more than one developers. ding t e users of the t team using their username. emovlng a user from a r team using their username. Ing splitting esponse ccount created successfully. ogm successful. C anges saved successfully. anges saved successfully. eam create uccessfully estmauon Logm Page. Home Page. Pro 1 e Page ettlngs Page Settmgs Page Adding users A to the team users. Removmg Remove users from ser. sersa e Se tings Page. the team uccessfully. ser oved Settings Page. the team. g splitting percentage for the funds. Lin ing GitHub account from the tea successfully. Changes save successfully. A splittmg percentage. ogm Wit GitHub. ettmgs age percentage of the funds for different members of the team. ccount GitHub Linked account to successfully. the Contripa account for verification ettlngs Page.
+
+========================================
+PAGE 23
+========================================
+a et 11. 12. funds to the account funds from the account. money oney. A d a post. ser User User 16 Ing money using cc/dc to the account. It rawmg money from Contripay account to the bank account. Adding a post on the update wall for the donors. oney a e successfully. oney withdrawn successfully. ost successfully age. W et Page. Creating post. a P ate
+
+========================================
+PAGE 24
+========================================
+4.5 FR DIAGRAM uid payid User username Donor uid Payment rid Team 17
+
+========================================
+PAGE 25
+========================================
+4.6 USE CASE DIAGRAM DONATION Donation *when user doesntt exist Register «extend» *When already logged in Add money «extend» Wallet -'extend» Wallet «extend» Select amount 18 Developer Withdraw money «extend» Select the account
+
+========================================
+PAGE 26
+========================================
+UPDATE WALL Update Wall *when user doesnt exist «extend» Login hen already logged in Update WALL Developer Donor View Profile eextend»; Add a new post 19
+
+========================================
+PAGE 27
+========================================
+4.7 STATE TRANSITION DIAGRAM Login Logout PROFILE/ACCOUNT After successful login View Details Select Operations if updateProfile Update Profile if updateSettings IJpdate Settings View Updates Records After successful operation 20
+
+========================================
+PAGE 28
+========================================
+POSTS After successful bgin Login View Update Wall Select operation if cr Create a post if delete Delete a post View updated posts Logout After successful operadn 21
+
+========================================
+PAGE 29
+========================================
+Login Logout WALLET After successful login it send Send Money After successful operation 22 View Wallet Select operation if withdraw Withdraw Money Show Transactions
+
+========================================
+PAGE 30
+========================================
+DONATION After successful logil Login View Profile Select operation if don Donate once if rdon Recurring Donation Display success message After successful operation 23
+
+========================================
+PAGE 31
+========================================
+4.8 DATA FLOW DIAGRAMS PROFILE/ACCOUNT 1. Fetch user profile User Display user profile Fetch settings Display settings Users Update settings 2- View Profile Fetch Details Display details Details Update Details Update Profile User Display updated profile 24
+
+========================================
+PAGE 32
+========================================
+TEAM 1. Add a team of users User Add users Users Update the users in the team Create a Team Add Team Name Team Update the team name user Team 2. Update Team User Display updated team with users 25
+
+========================================
+PAGE 33
+========================================
+UPDATE WALL L. Add a post User Add userid of the creator of the post Update the userid 2- Create a post Add the content of the post posts Update the content Update the Updates Wall Display updates wall with updated posts 26
+
+========================================
+PAGE 34
+========================================
+DONATION/PAYMENT Donor Developer View profile of developer Donate once Payment Make payment Tranter the funds i. View Profile Recurring Donations Payment Make payment 2. Send the funds to the developer Update payments of the developer Payment Fetch the wallet of the developer Update the wallet of the developer 27
+
+========================================
+PAGE 35
+========================================
+4.9 FLOW CHART Edit profileü Yes Edited successfully Yes Edited Successfuuy DEVELOPER egisteraton successful Create p Ost Yes No Edit settings? Login Correct credetals Team User already exist Add to Team Yes Yes Yes Choose another 28 Register Yes Post created post removed No emove a post No Dsplay posts
+
+========================================
+PAGE 36
+========================================
+DONOR Mew Add money Yes successfully Yes Withdrawn successfully Correct Credentials No lthdraw Money egisteraton successfull Yes Register Donate Once Yes Donated successfully Donated successfully 29 View U ates all posts
+
+========================================
+PAGE 37
+========================================
+CHAPTER 5 IMPLEMENTATION AND TESTING 5.1. l. Important code and description l. Hashing in register module: app.post(' /register•, function (req, res) username — req.body .username; var password req.body . password; var email req.body.emall; active = false; Var reg . session . username = username; req.session . password = password; .session.email — email; bcrypt.genSaIt(Ie, function(zr-r, salt) bcrypt. hash(passuord, salt, hash) pgpool.query( ' INSERT INTO 'Vusers" (username, password, active, [username, hash, actives email], function (err, result) if (err) res. status (SOO). send (err. toString ( ) ) ; else res. redirect ( " / send" ) ; 30 email) VALUES ($1. $2,
+
+========================================
+PAGE 38
+========================================
+Description: Hashing is a technique used to convert readable confidential data into an unreadable encrypted format for privacy. The above code is used to encrypt the password entered by the user during the registration. The bcrypt.genSalt function is used to generate a random salt. This salt is then used with the password to generate a hash using the bcrypt.hash function. This will encrypt the user's password and this encrypted form of password is stored in the database. Hence even If an attacker gets the access to the database, he won't be able to access the password as hashed password can't be decrypted. 2. Comparing the hash in login module Code: pgpocl.query('SELECT FROM "users" WHERE username If (result. rows. length req.session.uid= result. rows [a] . id; var dbString — result.rows[el -password; var active— result.rows[e] active; [username], function (err, result) bcrypt.compare (password, dbString, function(err, resu) if if ( active—true) req. session-username — username; req. ses s ion. password = password; console. log(result. rows[ø] . id) ; res.redirect( ' /dashboard ' ) ; else req. session. destroy ( ) ; else "please verify your account.' , {msg: "Invalid password! "Y); As said above, the hashed passwords can't be decrypted or reversed by any means as the salt increases the entropy of the hash generated. So while logging in, we can't decrypt the password from the database and compare it with the password entered the user. For this purpose we use comparison. 31
+
+========================================
+PAGE 39
+========================================
+The bcrypt.compare function is used to compare the hash of the password entered by the user with the hash stored in the database for that particular account. If the hash of the password entered by the user matches the hashed password in the database, then the user is authenticated. 3. Module for sending verification email. Code: app .get( ' 'send ' . function(req , var text — req.session.username; Van bytes — utf8.encode(text) ; var rand base64. encode(bytes); link—"https://contripay.herokuapp.com/verify? %rand; var email - to: Ireq . session .errail], from: adnin@contripay.con• subject: Please confirm your Email text: html: "Hello, <br» please Click on the unk to verify your email, here to mailer. sendMai1(email, response) { if (error) { console. log(ernor) res.send(error); console . log(response) ; sent successfully! please verify your account")); Description: Node js comes with an npm (Node Package Manager) which is used to install third party packages which contains libraries and functions helpful in building some functionalities. Node mailer is one of those packages which helps to send emails using node js. Node Mailer uses SMTP protocol to send emails. When the user register for a new account, this endpoint is called which send the verification mail to the users so that the identity of the user can be authenticated. Sendgrid is an email delivery service which delivers your transactional and marketing emails through the world's largest cloud-based email delivery platform. In this module Sendgrid API is used for sending the verification emails. 5.1.2. Coding Efficiency Node.js is a JavaScript runtime environment built on Chrome's V8 JavaScript engine. Node really provides is a very practical and optimized solution for web development. Node is quite fast and V 8 engine is much optimized to perform simple CPU bound operations. One of the great features is that you can create a REST API in node js which helps in accessing resources with less efficiency and more speed. In the proposed system there are many endpoints like /tid which is used at many places Inside other endpoints to get the resource faster without querying the database or writing the query again and again. Also the node packages makes the code less complicated and lesser in number too as inbuilt libraries can be called directly. 32
+
+========================================
+PAGE 40
+========================================
+5.2 Testing approaches 5.2. l. Unit Testing Unit testing, a testing technique using which individual modules are tested to determine if there are any issues by the developer himself. It is concerned with functional correctness of the standalone modules. The main aim is to isolate each unit of the system to identify, analyse and fix the defects. Advantages: Reduces Defects in the newly developed features or reduces bugs when changing the existing functionality. Reduces Cost of Testing as defects are captured in very early phase. X Improves design and allows better refactoring of code. Unit Tests, when integrated with build gives the quality of the build as well. In the proposed system the unit testing is done by testing each module separately using test cases. Every module has a test case which includes different steps to perform and test a module so as to check its functioning. The expected and the actual result is matched and the test is declared as passed or failed on the basis of that. Following are the test cases for the proposed system under Unit Testing: 33
+
+========================================
+PAGE 41
+========================================
+Project Name: Contripay Test Case ID: 1 Test Priority (Low Medium High): Test Case Test Designed by: Adarsh Test Designed date: 25-01-2019 Hi h Module Name: Login Test Title: Login escriptlon: se to ogln user Into his/her account. Pre-conditions: User should be a registered user using the register module Depen encles: Expected Step 2 3 4 Test Steps Enter username & password in respective tex fields username & password in respective text username & password in respective text fields username & password in respective text fields Test Data Correct username & incorrect password Incorrect username & correct password Incorrect username 8 incorrect password Correct correct password Actual Result Password is incorrect User does not exist Username/ Password is incorrect Logged in successfully Status (Pass/Fail) P a ss Notes Result Password incorrect IS User does not exist Userna me/ Password is incorrect Logged in successfu Ily Post-conditions: User is logged in successfully If the correct credentials are g•ven & should be agein redirected to login page with an error prompt Ifthe credentials are incorrect
+
+========================================
+PAGE 42
+========================================
+Test Case ID: 2 Test Priority (Low Medium High): Test Case Test Designed by: Adarsh Test Designed date: 25-01-2019 Hi h Module Name: Register Test Title: Register escnptlon: se to register a new account for the user. Pre-conditions: Dependencies: es xecu e Actual Result Password is incorrect User does not exist ord is incorrect Logged in successfu ly ars Step 2 3 4 Test Steps Enter username & password in respective tex fields n er username & password in respective tex fields username R password in respective tex fields username & password in respective tex fields Data Correct username & incorrect password Incorrect username & correct password Incorrect username & incorrect password Correct username & correct password Expected Result Password is incorrect User does not exist rd is incorrect Logged in successfully Status (Pass/Fail) Pass Pess Notes Post-conditions: User is logged in successfully If the correct credentials are given & should be again redirected to login page with an error prompt Ifthe credentials are incorrect
+
+========================================
+PAGE 43
+========================================
+Project Name: Contripay Test Case ID: 3 Test Priority (Low Medium High): Test Case Test Designed by: Adarsh Test Designed date: 25-01-2019 Low Module Name: Account Settings Test Title: Settings escriptlon: se toc ange settings of an account Pre-conditions: User should be a registered user and should be logged in to the account. Dependencies: Step 2 3 4 Test Steps Enter sam password Enter different Enter different Enter differen non-existing username & ass ord in ræspec%ve tex Data password Incorrect Incorrect usernam & password Expected Result p a [JFd*te successfully Actual Result Pasä\vyor$ successful Iy Username & Status (Pass/Fail) pass Pass Notes Usernamqel ready H reaw exists Username & password yedate success Ily s Post-conditions: User is logged in successfully If the correct credentials are g•ven & should be again redirected to login page with an error prompt Ifthe credentials are incorrect
+
+========================================
+PAGE 44
+========================================
+Project Name: Contripay Test Case ID: 4 Test Priority (Low Medium High): Hi h Module Name: Create Team Test Title: Create Team escriptlon: se to create a team Test Case Test Designed by: Adarsh Test Designed date: 25-01-2019 Pre-conditions: User should be a registered user and should be logged in to the account. Step 2 Test Steps Enter an Test Data Existing team Expected Result Team name already exists Team created successfully Actual Team Result name Status (Pass/Fail) Pass Notes existing team name name Enter a non- Non-existing existing team team name name already exists Team created successfu Ily Post-conditions: User is logged in successfully If the correct credentials are given & should be again redirected to login page with an error prompt If the credentials are incorrect
+
+========================================
+PAGE 45
+========================================
+Project Name: Contripay Test Case ID: 5 Test Priority (Low Medium High): Medium Module Name: Team Settings Test Title: Team Settings escriptlon: se toe It eam details Test Case Test Designed by: Adarsh Test Designed date: 25-01-2019 Pre-conditions: User should be a registered user and should be logged in to the account and should be admin of the team Step 2 3 4 Test Step Enter Team name Enter Team name Enter Team name and description Enter Team Name and description Test Data Existing Team name Non-existing Team name Existing Team name and description Non-existing Team name an description Expected Result Team name already exists updated successfu ly Team narme already exists Team details u pdeted successfully Actual Result Team name already exists updated successfully Team name already exists Team details u pdated successfully Status (Pass/Fail) Pass Pass N otes Post-conditions: The team details will be updated If a non-existing team name is used for updating of Team details
+
+========================================
+PAGE 46
+========================================
+Test Case ID: 6 Test Priority (Low Medium High): Medium Module Name: Add user Test Title: Add user escnptlon: se to a to the team a mem Test Case Test Designed by: Adarsh Test Designed date: 25-01-2019 er Pre-conditions: User should be a registered user and should be logged in to the account and should be admin of the team Step 2 3 Test Step Enter username Enter userna me Enter username Test Data Username whic does not exist Username whic exists but is not verified Username whic eXl'é?iagg is Expected Result User does not exist ser is not verified Status Actual Result N otes user does not exist User is not User added to the team successfull (Pass/Fail) Pass Pass Post-conditions: The user specified will be added to the team successfully and will be given least privileges
+
+========================================
+PAGE 47
+========================================
+Test Case ID: 7 Test Priority (Low Medium High): Medium Descri tion: Used to ost messa or updates on the wall Test Designed by: Adarsh Test Designed date: 25-01-2019 es Pre-conditions: LJser should be a registered user and should be logged in to the account or should be admin of the tearyn Step 2 3 4 Test Steps Enter text for the post Delete the pos Delete the pos Enter text for he post Test Data Post message Admin Not admin Non-existing Team name an description Expected Result Post updated successfully Post deleted successfully Not allowed to delete the post Team details updated successfully Actual Result Post updated successfully ost delete successfully Not allowed to delete the post Team details updated successfully Status (Pass/Fail) Pass N otes Post-conditions: The team details will be updated If a non-existing team name is used for updating of Team details
+
+========================================
+PAGE 48
+========================================
+5.2.2. Integration Testing Upon completion of unit testing, the units or modules are to be integrated which gives raise to integration testing. The purpose of integration testing is to verify the functional, performance, and reliability between the modules that are integrated. Test est ase ween ec Description Expected Result Ent r Check the interfac login cre&entia To 1 2 3 4 5 6 the registration page and login page Check the interfac link between the dashboard and th account settings e t e Inter ac et ent e das oar crea eam page and click on the Login button Enter registratio To be details and clic redirected t the Login on register button From Dashboad To be elect th redirected to account settin account settin option page cllcVI) acireawr redirected to eam the create tea page List o/ thfic teams Redirecte dash gar Redirecte to the login pag Redirect to acco s settings page to create team pag e Irecte ass ai Pass Pass Pass ass ass Pass c c on eam user IS a parto user IS a part of Redirecte to the edi ag team 41
+
+========================================
+PAGE 49
+========================================
+CHAPTER 6 RESULTS AND DISCUSSION 6.1 Test Reports The test results are promising as all the test cases are passed and the proposed system can go through all the conditions set while testing it. It can face problematic situations and can work fine in different & difficult conditions. 6.1. I Project Information Project Overvrew PROJECT BASIC INFORMATION Project Name ro uct Description Project Description Project Duration 6.1.2 Test Objectives Contnpay crow un Ing p at orm. Contrlpay IS a crow un Ing p at orm or open source eve ope where the open source developers can showcase their work & g t financial support from the people who appreciate their work. Project Type Start ate t ug We n PP tcatlon ate pri The testing of the proposed system had different goals and objectives. The major objectives of testing are as follows: X Finding defects & bugs which may be introduced by the programmer while developing the proposed system. X Gaining confidence in the product and providing information about the level of quality to the users of the application. X To prevent & avoid any defects and failures. X To make sure that the end result meets the business and user requirements. X To ensure that it satisfies the BRS that is Business Requirement Specification and SRS that is System Requirement Specifications as both are necessary as one satisfies the customers & another satisfies the developer. X To gain the confidence of the customers by providing them a quality product and make them have trust in the product. 42
+
+========================================
+PAGE 50
+========================================
+6.1.3 Test Summary Test cycle EXECUTED Ota System Test (PASSED + FAILED) PENDING IN PROGRESS (Su - ) TEST PL NNED 7 7 Remar s Functions Logm egrster Account settings Team eam Settings Add User Posts Description Used to login user account. Used to register a new account fo the user Used to change settings of an account Used to create a team Used to edit Team details se to a a member to the team Used to post messages or updates on the wall % TCs Executed 100" 0 100% 100% 1 OOYO OTCs Passed 100% 100% 100% 10000 100% 1000 c, 43 TCs pending o Priority Low Hi Me •um Medium Me lum
+
+========================================
+PAGE 51
+========================================
+6.1 4 Defects Total No. of bugs: O Status of bugs: Closed 6.2 User Documentation l. Home n @ Gotthgstdrt«j• CONTRIPAY A Crowd Funding Platform For Open Source Gives a descriptive information to the users who are visiting the website for the first time. The user gets to know what the web application is about and helps them to get started. 2. Login ogin 44 How
+
+========================================
+PAGE 52
+========================================
+This is the interface from where the registered user can log into their account using their username& password. 3. Register egister This is the interface through which an unregistered user can create an account using his/her personal details like email, a password for security & a username for identitiy. 4. Dashboard Contripay @Senitw • CONTRIPAY Welcome to the dashboard newui ! This is the first page that the user encounters when logged into his account & lets the user know that he/she is logged in. Also, we have different options to work with in the menu. 45
+
+========================================
+PAGE 53
+========================================
+5. Profile Mike Scheinder An for IS and in appic_ution_ Feel free to contribute to my by dcrut_irtg m o button tho rig "t Havo Nc filo This is a profile page of a user on Contripay which will be used to get funding from the supporters by sharing your profile page with them. Also, it gives the basic information about the person or the team of whom the profile is. 6. Account Settings ccount We can change our account settings & details like our username or password using this page. 46
+
+========================================
+PAGE 54
+========================================
+7. Create Team team We can create a team of many members using this interface by giving a name for the team to be created. 8. Team List Conuipay CONTRIPAY newuis teams This interface will list and show all the team that you are a part of. You can select any team of which you want to change settings or details of. 47
+
+========================================
+PAGE 55
+========================================
+9. Edit Team eamte rtdtd This interface will let u edit the setting of the team that you selected from the previous interface. It will let you change the name & description of the team which you've created. Also, it lets you add & remove new members to your team. 48
+
+========================================
+PAGE 56
+========================================
+CHAPTER 7 CONCLUSION 7.1 Conclusion "Contripay" is developed to support & help the open source developers financially to help them maintain their work. Using the proposed system developers can collect funds from different people or the users using their project/product. It also serves as a platform for the open source developers. The main aim of the project is to provide financial support to the open source developers to create an account with their GitHub account linked to it for ceivin the donations. also be able to create teams if there are more than one person working on a project. 3. The donors will get the new updates and the beta updates of the software before anyone else exclusively by the software developers as a gesture of thanking them. 4. The updates will be given through posts which can be posted by the members of the team or an individual. Thus "Contripay" is an efficient & effective web application to fulfil the needs of the open source developers or anyone who want to get support from the people for a good cause. 7.2 Limitations of the system There is some limitation in every web application which may be due to different constraints that don't support the system. There are also some limitations in the proposed system and they are as follows: l. The user is not able to store & collect the funds as a wallet is not being developed to store the funds & withdraw it whenever they want. 2. All the donations are instant & can't be scheduled for later. 3. The system is hosted on a shared hosting and hence can't take load of large number of users but can handle it when it is scaled further. 49
+
+========================================
+PAGE 57
+========================================
+7.3 Future Scope The future scope of the application is wide as there is always space for improvement & the application is scalable to higher levels. l. A separate wallet will be introduced to store & withdraw funds to & from an account. 2. The fund will be distributed within the members of the team. 3. The developer who creates and manages the team should be able to set the percentage of the contribution which will be received by the other members. 4. So, whenever someone donates them, the money is distributed between them according to that percentage. 5. The donors would also be able to set repetitive donations more like a monthly subscription to a project with the amount of their choice. 7.4References https://www.patreon.com/ https://www.kickstarter.com/ https://www.indiegogo.com/ https://stackoverflow.com/ https://www.w3schools.com/ https://www.tutoria Ispoint.com/ https://nodejs.org/en/ https://www.postgresql.org/ https://www.heroku.com https://www.ketto.org/ 50
