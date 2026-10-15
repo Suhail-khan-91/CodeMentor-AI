@@ -9,7 +9,6 @@
       "session_number": 8,
       "title": "Session 8 - OOP Part 1: Class & Object",
       "video_url": "https://www.youtube.com/watch?v=Trvqq5w7-0Q",
-      "notebook_file": "08_oop_part1_class_and_object.ipynb",
       "lessons": [
         {
           "lesson_id": "lesson_08_01",
@@ -43,7 +42,7 @@
                 {
                   "id": "tc_02",
                   "description": "Overdraft attempt",
-                  "stdin": "Nitish\n500\n100\n800",
+                  "stdin": "Alex\n500\n100\n800",
                   "expected_output": "600.0\nInsufficient funds",
                   "is_hidden": true,
                   "match_mode": "trimmed"
@@ -64,7 +63,6 @@
       "session_number": 9,
       "title": "Session 9 - OOP Part 2: Encapsulation & Static Members",
       "video_url": "https://www.youtube.com/watch?v=P4xizq3CiJg",
-      "notebook_file": "09_oop_part2_encapsulation_static.ipynb",
       "lessons": [
         {
           "lesson_id": "lesson_09_01",
@@ -119,7 +117,6 @@
       "session_number": 10,
       "title": "Session 10 - OOP Part 3: Inheritance & Polymorphism",
       "video_url": "https://www.youtube.com/watch?v=bEWwM4hXZg8",
-      "notebook_file": "10_oop_part3_inheritance_polymorphism.ipynb",
       "lessons": [
         {
           "lesson_id": "lesson_10_01",
@@ -172,9 +169,8 @@
     {
       "session_id": "session_11",
       "session_number": 11,
-      "title": "Session 11 - Week 3: Interview Questions & Object Internals",
+      "title": "Session 11 - Dunder Methods & Operator Overloading",
       "video_url": "https://www.youtube.com/watch?v=HQH5FxvJXzI",
-      "notebook_file": "11_week3_interview_questions.ipynb",
       "lessons": [
         {
           "lesson_id": "lesson_11_01",
@@ -229,7 +225,6 @@
       "session_number": 12,
       "title": "Session 12 - Abstraction & Abstract Base Classes",
       "video_url": "https://www.youtube.com/watch?v=O-NrQvtorp0",
-      "notebook_file": "12_oop_abstraction.ipynb",
       "lessons": [
         {
           "lesson_id": "lesson_12_01",

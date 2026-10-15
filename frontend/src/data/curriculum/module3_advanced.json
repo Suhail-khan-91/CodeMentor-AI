@@ -9,7 +9,6 @@
       "session_number": 13,
       "title": "Session 13 - File Handling & Serialization",
       "video_url": "https://www.youtube.com/watch?v=o-TAYRMQzIQ",
-      "notebook_file": "13_session10_file_handling_serialization.ipynb",
       "lessons": [
         {
           "lesson_id": "lesson_13_01",
@@ -43,7 +42,7 @@
                 {
                   "id": "tc_02",
                   "description": "Two students score",
-                  "stdin": "{\"Suhail\": 98, \"Nitish\": 94}",
+                  "stdin": "{\"Suhail\": 98, \"Alex\": 94}",
                   "expected_output": "Suhail: 98\n96.0",
                   "is_hidden": true,
                   "match_mode": "trimmed"
@@ -64,7 +63,6 @@
       "session_number": 14,
       "title": "Session 14 - Exception Handling & Custom Exceptions",
       "video_url": "https://www.youtube.com/watch?v=rvKR6tciJ2Q",
-      "notebook_file": "14_session11_exception_handling_modules.ipynb",
       "lessons": [
         {
           "lesson_id": "lesson_14_01",
@@ -127,7 +125,6 @@
       "session_number": 15,
       "title": "Session 15 - Decorators, Namespaces & LEGB Scope",
       "video_url": "https://www.youtube.com/watch?v=aMARZGTbULc",
-      "notebook_file": "15_session12_decorators_namespaces.ipynb",
       "lessons": [
         {
           "lesson_id": "lesson_15_01",

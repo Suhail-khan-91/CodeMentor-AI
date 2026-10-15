@@ -1,18 +1,17 @@
 {
   "module_id": "module_6",
   "module_number": 6,
-  "title": "Data Visualization (Matplotlib, Plotly & Seaborn)",
-  "description": "2D and 3D Matplotlib plots, subplots, interactive visualizations with Plotly Express, and advanced statistical plotting with Seaborn.",
+  "title": "Data Visualization (Matplotlib & Seaborn)",
+  "description": "2D Matplotlib plots, subplots, line charts, figure styling, and statistical distribution analysis with Seaborn.",
   "sessions": [
     {
-      "session_id": "session_27",
-      "session_number": 27,
-      "title": "Session 27 - Matplotlib Fundamentals",
+      "session_id": "session_25",
+      "session_number": 25,
+      "title": "Session 25 - Matplotlib Fundamentals & 2D Plotting",
       "video_url": "https://www.youtube.com/watch?v=XaKn_cKFlSY",
-      "notebook_file": "27_session23_plotting_using_matplotlib.ipynb",
       "lessons": [
         {
-          "lesson_id": "lesson_27_01",
+          "lesson_id": "lesson_25_01",
           "title": "Anatomy of a Figure, Line Plots & Subplots",
           "concept_markdown": "- **Anatomy**: A Matplotlib `Figure` contains one or more `Axes` (the plotting canvas). Each axis has labels, title, ticks, and legends.\n- `plt.subplots(nrows, ncols)`: Creates figure and grid of subplots.\n- Plot types: Line (`plot`), Scatter (`scatter`), Bar (`bar`), Histogram (`hist`).",
           "code_walkthroughs": [
@@ -25,7 +24,7 @@
           ],
           "practice_challenges": [
             {
-              "id": "chal_27_01_plot_data_pipeline",
+              "id": "chal_25_01_plot_data_pipeline",
               "title": "Chart Data Aggregator & Boundary Analysis",
               "difficulty": "intermediate",
               "description": "Read a space-separated line of numbers representing monthly sensor readings. Calculate the 3-point moving average: `avg(i-1, i, i+1)` for `1 <= i <= len-2`. Print the moving averages rounded to 1 decimal place, space-separated.",
@@ -60,14 +59,13 @@
       ]
     },
     {
-      "session_id": "session_28",
-      "session_number": 28,
-      "title": "Session 28 - Seaborn Statistical Graphics & Categorical Plots",
+      "session_id": "session_26",
+      "session_number": 26,
+      "title": "Session 26 - Seaborn Statistical Graphics & Data Visualization",
       "video_url": "https://www.youtube.com/watch?v=kLWeKeqc9Ms",
-      "notebook_file": "32_session26_plotting_using_seaborn_part2.ipynb",
       "lessons": [
         {
-          "lesson_id": "lesson_28_01",
+          "lesson_id": "lesson_26_01",
           "title": "Statistical Distribution Analysis & Five-Number Summaries",
           "concept_markdown": "Seaborn provides high-level APIs for statistical exploration:\n- **Boxplots**: Visualizes the five-number summary: Minimum, Q1 (25th percentile), Median (50th percentile), Q3 (75th percentile), and Maximum, with dots representing outliers beyond `1.5 * IQR`.\n- **IQR Formula**: `IQR = Q3 - Q1`.\n- **Outliers**: Any value `< Q1 - 1.5 * IQR` or `> Q3 + 1.5 * IQR`.",
           "code_walkthroughs": [
@@ -80,7 +78,7 @@
           ],
           "practice_challenges": [
             {
-              "id": "chal_28_01_boxplot_outlier_count",
+              "id": "chal_26_01_boxplot_outlier_count",
               "title": "Boxplot Outlier Detector",
               "difficulty": "intermediate",
               "description": "Read a space-separated line of numbers from input. Calculate the 25th percentile (`Q1`) and 75th percentile (`Q3`) using `np.percentile(arr, [25, 75])`. Compute `IQR = Q3 - Q1`. Count how many elements in the array are outliers (`value < Q1 - 1.5*IQR` or `value > Q3 + 1.5*IQR`). Print the count as integer.",

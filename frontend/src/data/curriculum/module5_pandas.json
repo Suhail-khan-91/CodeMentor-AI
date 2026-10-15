@@ -9,7 +9,6 @@
       "session_number": 19,
       "title": "Session 19 - Pandas Series Fundamentals",
       "video_url": "https://www.youtube.com/watch?v=zCDVUyq8lkw",
-      "notebook_file": "19_session16_pandas_series.ipynb",
       "lessons": [
         {
           "lesson_id": "lesson_19_01",
@@ -64,7 +63,6 @@
       "session_number": 20,
       "title": "Session 20 - Pandas DataFrame & Row/Column Selection",
       "video_url": "https://www.youtube.com/watch?v=OG31yhRQxPI",
-      "notebook_file": "20_session17_pandas_dataframe.ipynb",
       "lessons": [
         {
           "lesson_id": "lesson_20_01",
@@ -119,7 +117,6 @@
       "session_number": 21,
       "title": "Session 21 - Important Series & DataFrame Methods",
       "video_url": "https://www.youtube.com/watch?v=zTa4MIrGTIE",
-      "notebook_file": "22_session18_important_dataframe_methods.ipynb",
       "lessons": [
         {
           "lesson_id": "lesson_21_01",
@@ -174,7 +171,6 @@
       "session_number": 22,
       "title": "Session 22 - GroupBy Object & Analytical Aggregations",
       "video_url": "https://www.youtube.com/watch?v=LPBjF4_gZnI",
-      "notebook_file": "23_session19_groupby_object_in_pandas.ipynb",
       "lessons": [
         {
           "lesson_id": "lesson_22_01",
@@ -229,7 +225,6 @@
       "session_number": 23,
       "title": "Session 23 - Merging, Joining & Concatenating",
       "video_url": "https://www.youtube.com/watch?v=Ssy1EfK5S-o",
-      "notebook_file": "24_session20_merging_joining_concatenating.ipynb",
       "lessons": [
         {
           "lesson_id": "lesson_23_01",
@@ -284,7 +279,6 @@
       "session_number": 24,
       "title": "Session 24 - Vectorized Strings, DateTime & Pivot Tables",
       "video_url": "https://www.youtube.com/watch?v=UE6DmRQJ2w8",
-      "notebook_file": "26a_session22_pivot_table.ipynb",
       "lessons": [
         {
           "lesson_id": "lesson_24_01",

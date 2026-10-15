@@ -263,6 +263,42 @@ We systematically addressed all visual clutter, dead links, duplicate call-to-ac
 
 ---
 
+---
+
+## 📚 Section 9: Curriculum Redesign, Content Simplification & Notebook Removal (October 15, 2026)
+
+### 1. Scope & Goals
+- Kept the 6 modular structure intact while reviewing all sessions, lessons, walkthroughs, and test cases.
+- Removed all legacy/broken Jupyter notebook links from the curriculum schemas and UI.
+- Preserved all YouTube video lecture URLs (`video_url`) for every session.
+- Eliminated all external third-party references, names, and emails (`CampusX`, `nitish.singh@gmail.com`, `suhail@campusx.in`, etc.).
+- Renumbered sessions into a continuous sequence (1 through 26) across all 6 modules.
+
+### 2. Changes Applied
+1. **Curriculum Index Alignment (`frontend/src/data/curriculum/index.json`):**
+   - Updated `course_id` to `"codementor_python_curriculum"`.
+   - Updated `total_sessions` to `26` (Module 1: 7, Module 2: 5, Module 3: 3, Module 4: 3, Module 5: 6, Module 6: 2).
+   - Removed external cohort branding from the global course description.
+2. **Notebook Field Removal:**
+   - Deleted all 26 dead `"notebook_file"` fields across `module1_fundamentals.json` through `module6_visualization.json`.
+   - Removed notebook action button from `CourseExplorer.jsx`.
+3. **Module 1 Sanitization (`module1_fundamentals.json`):**
+   - Replaced walkthrough `'CampusX'` with `'Python'` and updated string slicing outputs.
+   - Replaced email challenge test inputs with `alex@codementor.ai` and `sam.taylor@gmail.com`.
+   - Replaced frequency map input with `'Python'` and updated sorted frequency expectations.
+   - Replaced function default argument sample with `greet('Alex')` and `greet('Sam', 'Welcome')`.
+4. **Module 2 Polish (`module2_oop.json`):**
+   - Renamed Session 11 from `"Week 3: Interview Questions & Object Internals"` to `"Session 11 - Dunder Methods & Operator Overloading"`.
+   - Replaced test case input name with `Alex`.
+5. **Module 3 Polish (`module3_advanced.json`):**
+   - Replaced JSON student score test case input name with `Alex`.
+6. **Module 6 Renumbering (`module6_visualization.json`):**
+   - Renumbered Session 27 to `Session 25 - Matplotlib Fundamentals & 2D Plotting` (`session_25`, `lesson_25_01`, `chal_25_01_plot_data_pipeline`).
+   - Renumbered Session 28 to `Session 26 - Seaborn Statistical Graphics & Data Visualization` (`session_26`, `lesson_26_01`, `chal_26_01_boxplot_outlier_count`).
+   - Updated title from `Matplotlib, Plotly & Seaborn` to `Matplotlib & Seaborn`.
+
+---
+
 ## 🚀 How to Run the Project
 
 ### Start the Backend (Terminal 1)
@@ -278,4 +314,5 @@ cd c:\Users\Suhail\Desktop\Soheab\code-mentor\frontend
 npm run dev
 ```
 *(Runs on `http://127.0.0.1:5173`)*
+
 

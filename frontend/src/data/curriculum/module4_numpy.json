@@ -9,7 +9,6 @@
       "session_number": 16,
       "title": "Session 16 - NumPy Fundamentals",
       "video_url": "https://www.youtube.com/watch?v=XF6DCrNTzug",
-      "notebook_file": "16_session13_numpy_fundamentals.ipynb",
       "lessons": [
         {
           "lesson_id": "lesson_16_01",
@@ -64,7 +63,6 @@
       "session_number": 17,
       "title": "Session 17 - Advanced NumPy: Indexing & Broadcasting",
       "video_url": "https://www.youtube.com/watch?v=40xGMygHMDU",
-      "notebook_file": "17_session14_advanced_numpy.ipynb",
       "lessons": [
         {
           "lesson_id": "lesson_17_01",
@@ -119,7 +117,6 @@
       "session_number": 18,
       "title": "Session 18 - NumPy Tricks: Conditional Selection & Stats",
       "video_url": "https://www.youtube.com/watch?v=jFBpnd0G09o",
-      "notebook_file": "18_session15_numpy_tricks.ipynb",
       "lessons": [
         {
           "lesson_id": "lesson_18_01",

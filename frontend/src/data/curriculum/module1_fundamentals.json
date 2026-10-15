@@ -9,7 +9,6 @@
       "session_number": 1,
       "title": "Session 1 - Python Fundamentals",
       "video_url": "https://www.youtube.com/watch?v=1z5-O7-5AXk",
-      "notebook_file": "01_session1_python_fundamentals.ipynb",
       "lessons": [
         {
           "lesson_id": "lesson_01_01",
@@ -162,7 +161,6 @@
       "session_number": 2,
       "title": "Session 2 - Operators, If-Else & Loops",
       "video_url": "https://www.youtube.com/watch?v=JCkIrdrZEE8",
-      "notebook_file": "02_session2_operators_if_else_loops.ipynb",
       "lessons": [
         {
           "lesson_id": "lesson_02_01",
@@ -325,7 +323,6 @@
       "session_number": 3,
       "title": "Session 3 - Python Strings",
       "video_url": "https://www.youtube.com/watch?v=6HAu0Y9BjA4",
-      "notebook_file": "03_session3_python_strings.ipynb",
       "lessons": [
         {
           "lesson_id": "lesson_03_01",
@@ -334,9 +331,9 @@
           "code_walkthroughs": [
             {
               "title": "Negative Slicing and Reversal",
-              "code": "text = 'CampusX'\nprint(text[1:5], text[::-1])",
-              "expected_stdout": "ampu XsupmaC\n",
-              "explanation": "`text[1:5]` extracts indices 1, 2, 3, 4 (`'ampu'`), and `text[::-1]` reverses the entire string."
+              "code": "text = 'Python'\nprint(text[1:5], text[::-1])",
+              "expected_stdout": "ytho nohtyP\n",
+              "explanation": "`text[1:5]` extracts indices 1, 2, 3, 4 (`'ytho'`), and `text[::-1]` reverses the entire string."
             }
           ],
           "practice_challenges": [
@@ -426,7 +423,6 @@
       "session_number": 4,
       "title": "Session 4 - Programming Problems on Strings",
       "video_url": "https://www.youtube.com/watch?v=7ltjqU5iytY",
-      "notebook_file": "04_session3_problems_on_strings.ipynb",
       "lessons": [
         {
           "lesson_id": "lesson_04_01",
@@ -483,16 +479,16 @@
                 {
                   "id": "tc_01",
                   "description": "Standard email",
-                  "stdin": "suhail@campusx.in",
-                  "expected_output": "suhail",
+                  "stdin": "alex@codementor.ai",
+                  "expected_output": "alex",
                   "is_hidden": false,
                   "match_mode": "trimmed"
                 },
                 {
                   "id": "tc_02",
                   "description": "Dot-separated username",
-                  "stdin": "nitish.singh@gmail.com",
-                  "expected_output": "nitish.singh",
+                  "stdin": "sam.taylor@gmail.com",
+                  "expected_output": "sam.taylor",
                   "is_hidden": true,
                   "match_mode": "trimmed"
                 }
@@ -512,7 +508,6 @@
       "session_number": 5,
       "title": "Session 5 - Lists in Python",
       "video_url": "https://www.youtube.com/watch?v=WmbU3WBaoR0",
-      "notebook_file": "05_session4_lists_in_python.ipynb",
       "lessons": [
         {
           "lesson_id": "lesson_05_01",
@@ -613,7 +608,6 @@
       "session_number": 6,
       "title": "Session 6 - Tuples, Sets & Dictionaries",
       "video_url": "https://www.youtube.com/watch?v=jcQjp11mn1A",
-      "notebook_file": "06_session5_tuples_sets_dictionary.ipynb",
       "lessons": [
         {
           "lesson_id": "lesson_06_01",
@@ -685,8 +679,8 @@
                 {
                   "id": "tc_01",
                   "description": "Standard word",
-                  "stdin": "CampusX",
-                  "expected_output": "a: 1\nc: 1\nm: 1\np: 1\ns: 1\nu: 1\nx: 1",
+                  "stdin": "Python",
+                  "expected_output": "h: 1\nn: 1\no: 1\np: 1\nt: 1\ny: 1",
                   "is_hidden": false,
                   "match_mode": "trimmed"
                 },
@@ -714,7 +708,6 @@
       "session_number": 7,
       "title": "Session 7 - Functions in Python",
       "video_url": "https://www.youtube.com/watch?v=OOInK25PoFo",
-      "notebook_file": "07_session6_functions_in_python.ipynb",
       "lessons": [
         {
           "lesson_id": "lesson_07_01",
@@ -723,9 +716,9 @@
           "code_walkthroughs": [
             {
               "title": "Function with Default Parameters",
-              "code": "def greet(name, greeting='Hello'):\n    return f'{greeting}, {name}!'\n\nprint(greet('Suhail'))\nprint(greet('Nitish', 'Welcome'))",
-              "expected_stdout": "Hello, Suhail!\nWelcome, Nitish!\n",
-              "explanation": "Calling `greet('Suhail')` uses the default greeting, while `'Welcome'` overrides it."
+              "code": "def greet(name, greeting='Hello'):\n    return f'{greeting}, {name}!'\n\nprint(greet('Alex'))\nprint(greet('Sam', 'Welcome'))",
+              "expected_stdout": "Hello, Alex!\nWelcome, Sam!\n",
+              "explanation": "Calling `greet('Alex')` uses the default greeting, while `'Welcome'` overrides it."
             }
           ],
           "practice_challenges": [
