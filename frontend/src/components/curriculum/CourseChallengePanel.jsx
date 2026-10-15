@@ -30,6 +30,7 @@ export default function CourseChallengePanel({
   hasNext = false,
   hasPrev = false,
   onBackToCourse,
+  attachedFiles = [],
 }) {
   const [activeTab, setActiveTab] = useState('tests'); // 'tests' | 'hints' | 'tutor'
   const [isEvaluating, setIsEvaluating] = useState(false);
@@ -80,7 +81,7 @@ export default function CourseChallengePanel({
         test_cases: challenge.test_cases || [],
       };
 
-      const result = await evaluateTask(code, taskPayload);
+      const result = await evaluateTask(code, taskPayload, attachedFiles);
       setEvaluationResult(result);
 
       // If passed all test cases, record success in curriculum and progress engines

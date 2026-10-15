@@ -157,10 +157,10 @@ export async function getSampleTasks() {
  *   }>
  * }>}
  */
-export async function evaluateTask(code, taskOrId) {
+export async function evaluateTask(code, taskOrId, files = []) {
   const payload = typeof taskOrId === 'string'
-    ? { code, task_id: taskOrId }
-    : { code, task: taskOrId };
+    ? { code, task_id: taskOrId, files }
+    : { code, task: taskOrId, files };
 
   return apiPost('/api/evaluate', payload);
 }

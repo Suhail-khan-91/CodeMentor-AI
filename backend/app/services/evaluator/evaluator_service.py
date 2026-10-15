@@ -23,12 +23,18 @@ class TaskEvaluator:
     def _get_active_runner(self) -> BaseRunner:
         return self._runner or get_runner()
 
-    def evaluate(self, code: str, task: TaskDefinition) -> EvaluationResult:
+    def evaluate(
+        self,
+        code: str,
+        task: TaskDefinition,
+        files: Optional[List[Dict[str, str]]] = None
+    ) -> EvaluationResult:
         """
         Evaluate Python code against all test cases defined in a task.
 
         :param code: Python source code submitted by the user.
         :param task: TaskDefinition containing test cases.
+        :param files: Optional list of attached files to write in sandbox.
         :return: Structured EvaluationResult.
         """
         runner = self._get_active_runner()
@@ -48,7 +54,7 @@ class TaskEvaluator:
             )
 
         for tc in task.test_cases:
-            run_res = runner.run(code=code, stdin=tc.stdin)
+            run_res = runner.run(code=code, stdin=tc.stdin, files=files)
             total_time_ms += run_res.execution_time_ms
 
             # 1. Timeout occurred
@@ -153,7 +159,12 @@ class TaskEvaluator:
         )
 
 
-def evaluate_task(code: str, task: TaskDefinition, runner: Optional[BaseRunner] = None) -> EvaluationResult:
+def evaluate_task(
+    code: str,
+    task: TaskDefinition,
+    runner: Optional[BaseRunner] = None,
+    files: Optional[List[Dict[str, str]]] = None
+) -> EvaluationResult:
     """Helper shortcut function to evaluate code against a task."""
     evaluator = TaskEvaluator(runner=runner)
-    return evaluator.evaluate(code=code, task=task)
+    return evaluator.evaluate(code=code, task=task, files=files)

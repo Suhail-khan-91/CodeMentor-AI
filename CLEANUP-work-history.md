@@ -333,6 +333,38 @@ We systematically addressed all visual clutter, dead links, duplicate call-to-ac
 
 ---
 
+## 🧪 Section 11: End-to-End Curriculum & Chapter Exam Suite Verification (October 15, 2026)
+
+### 1. Scope & Execution
+- Systematically evaluated every single lesson challenge and chapter exam across all 6 core modules (26 total sessions):
+  - **Module 1 (Fundamentals & Data Structures)**: 7 Sessions, 14 Practice Challenges, 4 Exam Questions.
+  - **Module 2 (Object-Oriented Programming)**: 5 Sessions, 5 Practice Challenges, 1 Exam Question.
+  - **Module 3 (Advanced Python Programming)**: 3 Sessions, 3 Practice Challenges, 1 Exam Question.
+  - **Module 4 (NumPy Numerical Computing)**: 3 Sessions, 3 Practice Challenges, 1 Exam Question.
+  - **Module 5 (Pandas Data Analysis)**: 6 Sessions, 6 Practice Challenges, 1 Exam Question.
+  - **Module 6 (Data Visualization — Matplotlib & Seaborn)**: 2 Sessions, 2 Practice Challenges, 1 Exam Question.
+- **Automated Verification Harness (`backend/test_curriculum_and_exams.py`)**:
+  - Dynamically parsed curriculum JSON schemas and executed every challenge and exam question's solution code against its full suite of public and hidden test cases using `SubprocessRunner`.
+  - **Results**:
+    - **Practice Challenges**: `35 / 35 passed (100%)`
+    - **Chapter Exam Questions**: `9 / 9 passed (100%)`
+    - **Failures / Errors**: `0`
+
+### 2. Integration with `sales_data.csv`
+- Injected `sales_data.csv` into the execution sandbox:
+  - **Pandas Data Analysis**: Successfully parsed all 16 rows, performed column grouping and summation on `Units_Sold`, and identified top product (`Wireless Mouse`).
+  - **Matplotlib Data Visualization**: Successfully plotted units sold by city with a bar chart, captured headless figure export, and converted to base64 PNG.
+- **Full File Pipeline Wiring**:
+  - Enhanced `TaskEvaluator.evaluate()` and `evaluate_task()` in `backend/app/services/evaluator/` to accept `files: Optional[List[Dict[str, str]]] = None`.
+  - Updated `POST /api/evaluate` to accept `files` in request payload and pass to `evaluate_task()`.
+  - Updated `CourseChallengePanel.jsx` and `api.js` to propagate `attachedFiles` to automated evaluation runs.
+
+### 3. Live Browser Verification
+- Tested Module 1 Mastery Exam (`/editor?mode=course&examId=exam_module_1`) in the browser UI.
+- Verified Question 1 of 4 (Prime Number Verifier) evaluated and scored 100% on test cases, and stepper navigated seamlessly to Question 2 (Anagram Detector).
+
+---
+
 ## 🚀 How to Run the Project
 
 ### Start the Backend (Terminal 1)

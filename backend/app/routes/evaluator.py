@@ -87,5 +87,6 @@ def evaluate_code():
             "status": 400
         }), 400
 
-    result = evaluate_task(code=code, task=task)
+    files = data.get("files")
+    result = evaluate_task(code=code, task=task, files=files)
     return jsonify(result.to_dict()), 200

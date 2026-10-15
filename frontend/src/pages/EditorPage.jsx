@@ -893,6 +893,7 @@ export default function EditorPage() {
                 hasNext={examQuestionsList.length > 0 ? currentExamIndex < examQuestionsList.length - 1 : false}
                 hasPrev={examQuestionsList.length > 0 ? currentExamIndex > 0 : false}
                 onBackToCourse={() => (window.location.href = '/courses')}
+                attachedFiles={attachedFiles}
               />
             </section>
           )}
